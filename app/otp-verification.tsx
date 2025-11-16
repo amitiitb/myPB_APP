@@ -138,7 +138,7 @@ export default function OTPVerificationScreen() {
       Alert.alert(
         language === 'en' ? 'OTP Resent' : 'OTP पुनः भेजा गया',
         language === 'en'
-          ? 'A new OTP has been sent to your phone number'
+          ? 'A new OTP has been sent to your contact number'
           : 'आपके फोन नंबर पर एक नया OTP भेजा गया है'
       );
     }, 1000);
@@ -173,7 +173,7 @@ export default function OTPVerificationScreen() {
                 Enter OTP
               </ThemedText>
               <ThemedText style={{ fontSize: 15, color: '#6B7280', textAlign: 'center', lineHeight: 21 }}>
-                A 6-digit code was sent to your phone number
+                A 6-digit code was sent to your contact number
               </ThemedText>
             </View>
 

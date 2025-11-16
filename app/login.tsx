@@ -24,17 +24,17 @@ export default function LoginScreen() {
 
   const handleContinue = async () => {
     if (!phoneNumber) {
-      Alert.alert('Error', 'Please enter your phone number');
+  Alert.alert('Error', 'Please enter your contact number');
       return;
     }
 
     if (phoneNumber.length !== 10) {
-      Alert.alert('Error', 'Please enter a valid 10-digit phone number');
+  Alert.alert('Error', 'Please enter a valid 10-digit contact number');
       return;
     }
 
     if (!/^[6-9]/.test(phoneNumber)) {
-      Alert.alert('Error', 'Please enter a valid Indian mobile number starting with 6, 7, 8, or 9');
+  Alert.alert('Error', 'Please enter a valid Indian contact number starting with 6, 7, 8, or 9');
       return;
     }
 
@@ -133,7 +133,7 @@ export default function LoginScreen() {
               Log in or Create Account
             </ThemedText>
 
-            {/* Mobile Number Input */}
+            {/* Contact Number Input */}
             <View style={styles.inputContainer}>
               <View style={styles.phoneInputContainer}>
                 <View style={styles.countryCodeContainer}>
@@ -143,7 +143,7 @@ export default function LoginScreen() {
                 <View style={styles.separator} />
                 <TextInput
                   style={styles.phoneInput}
-                  placeholder="Enter mobile number"
+                  placeholder="Enter contact number"
                   placeholderTextColor="#9CA3AF"
                   value={phoneNumber}
                   onChangeText={handlePhoneNumberChange}

@@ -1,3 +1,4 @@
+
 import { PropsWithChildren, useState } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
@@ -7,9 +8,21 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
+const scss = StyleSheet.create({
+  icon: {
+    transitionProperty: 'transform',
+    transitionDuration: '200ms',
+  },
+});
+
 export function Collapsible({ children, title }: PropsWithChildren & { title: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const theme = useColorScheme() ?? 'light';
+
+  const iconStyle = [
+    scss.icon,
+    { transform: [{ rotate: isOpen ? '90deg' : '0deg' }] },
+  ];
 
   return (
     <ThemedView>
@@ -22,7 +35,7 @@ export function Collapsible({ children, title }: PropsWithChildren & { title: st
           size={18}
           weight="medium"
           color={theme === 'light' ? Colors.light.icon : Colors.dark.icon}
-          style={{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }}
+          style={iconStyle}
         />
 
         <ThemedText type="defaultSemiBold">{title}</ThemedText>

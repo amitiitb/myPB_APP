@@ -41,7 +41,7 @@ export default function HomeScreen() {
           <ThemedText type="subtitle">Test Complete OTP Flow</ThemedText>
         </Link>
         <ThemedText>
-          Test the complete PrintBandhan OTP authentication flow with phone number and verification.
+          Test the complete PrintBandhan OTP authentication flow with contact number and verification.
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>

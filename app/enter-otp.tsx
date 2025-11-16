@@ -113,13 +113,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: 40,
+    paddingTop: 30,
   },
   heading: {
     fontWeight: '700',
     fontSize: 22,
     color: '#1F2937',
-    marginTop: 40,
+    marginTop: 50,
     textAlign: 'center',
   },
   subtext: {

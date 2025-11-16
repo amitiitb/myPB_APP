@@ -23,31 +23,38 @@ const BusinessProfileStepTwo: React.FC = () => {
   const [error, setError] = useState('');
 
   const serviceCategories = {
-    'Printing Services': ['Offset Printing', 'Digital Printing', 'Screen Printing', 'Large Format'],
+    'Printing Services': [
+      'Offset Printing',
+      'Digital Printing',
+      'Screen Printing',
+      'Large Format',
+    ],
     'Event & Personal Printing': [
-      'Wedding Cards',
-      'Birthday Invitation Cards',
-      'Anniversary Invitation Cards',
-      'Others',
+      'Marriage Cards',
+      'Invitation Cards',
+    ],
+    'Business Essentials': [
+      'Letter Pads',
+      'Visiting Cards',
+      'Calendars',
+      'Brochures',
     ],
     'Marketing & Promotional': [
       'Flyers',
-      'Posters',
-      'Flex Banners',
-      'Vinyl Posters',
-      'Standees / Roll-up Banners',
-      'Menu Cards',
+      'Handbills',
+      'Posters (Vinyl Poster)',
+      'Flex',
+      'Banners / Signage',
+      'Stickers',
+      'Labels',
     ],
-    'Business Essentials': [
-      'Visiting Cards',
-      'Letterheads',
-      'Envelopes',
-      'Brochures',
-      'Calendars',
-      'Bill / Invoice Books',
-      'Notepads',
+    'Merchandise & Packaging': [
+      'T-shirts',
+      'Mugs',
+      'Grocery Bags',
+      'Plastic Films',
+      'Packaging',
     ],
-    'Merchandise & Packaging': ['T-shirts', 'Mugs', 'Stickers', 'Paper Bags'],
   };
 
   const toggleService = (service: string) => {

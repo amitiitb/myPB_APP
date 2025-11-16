@@ -151,7 +151,7 @@ const BusinessProfileStepThree: React.FC = () => {
 
   const validateMobile = () => {
     if (formMobile.length !== 10 || !/^[6-9]/.test(formMobile)) {
-      setFormErrors((prev) => ({ ...prev, mobile: 'Enter a valid 10-digit mobile number.' }));
+  setFormErrors((prev) => ({ ...prev, mobile: 'Enter a valid 10-digit contact number.' }));
       return false;
     }
     setFormErrors((prev) => ({ ...prev, mobile: '' }));
@@ -425,10 +425,10 @@ const BusinessProfileStepThree: React.FC = () => {
                   {formErrors.name ? <Text style={styles.errorTextSmall}>{formErrors.name}</Text> : null}
                 </View>
 
-                {/* Mobile Number */}
+                {/* Contact Number */}
                 <View style={styles.formGroup}>
                   <Text style={styles.label}>
-                    Mobile Number <Text style={{ color: '#EF4444' }}>*</Text>
+                    Contact Number <Text style={{ color: '#EF4444' }}>*</Text>
                   </Text>
                   <TextInput
                     style={[styles.input, formErrors.mobile && styles.inputError]}

@@ -5,6 +5,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 interface HeaderBarProps {
   title: string;
   notificationCount?: number;
+  language?: 'en' | 'hi';
+  onLanguageToggle?: () => void;
   onNotificationPress?: () => void;
   onSettingsPress?: () => void;
 }
@@ -12,6 +14,8 @@ interface HeaderBarProps {
 const HeaderBar: React.FC<HeaderBarProps> = ({
   title,
   notificationCount = 0,
+  language = 'en',
+  onLanguageToggle,
   onNotificationPress,
   onSettingsPress,
 }) => {
@@ -19,6 +23,14 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
     <View style={styles.headerBar}>
       <Text style={styles.headerTitle}>{title}</Text>
       <View style={styles.headerRightRow}>
+        {/* Language Toggle */}
+        {onLanguageToggle && (
+          <TouchableOpacity style={styles.languageToggle} onPress={onLanguageToggle}>
+            <Text style={styles.languageText}>
+              {language === 'en' ? 'हिंदी' : 'English'}
+            </Text>
+          </TouchableOpacity>
+        )}
         {/* Notification Bell */}
         <TouchableOpacity style={styles.iconWrapper} onPress={onNotificationPress}>
           <Ionicons name="notifications-outline" size={24} color="#fff" />
@@ -55,6 +67,26 @@ const styles = StyleSheet.create({
   headerRightRow: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  languageToggle: {
+    backgroundColor: 'rgba(255,255,255,0.65)',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    elevation: 1,
+    marginRight: 12,
+  },
+  languageText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#4B5563',
+    opacity: 0.95,
   },
   iconWrapper: {
     marginLeft: 12,
