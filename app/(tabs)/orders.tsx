@@ -22,7 +22,11 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
   const [language, setLanguage] = useState<'en' | 'hi'>('en');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showStatusFilter, setShowStatusFilter] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState('All');
   const notificationCount = 4;
+
+  const statusOptions = ['All', 'Active', 'Order Placed', 'Composing', 'Proofreading', 'Printing', 'Ready to Deliver', 'Delivered', 'Cancelled'];
 
   const toggleLanguage = () => {
     setLanguage(language === 'en' ? 'hi' : 'en');
@@ -67,10 +71,45 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
               </Text>
             </TouchableOpacity>
           ))}
-          <TouchableOpacity style={scss.filterIcon}>
-            <Ionicons name="filter-outline" size={20} color="#7C3AED" />
+          <TouchableOpacity 
+            style={scss.filterIcon}
+            onPress={() => setShowStatusFilter(!showStatusFilter)}
+          >
+            <Ionicons name="filter" size={20} color="#7C3AED" />
           </TouchableOpacity>
         </View>
+
+        {/* Status Filter Dropdown */}
+        {showStatusFilter && (
+          <View style={scss.filterDropdown}>
+            <Text style={scss.filterDropdownTitle}>Filter by Status</Text>
+            {statusOptions.map((status) => (
+              <TouchableOpacity
+                key={status}
+                style={scss.filterOption}
+                onPress={() => {
+                  setSelectedStatus(status);
+                  setShowStatusFilter(false);
+                }}
+              >
+                <View style={scss.filterOptionContent}>
+                  {selectedStatus === status && (
+                    <View style={scss.radioSelected} />
+                  )}
+                  {selectedStatus !== status && (
+                    <View style={scss.radioUnselected} />
+                  )}
+                  <Text style={[
+                    scss.filterOptionText,
+                    selectedStatus === status && scss.filterOptionTextActive
+                  ]}>
+                    {status}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
         {/* Search Bar */}
         <View style={scss.searchContainer}>
@@ -125,10 +164,10 @@ const scss = StyleSheet.create({
     marginBottom: 16,
   },
   filterTab: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginRight: 12,
-    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginRight: 6,
+    borderRadius: 16,
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#E5E7EB',
@@ -138,7 +177,7 @@ const scss = StyleSheet.create({
     borderColor: '#7C3AED',
   },
   filterTabText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '500',
     color: '#6B7280',
   },
@@ -216,6 +255,60 @@ const scss = StyleSheet.create({
     color: '#fff',
     fontWeight: '700',
     fontSize: 16,
+  },
+  filterDropdown: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderColor: '#E5E7EB',
+    borderWidth: 1,
+    marginBottom: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  filterDropdownTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 12,
+  },
+  filterOption: {
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  filterOptionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  radioSelected: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#7C3AED',
+    marginRight: 12,
+  },
+  radioUnselected: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    marginRight: 12,
+  },
+  filterOptionText: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
+  filterOptionTextActive: {
+    color: '#111827',
+    fontWeight: '600',
   },
 });
 

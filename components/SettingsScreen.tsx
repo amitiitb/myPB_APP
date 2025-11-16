@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Platform, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const SettingsScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -15,6 +15,7 @@ const SettingsScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         </TouchableOpacity>
         <Text style={scss.headerTitle}>Settings</Text>
       </View>
+      <ScrollView contentContainerStyle={scss.scrollContent} showsVerticalScrollIndicator={false}>
       {/* Account Section */}
       <View style={scss.card}>
         <Text style={scss.sectionTitle}>ACCOUNT</Text>
@@ -62,6 +63,7 @@ const SettingsScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <Text style={scss.logoutBtnText}>Log Out</Text>
       </TouchableOpacity>
       <Text style={scss.footerText}>dil se printing</Text>
+      </ScrollView>
     </View>
   );
 };
@@ -71,6 +73,11 @@ const scss = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9F9FF',
     paddingTop: Platform.OS === 'ios' ? 48 : 24,
+    paddingBottom: 20,
+  },
+  scrollContent: {
+    paddingHorizontal: 4,
+    paddingBottom: 30,
   },
   header: {
     flexDirection: 'row',

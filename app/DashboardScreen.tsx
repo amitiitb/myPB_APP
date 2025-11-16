@@ -139,15 +139,20 @@ const DashboardScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Order Overview Box */}
+          {/* Order Overview Section */}
+          <View style={scss.sectionHeader}>
+            <Text style={scss.sectionTitle}>Order Overview</Text>
+          </View>
           <TextInput
             style={scss.orderOverviewBox}
-            placeholder="Order Overview..."
+            placeholder="Enter order details..."
             placeholderTextColor="#9CA3AF"
           />
 
           {/* Category Breakdown Section */}
-          <Text style={scss.sectionTitle}>Category Breakdown</Text>
+          <View style={scss.sectionHeader}>
+            <Text style={scss.sectionTitle}>Category Breakdown</Text>
+          </View>
           <View style={scss.categoryBox} />
         </ScrollView>
         {/* Floating Add New Order Button */}
