@@ -2,6 +2,8 @@ import AddOrderStep1 from '@/components/AddOrderStep1';
 import FooterNav from '@/components/FooterNav';
 import HeaderBar from '@/components/HeaderBar';
 import SettingsScreen from '@/components/SettingsScreen';
+import { useLanguage } from '@/context/LanguageContext';
+import { useTheme } from '@/context/ThemeContext';
 import React, { useState } from 'react';
 import {
     Dimensions,
@@ -23,16 +25,13 @@ import OrdersScreen from './(tabs)/orders';
 const { width } = Dimensions.get('window');
 
 const DashboardScreen: React.FC = () => {
+  const { darkMode } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
   const [dateFilter, setDateFilter] = useState('Last 7 Days');
-  const [language, setLanguage] = useState<'en' | 'hi'>('en');
   const [activeTab, setActiveTab] = useState<'home' | 'orders' | 'finance' | 'inventory' | 'customers'>('home');
   const [showAddOrder, setShowAddOrder] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const notificationCount = 4;
-
-  const toggleLanguage = () => {
-    setLanguage(language === 'en' ? 'hi' : 'en');
-  };
 
   // Show settings screen
   if (showSettings) {
@@ -80,25 +79,25 @@ const DashboardScreen: React.FC = () => {
         <ScrollView contentContainerStyle={scss.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Business Reports Section */}
           <View style={scss.sectionHeader}>
-            <Text style={scss.sectionTitle}>Business Reports</Text>
-            <TouchableOpacity style={scss.dateFilterBtn}>
-              <Ionicons name="calendar-outline" size={16} color="#6B7280" style={{ marginRight: 6 }} />
-              <Text style={scss.dateFilterText}>{dateFilter}</Text>
+            <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>{t('dashboard.businessReports')}</Text>
+            <TouchableOpacity style={[scss.dateFilterBtn, darkMode && scss.dateFilterBtnDark]}>
+              <Ionicons name="calendar-outline" size={16} color={darkMode ? '#9CA3AF' : '#6B7280'} style={{ marginRight: 6 }} />
+              <Text style={[scss.dateFilterText, darkMode && scss.dateFilterTextDark]}>{dateFilter}</Text>
             </TouchableOpacity>
           </View>
           {/* Report Cards Grid */}
           <View style={scss.reportGrid}>
             {/* Card 1: Total Orders */}
             <TouchableOpacity
-              style={scss.reportCard}
+              style={[scss.reportCard, darkMode && scss.reportCardDark]}
               activeOpacity={0.8}
               onPress={() => setActiveTab('orders')}
             >
               <Text style={[scss.reportBigNum, { color: '#7C3AED' }]}>0</Text>
-              <Text style={scss.reportCardTitle}>Total Orders</Text>
+              <Text style={[scss.reportCardTitle, darkMode && scss.reportCardTitleDark]}>{t('dashboard.totalOrders')}</Text>
               <Text style={scss.reportPercentDrop}>▼ 100%</Text>
-              <View style={scss.reportSubRow}><Text style={scss.reportSubLabel}>In Progress:</Text><Text style={scss.reportSubValue}>0</Text></View>
-              <View style={scss.reportSubRow}><Text style={scss.reportSubLabel}>Delivered:</Text><Text style={scss.reportSubValue}>0</Text></View>
+              <View style={scss.reportSubRow}><Text style={[scss.reportSubLabel, darkMode && scss.reportSubLabelDark]}>In Progress:</Text><Text style={[scss.reportSubValue, darkMode && scss.reportSubValueDark]}>0</Text></View>
+              <View style={scss.reportSubRow}><Text style={[scss.reportSubLabel, darkMode && scss.reportSubLabelDark]}>Delivered:</Text><Text style={[scss.reportSubValue, darkMode && scss.reportSubValueDark]}>0</Text></View>
               {/* Completion Rate Bar */}
               <View style={scss.completionBarBg}>
                 <View style={scss.completionBarFill} />
@@ -106,60 +105,60 @@ const DashboardScreen: React.FC = () => {
             </TouchableOpacity>
             {/* Card 2: Total Sales */}
             <TouchableOpacity
-              style={scss.reportCard}
+              style={[scss.reportCard, darkMode && scss.reportCardDark]}
               activeOpacity={0.8}
               onPress={() => setActiveTab('finance')}
             >
               <Text style={[scss.reportBigNum, { color: '#10B981' }]}>0</Text>
-              <Text style={scss.reportCardTitle}>Total Sales</Text>
-              <View style={scss.reportSubRow}><Text style={scss.reportSubLabel}>Received:</Text><Text style={scss.reportSubValue}>0</Text></View>
-              <View style={scss.reportSubRow}><Text style={scss.reportSubLabel}>Due:</Text><Text style={scss.reportSubValue}>0</Text></View>
+              <Text style={[scss.reportCardTitle, darkMode && scss.reportCardTitleDark]}>{t('dashboard.totalSales')}</Text>
+              <View style={scss.reportSubRow}><Text style={[scss.reportSubLabel, darkMode && scss.reportSubLabelDark]}>{t('dashboard.received')}:</Text><Text style={[scss.reportSubValue, darkMode && scss.reportSubValueDark]}>0</Text></View>
+              <View style={scss.reportSubRow}><Text style={[scss.reportSubLabel, darkMode && scss.reportSubLabelDark]}>{t('dashboard.due')}:</Text><Text style={[scss.reportSubValue, darkMode && scss.reportSubValueDark]}>0</Text></View>
             </TouchableOpacity>
             {/* Card 3: Average Order */}
             <TouchableOpacity
-              style={scss.reportCard}
+              style={[scss.reportCard, darkMode && scss.reportCardDark]}
               activeOpacity={0.8}
               onPress={() => setActiveTab('orders')}
             >
               <Text style={[scss.reportBigNum, { color: '#7C3AED' }]}>0</Text>
-              <Text style={scss.reportCardTitle}>Avg Order (In Rs)</Text>
-              <View style={scss.reportSubRow}><Text style={scss.reportSubLabelSmall}>Highest</Text><Text style={scss.reportSubValueSmall}>0</Text></View>
-              <View style={scss.reportSubRow}><Text style={scss.reportSubLabelSmall}>Lowest</Text><Text style={scss.reportSubValueSmall}>0</Text></View>
+              <Text style={[scss.reportCardTitle, darkMode && scss.reportCardTitleDark]}>{t('dashboard.avgOrderInRs')}</Text>
+              <View style={scss.reportSubRow}><Text style={[scss.reportSubLabelSmall, darkMode && scss.reportSubLabelDark]}>{t('dashboard.highest')}</Text><Text style={[scss.reportSubValueSmall, darkMode && scss.reportSubValueDark]}>0</Text></View>
+              <View style={scss.reportSubRow}><Text style={[scss.reportSubLabelSmall, darkMode && scss.reportSubLabelDark]}>{t('dashboard.lowest')}</Text><Text style={[scss.reportSubValueSmall, darkMode && scss.reportSubValueDark]}>0</Text></View>
             </TouchableOpacity>
             {/* Card 4: Total Customers */}
             <TouchableOpacity
-              style={scss.reportCard}
+              style={[scss.reportCard, darkMode && scss.reportCardDark]}
               activeOpacity={0.8}
               onPress={() => setActiveTab('customers')}
             >
               <Text style={[scss.reportBigNum, { color: '#EF4444' }]}>5</Text>
-              <Text style={scss.reportCardTitle}>Total Customers</Text>
-              <View style={scss.reportSubRow}><Ionicons name="person-add-outline" size={16} color="#10B981" style={{ marginRight: 4 }} /><Text style={scss.reportSubLabelSmall}>New:</Text><Text style={scss.reportSubValueSmall}>0</Text></View>
-              <View style={scss.reportSubRow}><Ionicons name="repeat-outline" size={16} color="#7C3AED" style={{ marginRight: 4 }} /><Text style={scss.reportSubLabelSmall}>Repeated:</Text><Text style={scss.reportSubValueSmall}>0</Text></View>
+              <Text style={[scss.reportCardTitle, darkMode && scss.reportCardTitleDark]}>{t('dashboard.totalCustomers')}</Text>
+              <View style={scss.reportSubRow}><Ionicons name="person-add-outline" size={16} color="#10B981" style={{ marginRight: 4 }} /><Text style={[scss.reportSubLabelSmall, darkMode && scss.reportSubLabelDark]}>{t('dashboard.new')}:</Text><Text style={[scss.reportSubValueSmall, darkMode && scss.reportSubValueDark]}>0</Text></View>
+              <View style={scss.reportSubRow}><Ionicons name="repeat-outline" size={16} color="#7C3AED" style={{ marginRight: 4 }} /><Text style={[scss.reportSubLabelSmall, darkMode && scss.reportSubLabelDark]}>{t('dashboard.repeated')}:</Text><Text style={[scss.reportSubValueSmall, darkMode && scss.reportSubValueDark]}>0</Text></View>
             </TouchableOpacity>
           </View>
 
           {/* Order Overview Section */}
           <View style={scss.sectionHeader}>
-            <Text style={scss.sectionTitle}>Order Overview</Text>
+            <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>{t('dashboard.orderOverview')}</Text>
           </View>
           <TextInput
-            style={scss.orderOverviewBox}
-            placeholder="Enter order details..."
-            placeholderTextColor="#9CA3AF"
+            style={[scss.orderOverviewBox, darkMode && scss.orderOverviewBoxDark]}
+            placeholder={t('dashboard.enterOrderDetails')}
+            placeholderTextColor={darkMode ? '#9CA3AF' : '#9CA3AF'}
           />
 
           {/* Category Breakdown Section */}
           <View style={scss.sectionHeader}>
-            <Text style={scss.sectionTitle}>Category Breakdown</Text>
+            <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>{t('dashboard.categoryBreakdown')}</Text>
           </View>
-          <View style={scss.categoryBox} />
+          <View style={[scss.categoryBox, darkMode && scss.categoryBoxDark]} />
         </ScrollView>
         {/* Floating Add New Order Button */}
         <View style={scss.fabContainer}>
           <TouchableOpacity style={scss.fabButton} onPress={() => setShowAddOrder(true)}>
-            <Ionicons name="add" size={22} color="#fff" style={scss.fabIcon} />
-            <Text style={scss.fabButtonText}>Add New Order</Text>
+            <Ionicons name="add-circle" size={22} color="#fff" style={scss.fabIcon} />
+            <Text style={scss.fabButtonText}>{t('dashboard.addNewOrder')}</Text>
           </TouchableOpacity>
         </View>
       </>
@@ -169,7 +168,7 @@ const DashboardScreen: React.FC = () => {
 
   // Render based on activeTab - some screens have their own navigation
   return (
-    <SafeAreaView style={scss.safeArea}>
+    <SafeAreaView style={[scss.safeArea, darkMode && scss.safeAreaDark]}>
       {/* Show different content based on activeTab */}
       {activeTab === 'orders' || activeTab === 'finance' || activeTab === 'inventory' || activeTab === 'customers' ? (
         mainContent
@@ -178,10 +177,10 @@ const DashboardScreen: React.FC = () => {
           {/* Header Bar: Hide when AddOrderStep1 is shown */}
           {!showAddOrder && (
             <HeaderBar
-              title="Dashboard"
+              title={t('nav.dashboard')}
               notificationCount={notificationCount}
               language={language}
-              onLanguageToggle={toggleLanguage}
+              onLanguageToggle={() => setLanguage(language === 'en' ? 'hi' : 'en')}
               onNotificationPress={() => console.log('Notifications pressed')}
               onSettingsPress={() => setShowSettings(true)}
             />
@@ -201,7 +200,7 @@ const scss = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 90,
+    bottom: 125,
     alignItems: 'center',
     zIndex: 10,
   },
@@ -230,9 +229,11 @@ const scss = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9F9FF',
   },
+  safeAreaDark: {
+    backgroundColor: '#1F2937',
+  },
   scrollContent: {
     paddingHorizontal: '5%',
-    paddingTop: 20,
     paddingBottom: 120,
   },
   sectionHeader: {
@@ -246,6 +247,9 @@ const scss = StyleSheet.create({
     fontWeight: '700',
     color: '#111827',
   },
+  sectionTitleDark: {
+    color: '#F3F4F6',
+  },
   dateFilterBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -256,10 +260,17 @@ const scss = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
+  dateFilterBtnDark: {
+    backgroundColor: '#374151',
+    borderColor: '#4B5563',
+  },
   dateFilterText: {
     fontSize: 13,
     color: '#374151',
     fontWeight: '500',
+  },
+  dateFilterTextDark: {
+    color: '#E5E7EB',
   },
   reportGrid: {
     flexDirection: 'row',
@@ -278,6 +289,10 @@ const scss = StyleSheet.create({
     boxShadow: '0px 2px 4px rgba(0,0,0,0.08)',
     elevation: 3,
   },
+  reportCardDark: {
+    backgroundColor: '#374151',
+    borderColor: '#4B5563',
+  },
   reportBigNum: {
     fontSize: 28,
     fontWeight: '700',
@@ -288,6 +303,9 @@ const scss = StyleSheet.create({
     fontWeight: '600',
     color: '#374151',
     marginBottom: 2,
+  },
+  reportCardTitleDark: {
+    color: '#E5E7EB',
   },
   reportPercentDrop: {
     color: '#EF4444',
@@ -305,10 +323,16 @@ const scss = StyleSheet.create({
     color: '#6B7280',
     marginRight: 4,
   },
+  reportSubLabelDark: {
+    color: '#D1D5DB',
+  },
   reportSubValue: {
     fontSize: 13,
     color: '#111827',
     fontWeight: '600',
+  },
+  reportSubValueDark: {
+    color: '#F3F4F6',
   },
   reportSubLabelSmall: {
     fontSize: 12,
@@ -347,6 +371,11 @@ const scss = StyleSheet.create({
     fontSize: 15,
     color: '#374151',
   },
+  orderOverviewBoxDark: {
+    borderColor: '#4B5563',
+    backgroundColor: '#374151',
+    color: '#E5E7EB',
+  },
   categoryBox: {
     width: '100%',
     height: 220,
@@ -357,6 +386,10 @@ const scss = StyleSheet.create({
     marginBottom: 18,
     boxShadow: '0px 2px 4px rgba(0,0,0,0.08)',
     elevation: 3,
+  },
+  categoryBoxDark: {
+    backgroundColor: '#374151',
+    borderColor: '#4B5563',
   },
   addOrderBtn: {
     flexDirection: 'row',

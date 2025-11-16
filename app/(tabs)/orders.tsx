@@ -1,5 +1,7 @@
 import HeaderBar from '@/components/HeaderBar';
 import SettingsScreen from '@/components/SettingsScreen';
+import { useLanguage } from '@/context/LanguageContext';
+import { useTheme } from '@/context/ThemeContext';
 import React, { useState } from 'react';
 import {
     SafeAreaView,
@@ -18,8 +20,9 @@ interface OrdersScreenProps {
 }
 
 const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) => {
+  const { darkMode } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
   const [showSettings, setShowSettings] = useState(false);
-  const [language, setLanguage] = useState<'en' | 'hi'>('en');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [showStatusFilter, setShowStatusFilter] = useState(false);
@@ -27,10 +30,6 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
   const notificationCount = 4;
 
   const statusOptions = ['All', 'Active', 'Order Placed', 'Composing', 'Proofreading', 'Printing', 'Ready to Deliver', 'Delivered', 'Cancelled'];
-
-  const toggleLanguage = () => {
-    setLanguage(language === 'en' ? 'hi' : 'en');
-  };
 
   // Show settings screen
   if (showSettings) {
@@ -40,13 +39,13 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
   const orderFilters = ['All', 'Composing', 'Proofreading', 'Printing'];
 
   return (
-    <SafeAreaView style={scss.safeArea}>
+    <SafeAreaView style={[scss.safeArea, darkMode && scss.safeAreaDark]}>
       {/* Header Bar */}
       <HeaderBar
-        title="Orders"
+        title={t('nav.orders')}
         notificationCount={notificationCount}
         language={language}
-        onLanguageToggle={toggleLanguage}
+        onLanguageToggle={() => setLanguage(language === 'en' ? 'hi' : 'en')}
         onNotificationPress={() => console.log('Notifications pressed')}
         onSettingsPress={() => setShowSettings(true)}
       />
@@ -59,12 +58,14 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
               key={filter}
               style={[
                 scss.filterTab,
+                darkMode && scss.filterTabDark,
                 selectedFilter === filter && scss.filterTabActive
               ]}
               onPress={() => setSelectedFilter(filter)}
             >
               <Text style={[
                 scss.filterTabText,
+                darkMode && selectedFilter !== filter && scss.filterTabTextDark,
                 selectedFilter === filter && scss.filterTabTextActive
               ]}>
                 {filter}
@@ -75,14 +76,14 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
             style={scss.filterIcon}
             onPress={() => setShowStatusFilter(!showStatusFilter)}
           >
-            <Ionicons name="filter" size={20} color="#7C3AED" />
+            <Ionicons name="funnel" size={20} color="#7C3AED" />
           </TouchableOpacity>
         </View>
 
         {/* Status Filter Dropdown */}
         {showStatusFilter && (
-          <View style={scss.filterDropdown}>
-            <Text style={scss.filterDropdownTitle}>Filter by Status</Text>
+          <View style={[scss.filterDropdown, darkMode && scss.filterDropdownDark]}>
+            <Text style={[scss.filterDropdownTitle, darkMode && scss.filterDropdownTitleDark]}>{t('orders.filterByStatus')}</Text>
             {statusOptions.map((status) => (
               <TouchableOpacity
                 key={status}
@@ -101,6 +102,7 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
                   )}
                   <Text style={[
                     scss.filterOptionText,
+                    darkMode && scss.filterOptionTextDark,
                     selectedStatus === status && scss.filterOptionTextActive
                   ]}>
                     {status}
@@ -112,12 +114,12 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
         )}
 
         {/* Search Bar */}
-        <View style={scss.searchContainer}>
-          <Ionicons name="search-outline" size={18} color="#9CA3AF" style={scss.searchIcon} />
+        <View style={[scss.searchContainer, darkMode && scss.searchContainerDark]}>
+          <Ionicons name="search-outline" size={18} color={darkMode ? '#9CA3AF' : '#9CA3AF'} style={scss.searchIcon} />
           <TextInput
-            style={scss.searchInput}
-            placeholder="Search by name, phone, order ID..."
-            placeholderTextColor="#9CA3AF"
+            style={[scss.searchInput, darkMode && scss.searchInputDark]}
+            placeholder={t('orders.searchPlaceholder')}
+            placeholderTextColor={darkMode ? '#9CA3AF' : '#9CA3AF'}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -125,12 +127,12 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
 
         {/* No Orders Found */}
         <View style={scss.emptyContainer}>
-          <Ionicons name="document-outline" size={64} color="#D1D5DB" />
-          <Text style={scss.emptyTitle}>No orders found.</Text>
-          <Text style={scss.emptySubtitle}>
+          <Ionicons name="document-outline" size={64} color={darkMode ? '#6B7280' : '#D1D5DB'} />
+          <Text style={[scss.emptyTitle, darkMode && scss.emptyTitleDark]}>{t('orders.noOrdersFound')}</Text>
+          <Text style={[scss.emptySubtitle, darkMode && scss.emptySubtitleDark]}>
             {selectedFilter === 'All' 
-              ? 'Create your first order to get started!'
-              : `No orders in ${selectedFilter.toLowerCase()} stage.`
+              ? t('orders.createFirstOrder')
+              : t('orders.noOrdersInStage')
             }
           </Text>
         </View>
@@ -139,8 +141,8 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
       {/* Floating Add New Order Button */}
       <View style={scss.fabContainer}>
         <TouchableOpacity style={scss.fabButton}>
-          <Ionicons name="add" size={22} color="#fff" style={scss.fabIcon} />
-          <Text style={scss.fabButtonText}>Add New Order</Text>
+          <Ionicons name="add-circle" size={22} color="#fff" style={scss.fabIcon} />
+          <Text style={scss.fabButtonText}>{t('dashboard.addNewOrder')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -152,6 +154,9 @@ const scss = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#F9F9FF',
+  },
+  safeAreaDark: {
+    backgroundColor: '#1F2937',
   },
   scrollContent: {
     paddingHorizontal: '5%',
@@ -172,6 +177,10 @@ const scss = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E7EB',
   },
+  filterTabDark: {
+    backgroundColor: '#374151',
+    borderColor: '#4B5563',
+  },
   filterTabActive: {
     backgroundColor: '#7C3AED',
     borderColor: '#7C3AED',
@@ -180,6 +189,9 @@ const scss = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     color: '#6B7280',
+  },
+  filterTabTextDark: {
+    color: '#E5E7EB',
   },
   filterTabTextActive: {
     color: '#fff',
@@ -200,6 +212,10 @@ const scss = StyleSheet.create({
     marginBottom: 24,
     height: 44,
   },
+  searchContainerDark: {
+    backgroundColor: '#374151',
+    borderColor: '#4B5563',
+  },
   searchIcon: {
     marginRight: 8,
   },
@@ -208,6 +224,9 @@ const scss = StyleSheet.create({
     fontSize: 15,
     color: '#111827',
     paddingVertical: 0,
+  },
+  searchInputDark: {
+    color: '#E5E7EB',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -221,11 +240,17 @@ const scss = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
   },
+  emptyTitleDark: {
+    color: '#E5E7EB',
+  },
   emptySubtitle: {
     fontSize: 14,
     color: '#9CA3AF',
     textAlign: 'center',
     lineHeight: 20,
+  },
+  emptySubtitleDark: {
+    color: '#D1D5DB',
   },
   fabContainer: {
     position: 'absolute',
@@ -270,17 +295,27 @@ const scss = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
   },
+  filterDropdownDark: {
+    backgroundColor: '#374151',
+    borderColor: '#4B5563',
+  },
   filterDropdownTitle: {
     fontSize: 14,
     fontWeight: '600',
     color: '#111827',
     marginBottom: 12,
   },
+  filterDropdownTitleDark: {
+    color: '#F3F4F6',
+  },
   filterOption: {
     paddingVertical: 10,
     paddingHorizontal: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#F3F4F6',
+  },
+  filterOptionDark: {
+    borderBottomColor: '#4B5563',
   },
   filterOptionContent: {
     flexDirection: 'row',
@@ -301,10 +336,16 @@ const scss = StyleSheet.create({
     borderColor: '#D1D5DB',
     marginRight: 12,
   },
+  radioUnselectedDark: {
+    borderColor: '#6B7280',
+  },
   filterOptionText: {
     fontSize: 14,
     color: '#6B7280',
     fontWeight: '500',
+  },
+  filterOptionTextDark: {
+    color: '#D1D5DB',
   },
   filterOptionTextActive: {
     color: '#111827',

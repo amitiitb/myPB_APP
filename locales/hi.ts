@@ -1,0 +1,223 @@
+/**
+ * Hindi Translations
+ */
+
+export const hi = {
+  // Common
+  common: {
+    back: 'पीछे',
+    next: 'अगला',
+    cancel: 'रद्द करें',
+    submit: 'जमा करें',
+    add: 'जोड़ें',
+    edit: 'संपादित करें',
+    delete: 'हटाएं',
+    save: 'सहेजें',
+    update: 'अपडेट करें',
+    logout: 'लॉगआउट',
+    loading: 'लोड हो रहा है...',
+    error: 'त्रुटि',
+    success: 'सफलता',
+  },
+
+  // Navigation
+  nav: {
+    home: 'होम',
+    orders: 'ऑर्डर',
+    finance: 'वित्त',
+    inventory: 'इन्वेंटरी',
+    customers: 'ग्राहक',
+    settings: 'सेटिंग्स',
+    dashboard: 'डैशबोर्ड',
+  },
+
+  // Dashboard
+  dashboard: {
+    businessReports: 'व्यावसायिक रिपोर्टें',
+    orderOverview: 'ऑर्डर अवलोकन',
+    categoryBreakdown: 'श्रेणी विश्लेषण',
+    totalOrders: 'कुल ऑर्डर',
+    totalSales: 'कुल बिक्रय',
+    avgOrderInRs: 'औसत ऑर्डर (रुपये में)',
+    totalCustomers: 'कुल ग्राहक',
+    inProgress: 'प्रगति में',
+    delivered: 'वितरित',
+    received: 'प्राप्त',
+    due: 'बकाया',
+    new: 'नया',
+    repeated: 'दोहराया गया',
+    highest: 'सर्वोच्च',
+    lowest: 'न्यूनतम',
+    last7Days: 'पिछले 7 दिन',
+    enterOrderDetails: 'ऑर्डर विवरण दर्ज करें...',
+    addNewOrder: 'नया ऑर्डर जोड़ें',
+  },
+
+  // Orders
+  orders: {
+    orders: 'ऑर्डर',
+    all: 'सभी',
+    composing: 'रचना कर रहे हैं',
+    proofreading: 'प्रूफरीडिंग',
+    printing: 'प्रिंटिंग',
+    searchPlaceholder: 'नाम, फोन, ऑर्डर ID से खोजें...',
+    noOrdersFound: 'कोई ऑर्डर नहीं मिला।',
+    createFirstOrder: 'शुरुआत करने के लिए अपना पहला ऑर्डर बनाएं!',
+    noOrdersInStage: 'इस चरण में कोई ऑर्डर नहीं है।',
+    filterByStatus: 'स्थिति के अनुसार फ़िल्टर करें',
+    active: 'सक्रिय',
+    orderPlaced: 'ऑर्डर दिया गया',
+    readyToDeliver: 'डिलीवरी के लिए तैयार',
+    delivered: 'वितरित',
+    cancelled: 'रद्द किया गया',
+  },
+
+  // Finance
+  finance: {
+    finance: 'वित्त',
+    dateRange: 'तारीख की सीमा',
+    totalEarnings: 'कुल कमाई',
+    pendingPayments: 'लंबित भुगतान',
+    completedTransactions: 'पूर्ण लेनदेन',
+    selectDate: 'तारीख चुनें',
+    searchTransactions: 'ग्राहकों को नाम या फोन से खोजें...',
+    income: 'आय',
+    expenses: 'खर्च',
+    balance: 'शेष राशि',
+    noPendingPayments: 'कोई लंबित भुगतान नहीं है। बहुत अच्छा!',
+    noClearedPayments: 'अभी तक कोई क्लीयर भुगतान नहीं है।',
+    clearedPayments: 'क्लीयर भुगतान',
+  },
+
+  // Inventory
+  inventory: {
+    inventory: 'इन्वेंटरी',
+    noItems: 'अभी कोई इन्वेंटरी आइटम नहीं है। अपना पहला आइटम जोड़ें!',
+    addItem: 'आइटम जोड़ें',
+    itemName: 'आइटम का नाम',
+    quantity: 'मात्रा',
+    price: 'कीमत',
+    category: 'श्रेणी',
+    stock: 'स्टॉक',
+  },
+
+  // Customers
+  customers: {
+    customers: 'ग्राहक',
+    noCustomers: 'अभी कोई ग्राहक नहीं है। अपना पहला ग्राहक जोड़ें!',
+    addCustomer: 'ग्राहक जोड़ें',
+    customerName: 'ग्राहक का नाम',
+    phone: 'फोन',
+    email: 'ईमेल',
+    address: 'पता',
+    totalOrders: 'कुल ऑर्डर',
+  },
+
+  // Settings
+  settings: {
+    settings: 'सेटिंग्स',
+    account: 'खाता',
+    support: 'समर्थन',
+    myProfile: 'मेरी प्रोफाइल',
+    updateDetails: 'अपने व्यक्तिगत और व्यावसायिक विवरण अपडेट करें',
+    teamManagement: 'टीम प्रबंधन',
+    manageTeam: 'संगीतकारों और ऑपरेटरों को प्रबंधित करें',
+    appearance: 'दिखावट',
+    switchDarkMode: 'डार्क मोड में स्विच करें',
+    language: 'भाषा',
+    hindi: 'हिंदी (हिंदी)',
+    helpSupport: 'सहायता और समर्थन',
+    getHelp: 'सहायता प्राप्त करें और समर्थन से संपर्क करें',
+    connectCommunity: 'समुदाय से जुड़ें',
+    connectOthers: 'अन्य प्रिंटिंग प्रेस मालिकों से जुड़ें',
+    comingSoon: 'जल्द आ रहा है',
+    english: 'English',
+  },
+
+  // Team Management
+  teamManagement: {
+    teamManagement: 'टीम प्रबंधन',
+    owner: 'मालिक',
+    composer: 'संगीतकार',
+    operator: 'ऑपरेटर',
+    addOwner: 'मालिक जोड़ें',
+    addComposer: 'संगीतकार जोड़ें',
+    addOperator: 'ऑपरेटर जोड़ें',
+    name: 'नाम',
+    contactNumber: 'संपर्क संख्या',
+    required: '*',
+    mobile10Digit: '10 अंकों का मोबाइल नंबर',
+    whatsappSame: 'संपर्क संख्या के समान व्हाट्सएप?',
+    whatsappNumber: 'व्हाट्सएप नंबर',
+    whatsapp10Digit: '10 अंकों का व्हाट्सएप नंबर',
+    email: 'ईमेल',
+    emailOptional: '(वैकल्पिक)',
+    emailAddress: 'ईमेल पता दर्ज करें',
+    primary: 'प्राथमिक',
+    accountOwner: 'खाता मालिक',
+    primaryOwner: 'मालिक (प्राथमिक)',
+    noOwnersYet: 'अभी कोई मालिक नहीं है। अपना पहला मालिक जोड़ें!',
+    noComposersYet: 'अभी कोई संगीतकार नहीं है। अपना पहला संगीतकार जोड़ें!',
+    noOperatorsYet: 'अभी कोई ऑपरेटर नहीं है। अपना पहला ऑपरेटर जोड़ें!',
+    cannotDeletePrimary: 'प्राथमिक मालिक को हटाया नहीं जा सकता',
+  },
+
+  // Forms
+  forms: {
+    nameRequired: 'नाम आवश्यक है',
+    mobileRequired: 'मोबाइल नंबर आवश्यक है',
+    mobileInvalid: 'मोबाइल 6-9 से शुरू होने वाला 10 अंकों का होना चाहिए',
+    whatsappRequired: 'व्हाट्सएप नंबर आवश्यक है',
+    whatsappInvalid: 'व्हाट्सएप 6-9 से शुरू होने वाला 10 अंकों का होना चाहिए',
+    emailInvalid: 'कृपया एक वैध ईमेल पता दर्ज करें',
+  },
+
+  // Business Profile
+  businessProfile: {
+    step1: 'व्यावसायिक प्रोफाइल - चरण 1',
+    step2: 'व्यावसायिक प्रोफाइल - चरण 2',
+    step3: 'व्यावसायिक प्रोफाइल - चरण 3',
+    businessName: 'व्यावसायिक नाम',
+    businessLocation: 'व्यावसायिक स्थान',
+    description: 'विवरण',
+    businessType: 'व्यावसायिक प्रकार',
+    enterBusinessName: 'अपना व्यावसायिक नाम दर्ज करें',
+    enterLocation: 'अपना व्यावसायिक स्थान दर्ज करें',
+    enterDescription: 'व्यावसायिक विवरण दर्ज करें',
+    selectType: 'व्यावसायिक प्रकार चुनें',
+    printingPress: 'प्रिंटिंग प्रेस',
+    digitalMarketing: 'डिजिटल मार्केटिंग',
+    webDesign: 'वेब डिज़ाइन',
+  },
+
+  // Login
+  login: {
+    welcome: 'PrintBandhan में आपका स्वागत है',
+    tagline: 'अभी',
+    heading: 'अधिक प्रिंट करें, कम प्रबंधित करें',
+    subheading: '— PrintBandhan के साथ',
+    subtitle: 'भारत भर के व्यवसाय PrintBandhan को अपने सभी मुद्रण आवश्यकताओं के लिए एक भागीदार के रूप में विश्वास करते हैं।',
+    sectionTitle: 'लॉगिन करें या खाता बनाएं',
+    enterPhone: 'संपर्क नंबर दर्ज करें',
+    processing: 'प्रसंस्करण...',
+    continueButton: 'जारी रखें',
+    phone: 'फोन',
+    language: 'भाषा',
+    forgotPassword: 'पासवर्ड भूल गए',
+    createAccount: 'खाता बनाएं',
+    passwordResetMessage: 'पासवर्ड रीसेट कार्यक्षमता यहां लागू की जाएगी',
+    accountCreationMessage: 'खाता निर्माण कार्यक्षमता यहां लागू की जाएगी',
+    termsText: 'आगे बढ़कर, आप PrintBandhan के',
+    termsLink: 'नियम और शर्तें',
+    privacyLink: 'गोपनीयता नीति',
+  },
+
+  // OTP
+  otp: {
+    verification: 'OTP सत्यापन',
+    enterOtp: 'अपने नंबर पर भेजा गया OTP दर्ज करें',
+    resend: 'OTP फिर से भेजें',
+    verify: 'सत्यापित करें',
+    otp: 'OTP',
+  },
+};

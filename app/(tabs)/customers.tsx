@@ -1,4 +1,7 @@
 import HeaderBar from '@/components/HeaderBar';
+import SettingsScreen from '@/components/SettingsScreen';
+import { useLanguage } from '@/context/LanguageContext';
+import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -8,30 +11,30 @@ interface CustomersScreenProps {
 }
 
 const CustomersScreen: React.FC<CustomersScreenProps> = ({ activeTab, onTabPress }) => {
+  const { darkMode } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
   const [showSettings, setShowSettings] = React.useState(false);
-  const [language, setLanguage] = React.useState<'en' | 'hi'>('en');
   const notificationCount = 4;
 
-  const toggleLanguage = () => {
-    setLanguage(language === 'en' ? 'hi' : 'en');
-  };
+  if (showSettings) {
+    return <SettingsScreen onBack={() => setShowSettings(false)} />;
+  }
 
   return (
     <>
       <HeaderBar 
-        title="Customers" 
+        title={t('nav.customers')}
         notificationCount={notificationCount}
         language={language}
-        onLanguageToggle={toggleLanguage}
+        onLanguageToggle={() => setLanguage(language === 'en' ? 'hi' : 'en')}
         onNotificationPress={() => console.log('Notifications pressed')}
         onSettingsPress={() => setShowSettings(true)}
       />
-      <View style={scss.container}>
+      <View style={[scss.container, darkMode && scss.containerDark]}>
         <ScrollView contentContainerStyle={scss.scrollContent}>
-        <Text style={scss.title}>Customers</Text>
         {/* TODO: Render customers list here */}
-        <View style={scss.placeholderBox}>
-          <Text style={scss.placeholderText}>No customers yet. Add your first customer!</Text>
+        <View style={[scss.placeholderBox, darkMode && scss.placeholderBoxDark]}>
+          <Text style={[scss.placeholderText, darkMode && scss.placeholderTextDark]}>{t('customers.noCustomers')}</Text>
         </View>
       </ScrollView>
     </View>
@@ -44,6 +47,9 @@ const scss = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9F9FF',
   },
+  containerDark: {
+    backgroundColor: '#1F2937',
+  },
   scrollContent: {
     paddingHorizontal: '5%',
     paddingTop: 20,
@@ -55,6 +61,9 @@ const scss = StyleSheet.create({
     color: '#111827',
     marginBottom: 16,
   },
+  titleDark: {
+    color: '#F3F4F6',
+  },
   placeholderBox: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -65,10 +74,17 @@ const scss = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 40,
   },
+  placeholderBoxDark: {
+    backgroundColor: '#374151',
+    borderColor: '#4B5563',
+  },
   placeholderText: {
     color: '#6B7280',
     fontSize: 16,
     textAlign: 'center',
+  },
+  placeholderTextDark: {
+    color: '#D1D5DB',
   },
 });
 

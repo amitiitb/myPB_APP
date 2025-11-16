@@ -1,79 +1,101 @@
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Platform, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
+import TeamManagementScreen from './TeamManagementScreen';
 
 const SettingsScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [darkMode, setDarkMode] = useState(false);
-  const [language, setLanguage] = useState<'en' | 'hi'>('en');
+  const { darkMode, setDarkMode } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
+  const [showTeamManagement, setShowTeamManagement] = useState(false);
+  const router = useRouter();
+
+  const handleLogout = () => {
+    // Clear any user data/tokens here if needed
+    // For now, just navigate to login screen
+    router.replace('/login');
+  };
+
+  const handleLanguageChange = async (lang: 'en' | 'hi') => {
+    await setLanguage(lang);
+  };
+
+  // Show TeamManagementScreen if needed
+  if (showTeamManagement) {
+    return <TeamManagementScreen onBack={() => setShowTeamManagement(false)} />;
+  }
 
   return (
-    <View style={scss.container}>
-      {/* Top Nav Bar */}
-      <View style={scss.header}>
+    <SafeAreaView style={[scss.safeArea, darkMode && scss.safeAreaDark]}>
+      <View style={[scss.header, darkMode && scss.headerDark]}>
         <TouchableOpacity onPress={onBack}>
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={scss.headerTitle}>Settings</Text>
+        <Text style={scss.headerTitle}>{t('settings.settings')}</Text>
       </View>
       <ScrollView contentContainerStyle={scss.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Account Section */}
-        <View style={scss.card}>
-        <Text style={scss.sectionTitle}>ACCOUNT</Text>
+        <View style={[scss.card, darkMode && scss.cardDark]}>
+        <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>{t('settings.account')}</Text>
         <TouchableOpacity style={scss.row}>
-          <View style={scss.iconCircle}><Ionicons name="person-outline" size={22} color="#a78bfa" /></View>
-          <View style={scss.rowText}><Text style={scss.rowTitle}>My Profile</Text><Text style={scss.rowDesc}>Update your personal and business details</Text></View>
-          <Ionicons name="chevron-forward" size={20} color="#a1a1aa" />
+          <View style={[scss.iconCircle, darkMode && scss.iconCircleDark]}><Ionicons name="person-circle" size={22} color={darkMode ? '#c4b5fd' : '#a78bfa'} /></View>
+          <View style={scss.rowText}><Text style={[scss.rowTitle, darkMode && scss.rowTitleDark]}>{t('settings.myProfile')}</Text><Text style={[scss.rowDesc, darkMode && scss.rowDescDark]}>{t('settings.updateDetails')}</Text></View>
+          <Ionicons name="chevron-forward" size={20} color={darkMode ? '#6B7280' : '#a1a1aa'} />
         </TouchableOpacity>
-        <TouchableOpacity style={scss.row}>
-          <View style={scss.iconCircle}><Ionicons name="people-outline" size={22} color="#a78bfa" /></View>
-          <View style={scss.rowText}><Text style={scss.rowTitle}>Team Management</Text><Text style={scss.rowDesc}>Manage composers and operators</Text></View>
-          <Ionicons name="chevron-forward" size={20} color="#a1a1aa" />
+        <TouchableOpacity style={scss.row} onPress={() => setShowTeamManagement(true)}>
+          <View style={[scss.iconCircle, darkMode && scss.iconCircleDark]}><Ionicons name="people" size={22} color={darkMode ? '#c4b5fd' : '#a78bfa'} /></View>
+          <View style={scss.rowText}><Text style={[scss.rowTitle, darkMode && scss.rowTitleDark]}>{t('settings.teamManagement')}</Text><Text style={[scss.rowDesc, darkMode && scss.rowDescDark]}>{t('settings.manageTeam')}</Text></View>
+          <Ionicons name="chevron-forward" size={20} color={darkMode ? '#6B7280' : '#a1a1aa'} />
         </TouchableOpacity>
         <View style={scss.row}>
-          <View style={scss.iconCircle}><Ionicons name="moon-outline" size={22} color="#a78bfa" /></View>
-          <View style={scss.rowText}><Text style={scss.rowTitle}>Appearance</Text><Text style={scss.rowDesc}>Switch to Dark Mode</Text></View>
+          <View style={[scss.iconCircle, darkMode && scss.iconCircleDark]}><Ionicons name="moon" size={22} color={darkMode ? '#c4b5fd' : '#a78bfa'} /></View>
+          <View style={scss.rowText}><Text style={[scss.rowTitle, darkMode && scss.rowTitleDark]}>{t('settings.appearance')}</Text><Text style={[scss.rowDesc, darkMode && scss.rowDescDark]}>{t('settings.switchDarkMode')}</Text></View>
           <Switch value={darkMode} onValueChange={setDarkMode} thumbColor={darkMode ? '#7C3AED' : '#ccc'} trackColor={{ true: '#E9D5FF', false: '#E5E7EB' }} />
         </View>
         <View style={scss.row}>
-          <View style={scss.iconCircle}><Ionicons name="globe-outline" size={22} color="#a78bfa" /></View>
-          <View style={scss.rowText}><Text style={scss.rowTitle}>Language</Text><Text style={scss.rowDesc}>Hindi (हिंदी)</Text></View>
+          <View style={[scss.iconCircle, darkMode && scss.iconCircleDark]}><Ionicons name="globe" size={22} color={darkMode ? '#c4b5fd' : '#a78bfa'} /></View>
+          <View style={scss.rowText}><Text style={[scss.rowTitle, darkMode && scss.rowTitleDark]}>{t('settings.language')}</Text><Text style={[scss.rowDesc, darkMode && scss.rowDescDark]}>{language === 'en' ? 'English' : 'हिंदी'}</Text></View>
           <View style={scss.langToggleWrap}>
-            <TouchableOpacity style={[scss.langBtn, language === 'en' && scss.langBtnActive]} onPress={() => setLanguage('en')}><Text style={[scss.langBtnText, language === 'en' && scss.langBtnTextActive]}>English</Text></TouchableOpacity>
-            <TouchableOpacity style={[scss.langBtn, language === 'hi' && scss.langBtnActive]} onPress={() => setLanguage('hi')}><Text style={[scss.langBtnText, language === 'hi' && scss.langBtnTextActive]}>हिंदी</Text></TouchableOpacity>
+            <TouchableOpacity style={[scss.langBtn, language === 'en' && scss.langBtnActive]} onPress={() => handleLanguageChange('en')}><Text style={[scss.langBtnText, language === 'en' && scss.langBtnTextActive]}>English</Text></TouchableOpacity>
+            <TouchableOpacity style={[scss.langBtn, language === 'hi' && scss.langBtnActive]} onPress={() => handleLanguageChange('hi')}><Text style={[scss.langBtnText, language === 'hi' && scss.langBtnTextActive]}>हिंदी</Text></TouchableOpacity>
           </View>
         </View>
       </View>
       {/* Support Section */}
-      <View style={scss.card}>
-        <Text style={scss.sectionTitle}>SUPPORT</Text>
+      <View style={[scss.card, darkMode && scss.cardDark]}>
+        <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>{t('settings.support')}</Text>
         <TouchableOpacity style={scss.row}>
-          <View style={scss.iconCircle}><Ionicons name="help-circle-outline" size={22} color="#a78bfa" /></View>
-          <View style={scss.rowText}><Text style={scss.rowTitle}>Help & Support</Text><Text style={scss.rowDesc}>Get help and contact support</Text></View>
-          <Ionicons name="chevron-forward" size={20} color="#a1a1aa" />
+          <View style={[scss.iconCircle, darkMode && scss.iconCircleDark]}><Ionicons name="help-circle" size={22} color={darkMode ? '#c4b5fd' : '#a78bfa'} /></View>
+          <View style={scss.rowText}><Text style={[scss.rowTitle, darkMode && scss.rowTitleDark]}>{t('settings.helpSupport')}</Text><Text style={[scss.rowDesc, darkMode && scss.rowDescDark]}>{t('settings.getHelp')}</Text></View>
+          <Ionicons name="chevron-forward" size={20} color={darkMode ? '#6B7280' : '#a1a1aa'} />
         </TouchableOpacity>
         <View style={[scss.row, { opacity: 0.5 }]}> 
-          <View style={scss.iconCircle}><Ionicons name="people-circle-outline" size={22} color="#a78bfa" /></View>
-          <View style={scss.rowText}><Text style={scss.rowTitle}>Connect with Community</Text><Text style={scss.rowDesc}>Connect with other printing press owners</Text></View>
-          <View style={scss.comingSoon}><Text style={scss.comingSoonText}>Coming Soon</Text></View>
+          <View style={[scss.iconCircle, darkMode && scss.iconCircleDark]}><Ionicons name="people" size={22} color={darkMode ? '#c4b5fd' : '#a78bfa'} /></View>
+          <View style={scss.rowText}><Text style={[scss.rowTitle, darkMode && scss.rowTitleDark]}>{t('settings.connectCommunity')}</Text><Text style={[scss.rowDesc, darkMode && scss.rowDescDark]}>{t('settings.connectOthers')}</Text></View>
+          <View style={scss.comingSoon}><Text style={scss.comingSoonText}>{t('settings.comingSoon')}</Text></View>
         </View>
       </View>
       {/* Log Out Button */}
-      <TouchableOpacity style={scss.logoutBtn}>
-        <Ionicons name="log-out-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
-        <Text style={scss.logoutBtnText}>Log Out</Text>
+      <TouchableOpacity style={scss.logoutBtn} onPress={handleLogout}>
+        <Ionicons name="log-out" size={20} color="#fff" style={{ marginRight: 8 }} />
+        <Text style={scss.logoutBtnText}>{t('common.logout')}</Text>
       </TouchableOpacity>
       <Text style={scss.footerText}>dil se printing</Text>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const scss = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: '#F9F9FF',
-    paddingTop: Platform.OS === 'ios' ? 48 : 24,
-    paddingBottom: 20,
+  },
+  safeAreaDark: {
+    backgroundColor: '#1F2937',
   },
   scrollContent: {
     paddingHorizontal: 4,
@@ -83,16 +105,16 @@ const scss = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#7C3AED',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 14,
-    borderTopLeftRadius: 0,
-    borderTopRightRadius: 0,
+    paddingHorizontal: 20,
+    height: 64,
+  },
+  headerDark: {
+    backgroundColor: '#6D28D9',
   },
   headerTitle: {
     flex: 1,
     color: '#fff',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
     marginLeft: 16,
   },
@@ -201,6 +223,24 @@ const scss = StyleSheet.create({
     fontSize: 13,
     marginTop: 16,
     fontWeight: '500',
+  },
+  // Dark Mode Styles
+  cardDark: {
+    backgroundColor: '#374151',
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+  },
+  sectionTitleDark: {
+    color: '#9CA3AF',
+  },
+  rowTitleDark: {
+    color: '#F3F4F6',
+  },
+  rowDescDark: {
+    color: '#D1D5DB',
+  },
+  iconCircleDark: {
+    backgroundColor: '#4B5563',
   },
 });
 

@@ -1,5 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
+import { useLanguage } from '@/context/LanguageContext';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -16,9 +17,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const { width } = Dimensions.get('window');
 
 export default function LoginScreen() {
+  const { language, setLanguage, t } = useLanguage();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [language, setLanguage] = useState<'en' | 'hi'>('en');
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
 
@@ -68,10 +69,6 @@ export default function LoginScreen() {
     );
   };
 
-  const toggleLanguage = () => {
-    setLanguage(language === 'en' ? 'hi' : 'en');
-  };
-
   const handlePhoneNumberChange = (text: string) => {
     // Only allow digits and limit to 10 characters
     const cleaned = text.replace(/\D/g, '');
@@ -91,7 +88,7 @@ export default function LoginScreen() {
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           {/* Language Toggle */}
-          <TouchableOpacity style={styles.languageToggle} onPress={toggleLanguage}>
+          <TouchableOpacity style={styles.languageToggle} onPress={() => setLanguage(language === 'en' ? 'hi' : 'en')}>
             <ThemedText style={styles.languageText}>
               {language === 'en' ? 'हिंदी' : 'English'}
             </ThemedText>
@@ -99,9 +96,9 @@ export default function LoginScreen() {
 
           {/* Top Section */}
           <View style={styles.topSection}>
-            <ThemedText style={styles.tagline}>Now</ThemedText>
-            <ThemedText style={styles.heading}>Print More, Manage Less</ThemedText>
-            <ThemedText style={styles.subheading}>— with PrintBandhan</ThemedText>
+            <ThemedText style={styles.tagline}>{t('login.tagline')}</ThemedText>
+            <ThemedText style={styles.heading}>{t('login.heading')}</ThemedText>
+            <ThemedText style={styles.subheading}>{t('login.subheading')}</ThemedText>
 
             {/* Hero Image */}
             <View style={styles.heroImageContainer}>
@@ -119,18 +116,18 @@ export default function LoginScreen() {
             {/* Title */}
             <View style={styles.titleContainer}>
               <ThemedText style={styles.welcomeText}>
-                Welcome to <ThemedText style={styles.brandText}>PrintBandhan</ThemedText>
+                {t('login.welcome')}
               </ThemedText>
             </View>
 
             {/* Subtitle */}
             <ThemedText style={styles.subtitle}>
-              Businesses across India trust PrintBandhan as their partner for all printing needs.
+              {t('login.subtitle')}
             </ThemedText>
 
             {/* Section Title */}
             <ThemedText style={styles.sectionTitle}>
-              Log in or Create Account
+              {t('login.sectionTitle')}
             </ThemedText>
 
             {/* Contact Number Input */}
@@ -143,7 +140,7 @@ export default function LoginScreen() {
                 <View style={styles.separator} />
                 <TextInput
                   style={styles.phoneInput}
-                  placeholder="Enter contact number"
+                  placeholder={t('login.enterPhone')}
                   placeholderTextColor="#9CA3AF"
                   value={phoneNumber}
                   onChangeText={handlePhoneNumberChange}
@@ -168,8 +165,8 @@ export default function LoginScreen() {
               >
                 <ThemedText style={styles.continueButtonText}>
                   {isLoading
-                    ? (language === 'en' ? 'Processing...' : 'प्रसंस्करण...')
-                    : (language === 'en' ? 'Continue' : 'जारी रखें')}
+                    ? t('login.processing')
+                    : t('login.continueButton')}
                 </ThemedText>
               </LinearGradient>
             </TouchableOpacity>
@@ -177,14 +174,14 @@ export default function LoginScreen() {
             {/* Footer */}
             <View style={styles.footer}>
               <ThemedText style={styles.footerText}>
-                By moving forward, you agree to PrintBandhan's{' '}
+                {t('login.termsText')}{' '}
               </ThemedText>
               <TouchableOpacity>
-                <ThemedText style={styles.linkText}>Terms & Conditions</ThemedText>
+                <ThemedText style={styles.linkText}>{t('login.termsLink')}</ThemedText>
               </TouchableOpacity>
               <ThemedText style={styles.footerText}> & </ThemedText>
               <TouchableOpacity>
-                <ThemedText style={styles.linkText}>Privacy Policy</ThemedText>
+                <ThemedText style={styles.linkText}>{t('login.privacyLink')}</ThemedText>
               </TouchableOpacity>
             </View>
           </View>
@@ -233,24 +230,25 @@ const styles = StyleSheet.create({
   tagline: {
     fontSize: 16,
     fontWeight: '400',
-    color: '#6B7280',
+    color: '#374151',
     marginBottom: 8,
   },
   heading: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '800',
-    color: '#0F172A',
+    color: '#111827',
     textAlign: 'center',
     marginBottom: 6,
     textShadowColor: 'rgba(0,0,0,0.12)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
     letterSpacing: 0.2,
+    lineHeight: 36,
   },
   subheading: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#6B7280',
+    color: '#374151',
     textAlign: 'center',
     marginTop: 8,
     lineHeight: 22,
@@ -293,18 +291,18 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '400',
-    color: '#6B7280',
+    color: '#374151',
     textAlign: 'center',
     marginTop: 8,
-    lineHeight: 20,
+    lineHeight: 22,
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
-    color: '#0F172A',
+    color: '#111827',
     marginTop: 16,
     marginBottom: 12,
   },
