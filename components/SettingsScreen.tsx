@@ -16,8 +16,8 @@ const SettingsScreen: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <Text style={scss.headerTitle}>Settings</Text>
       </View>
       <ScrollView contentContainerStyle={scss.scrollContent} showsVerticalScrollIndicator={false}>
-      {/* Account Section */}
-      <View style={scss.card}>
+        {/* Account Section */}
+        <View style={scss.card}>
         <Text style={scss.sectionTitle}>ACCOUNT</Text>
         <TouchableOpacity style={scss.row}>
           <View style={scss.iconCircle}><Ionicons name="person-outline" size={22} color="#a78bfa" /></View>
