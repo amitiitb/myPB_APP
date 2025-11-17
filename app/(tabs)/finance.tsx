@@ -1,4 +1,5 @@
 
+import FooterNav from '@/components/FooterNav';
 import HeaderBar from '@/components/HeaderBar';
 import SettingsScreen from '@/components/SettingsScreen';
 import { useLanguage } from '@/context/LanguageContext';
@@ -16,10 +17,88 @@ const FinanceScreen: React.FC<FinanceScreenProps> = ({ activeTab, onTabPress }) 
   const { darkMode } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const [tab, setTab] = useState<'income' | 'expenses'>('income');
-  const [dateRange, setDateRange] = useState('Last 30 Days');
+  const [dateFilter, setDateFilter] = useState('Last 7 Days');
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const [search, setSearch] = useState('');
   const [showSettings, setShowSettings] = useState(false);
   const notificationCount = 4;
+
+  const dateFilterOptions = ['Today', 'Yesterday', 'Last 7 Days', 'Last 30 Days', 'Current Month', 'All Time'];
+
+  const getDaysInMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  };
+
+  const getFirstDayOfMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+  };
+
+  const renderCalendar = () => {
+    const days = [];
+    const daysInMonth = getDaysInMonth(selectedDate);
+    const firstDay = getFirstDayOfMonth(selectedDate);
+    const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+    // Day names
+    dayNames.forEach((day) => {
+      days.push(
+        <Text key={`day-${day}`} style={[scss.calendarDayName, darkMode && scss.calendarDayNameDark]}>
+          {day}
+        </Text>
+      );
+    });
+
+    // Empty cells for days before month starts
+    for (let i = 0; i < firstDay; i++) {
+      days.push(<View key={`empty-${i}`} style={[scss.calendarDay, scss.calendarDayEmpty]} />);
+    }
+
+    // Days of month
+    for (let i = 1; i <= daysInMonth; i++) {
+      const currentDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), i);
+      const isSelected = startDate && i === startDate.getDate() && selectedDate.getMonth() === startDate.getMonth();
+      const isInRange =
+        startDate &&
+        endDate &&
+        currentDate >= startDate &&
+        currentDate <= endDate;
+
+      days.push(
+        <TouchableOpacity
+          key={`day-${i}`}
+          style={[
+            scss.calendarDay,
+            isSelected && scss.calendarDaySelected,
+            isInRange && scss.calendarDayInRange,
+          ]}
+          onPress={() => {
+            if (!startDate) {
+              setStartDate(currentDate);
+            } else if (!endDate) {
+              if (currentDate < startDate) {
+                setEndDate(startDate);
+                setStartDate(currentDate);
+              } else {
+                setEndDate(currentDate);
+              }
+            } else {
+              setStartDate(currentDate);
+              setEndDate(null);
+            }
+          }}
+        >
+          <Text style={[scss.calendarDayText, isSelected && scss.calendarDayTextSelected, darkMode && scss.calendarDayTextDark]}>
+            {i}
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+
+    return days;
+  };
 
   // Show settings screen
   if (showSettings) {
@@ -48,14 +127,77 @@ const FinanceScreen: React.FC<FinanceScreenProps> = ({ activeTab, onTabPress }) 
           </TouchableOpacity>
         </View>
 
-        {/* Date Range Dropdown */}
-        <View style={scss.dateRow}>
-          <TouchableOpacity style={[scss.dateBtn, darkMode && scss.dateBtnDark]}>
-            <Ionicons name="calendar-outline" size={18} color="#7C3AED" />
-            <Text style={[scss.dateBtnText, darkMode && scss.dateBtnTextDark]}>{dateRange}</Text>
-            <Ionicons name="chevron-down" size={16} color="#7C3AED" />
+        {/* Date Range Filter */}
+        <View style={scss.sectionHeader}>
+          <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>Transactions</Text>
+          <TouchableOpacity style={[scss.dateFilterBtn, darkMode && scss.dateFilterBtnDark]} onPress={() => setShowDatePicker(!showDatePicker)}>
+            <Ionicons name="calendar-outline" size={16} color={darkMode ? '#9CA3AF' : '#6B7280'} style={{ marginRight: 6 }} />
+            <Text style={[scss.dateFilterText, darkMode && scss.dateFilterTextDark]}>{dateFilter}</Text>
+            <Ionicons name={showDatePicker ? 'chevron-up' : 'chevron-down'} size={14} color={darkMode ? '#9CA3AF' : '#6B7280'} style={{ marginLeft: 6 }} />
           </TouchableOpacity>
         </View>
+
+        {showDatePicker && (
+          <View style={[scss.datePickerDropdown, darkMode && scss.datePickerDropdownDark]}>
+            {/* Quick Filter Options */}
+            <View style={scss.quickFilterContainer}>
+              {dateFilterOptions.map((option) => (
+                <TouchableOpacity
+                  key={option}
+                  style={[
+                    scss.quickFilterOption,
+                    dateFilter === option && scss.quickFilterOptionActive,
+                  ]}
+                  onPress={() => {
+                    setDateFilter(option);
+                    setShowDatePicker(false);
+                    setStartDate(null);
+                    setEndDate(null);
+                  }}
+                >
+                  <Text
+                    style={[
+                      scss.quickFilterOptionText,
+                      darkMode && scss.quickFilterOptionTextDark,
+                      dateFilter === option && scss.quickFilterOptionTextActive,
+                    ]}
+                  >
+                    {option}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Calendar */}
+            <View style={scss.calendarContainer}>
+              <View style={scss.calendarHeader}>
+                <TouchableOpacity onPress={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() - 1, 1))}>
+                  <Ionicons name="chevron-back" size={20} color="#7C3AED" />
+                </TouchableOpacity>
+                <Text style={[scss.calendarTitle, darkMode && scss.calendarTitleDark]}>
+                  {selectedDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                </Text>
+                <TouchableOpacity onPress={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1))}>
+                  <Ionicons name="chevron-forward" size={20} color="#7C3AED" />
+                </TouchableOpacity>
+              </View>
+
+              <View style={scss.calendarGrid}>{renderCalendar()}</View>
+            </View>
+
+            {startDate && endDate && (
+              <TouchableOpacity
+                style={scss.applyBtn}
+                onPress={() => {
+                  setDateFilter(`${startDate.getDate()} - ${endDate.getDate()}`);
+                  setShowDatePicker(false);
+                }}
+              >
+                <Text style={scss.applyBtnText}>Apply Range</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
 
         {/* Summary Cards */}
         <View style={scss.summaryRow}>
@@ -96,8 +238,11 @@ const FinanceScreen: React.FC<FinanceScreenProps> = ({ activeTab, onTabPress }) 
         <View style={[scss.emptyBox, darkMode && scss.emptyBoxDark]}>
           <Text style={[scss.emptyText, darkMode && scss.emptyTextDark]}>{t('finance.noClearedPayments')}</Text>
         </View>
-      </ScrollView>
-    </View>
+        </ScrollView>
+      </View>
+      {!showSettings && activeTab && onTabPress && (
+        <FooterNav activeTab={activeTab} onTabPress={onTabPress} />
+      )}
     </>
   );
 };
@@ -112,25 +257,25 @@ const scss = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: '5%',
-    paddingTop: 20,
+    paddingTop: 16,
     paddingBottom: 120,
   },
   toggleRow: {
     flexDirection: 'row',
     backgroundColor: '#ECE6F9',
     borderRadius: 12,
-    marginTop: 16,
-    marginBottom: 12,
+    marginTop: 12,
+    marginBottom: 16,
     alignSelf: 'center',
     width: '95%',
-    padding: 4,
+    padding: 6,
   },
   toggleRowDark: {
     backgroundColor: '#374151',
   },
   toggleBtn: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
@@ -146,21 +291,53 @@ const scss = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
   },
   toggleBtnText: {
-    color: '#7C3AED',
+    color: '#111827',
     fontWeight: '600',
-    fontSize: 15,
+    fontSize: 17,
   },
   toggleBtnTextDark: {
     color: '#D1D5DB',
   },
   toggleBtnTextActive: {
-    color: '#7C3AED',
+    color: '#111827',
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    marginTop: 8,
   },
   dateRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginBottom: 10,
+    marginBottom: 16,
     marginRight: 2,
+  },
+  dateFilterWrapper: {
+    marginBottom: 16,
+  },
+  dateFilterBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E5E7EB',
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  dateFilterBtnDark: {
+    backgroundColor: '#374151',
+    borderColor: '#4B5563',
+  },
+  dateFilterText: {
+    fontSize: 13,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
+  dateFilterTextDark: {
+    color: '#9CA3AF',
   },
   dateBtn: {
     flexDirection: 'row',
@@ -185,11 +362,141 @@ const scss = StyleSheet.create({
   dateBtnTextDark: {
     color: '#9CA3AF',
   },
+  datePickerDropdown: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E5E7EB',
+    borderWidth: 1,
+    borderRadius: 10,
+    marginBottom: 12,
+    padding: 12,
+    marginTop: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  datePickerDropdownDark: {
+    backgroundColor: '#1F2937',
+    borderColor: '#374151',
+  },
+  quickFilterContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 10,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  quickFilterContainerDark: {
+    borderBottomColor: '#374151',
+  },
+  quickFilterOption: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    backgroundColor: '#F3F4F6',
+  },
+  quickFilterOptionDark: {
+    backgroundColor: '#374151',
+  },
+  quickFilterOptionActive: {
+    backgroundColor: '#7C3AED',
+  },
+  quickFilterOptionText: {
+    fontSize: 13,
+    color: '#374151',
+    fontWeight: '500',
+  },
+  quickFilterOptionTextDark: {
+    color: '#F3F4F6',
+  },
+  quickFilterOptionTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  calendarContainer: {
+    marginTop: 8,
+  },
+  calendarHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  calendarTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  calendarTitleDark: {
+    color: '#F3F4F6',
+  },
+  calendarGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  calendarDayName: {
+    width: '14.28%',
+    textAlign: 'center',
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginBottom: 4,
+  },
+  calendarDayNameDark: {
+    color: '#D1D5DB',
+  },
+  calendarDay: {
+    width: '14.28%',
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 6,
+    marginBottom: 4,
+  },
+  calendarDayEmpty: {
+    height: 0,
+    marginBottom: 0,
+  },
+  calendarDaySelected: {
+    backgroundColor: '#7C3AED',
+  },
+  calendarDayInRange: {
+    backgroundColor: '#EDE9FE',
+  },
+  calendarDayText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#111827',
+  },
+  calendarDayTextDark: {
+    color: '#F3F4F6',
+  },
+  calendarDayTextSelected: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  applyBtn: {
+    backgroundColor: '#7C3AED',
+    borderRadius: 8,
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  applyBtnText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '600',
+  },
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 18,
-    marginTop: 6,
+    marginBottom: 20,
+    marginTop: 12,
   },
   summaryCard: {
     flex: 1,
@@ -251,11 +558,11 @@ const scss = StyleSheet.create({
     color: '#E5E7EB',
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: '700',
     color: '#111827',
-    marginTop: 10,
-    marginBottom: 8,
+    marginTop: 16,
+    marginBottom: 16,
   },
   sectionTitleDark: {
     color: '#F3F4F6',

@@ -29,26 +29,52 @@ interface TeamMember {
 
 interface TeamManagementScreenProps {
   onBack: () => void;
+  ownerName?: string;
+  ownerPhone?: string;
+  ownerWhatsapp?: string;
+  owners?: TeamMember[];
+  composers?: TeamMember[];
+  operators?: TeamMember[];
 }
 
-const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({ onBack }) => {
+const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({ 
+  onBack, 
+  ownerName = 'Account Owner', 
+  ownerPhone = '9876543210',
+  ownerWhatsapp,
+  owners = [],
+  composers = [],
+  operators = [],
+}) => {
   const { darkMode } = useTheme();
   const [activeTab, setActiveTab] = useState<Role>('owners');
   
-  // Initialize owners with primary owner
-  const [owners, setOwners] = useState<TeamMember[]>([
-    {
-      id: 'primary-owner',
-      name: 'Account Owner',
-      mobile: '9876543210',
-      whatsapp: '9876543210',
-      email: 'owner@printbandhan.com',
-      role: 'Owner (Primary)',
-    },
-  ]);
+  // Initialize with data from props if available, otherwise use defaults
+  const [ownersData, setOwnersData] = useState<TeamMember[]>(() => {
+    // If owners data from Step 3 is available, use it
+    if (owners && owners.length > 0) {
+      return owners;
+    }
+    // Otherwise, create a primary owner entry
+    return [
+      {
+        id: 'primary-owner',
+        name: ownerName,
+        mobile: ownerPhone,
+        whatsapp: ownerWhatsapp || ownerPhone,
+        email: 'owner@printbandhan.com',
+        role: 'Owner (Primary)',
+      },
+    ];
+  });
   
-  const [composers, setComposers] = useState<TeamMember[]>([]);
-  const [operators, setOperators] = useState<TeamMember[]>([]);
+  const [composersData, setComposersData] = useState<TeamMember[]>(() => {
+    return (composers && composers.length > 0) ? composers : [];
+  });
+  
+  const [operatorsData, setOperatorsData] = useState<TeamMember[]>(() => {
+    return (operators && operators.length > 0) ? operators : [];
+  });
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -56,25 +82,31 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({ onBack }) =
   const [formName, setFormName] = useState('');
   const [formMobile, setFormMobile] = useState('');
   const [formWhatsapp, setFormWhatsapp] = useState('');
-  const [formEmail, setFormEmail] = useState('');
-  const [sameAsMobile, setSameAsMobile] = useState(false);
+  const [sameAsContact, setSameAsContact] = useState(false);
   const [formErrors, setFormErrors] = useState({
     name: '',
     mobile: '',
     whatsapp: '',
-    email: '',
   });
 
-  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Helper function to check if phone number already exists across all roles
+  const isPhoneNumberExists = (phoneNumber: string, excludeId?: string): boolean => {
+    const allMembers = [...ownersData, ...composersData, ...operatorsData];
+    return allMembers.some(
+      (member) => 
+        (member.mobile === phoneNumber || member.whatsapp === phoneNumber) && 
+        member.id !== excludeId
+    );
+  };
 
   const getTabData = () => {
     switch (activeTab) {
       case 'owners':
-        return owners;
+        return ownersData;
       case 'composers':
-        return composers;
+        return composersData;
       case 'operators':
-        return operators;
+        return operatorsData;
     }
   };
 
@@ -111,8 +143,8 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({ onBack }) =
     }
   };
 
-  const handleToggleSameAsMobile = () => {
-    setSameAsMobile((prev) => {
+  const handleToggleSameAsContact = () => {
+    setSameAsContact((prev) => {
       const next = !prev;
       if (next) {
         setFormWhatsapp(formMobile);
@@ -126,7 +158,7 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({ onBack }) =
   const handleMobileChange = (text: string) => {
     const cleaned = text.replace(/\D/g, '').slice(0, 10);
     setFormMobile(cleaned);
-    if (sameAsMobile) {
+    if (sameAsContact) {
       setFormWhatsapp(cleaned);
     }
   };
@@ -150,49 +182,57 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({ onBack }) =
       setFormErrors((prev) => ({ ...prev, mobile: 'Enter a valid 10-digit contact number.' }));
       return false;
     }
+    
+    // Check if phone number already exists across all roles
+    if (isPhoneNumberExists(formMobile, editingId || undefined)) {
+      setFormErrors((prev) => ({ ...prev, mobile: 'Phone number already linked to another user.' }));
+      return false;
+    }
+    
     setFormErrors((prev) => ({ ...prev, mobile: '' }));
     return true;
   };
 
   const validateWhatsapp = () => {
-    if (formWhatsapp.length !== 10 || !/^[6-9]/.test(formWhatsapp)) {
+    // WhatsApp is optional, only validate if provided
+    if (formWhatsapp.length > 0 && (formWhatsapp.length !== 10 || !/^[6-9]/.test(formWhatsapp))) {
       setFormErrors((prev) => ({ ...prev, whatsapp: 'Enter a valid 10-digit WhatsApp number.' }));
       return false;
     }
+    
+    // Check if WhatsApp number already exists across all roles
+    if (formWhatsapp && isPhoneNumberExists(formWhatsapp, editingId || undefined)) {
+      setFormErrors((prev) => ({ ...prev, whatsapp: 'Phone number already linked to another user.' }));
+      return false;
+    }
+    
     setFormErrors((prev) => ({ ...prev, whatsapp: '' }));
     return true;
   };
 
-  const validateEmail = () => {
-    if (formEmail && !EMAIL_REGEX.test(formEmail)) {
-      setFormErrors((prev) => ({ ...prev, email: 'Enter a valid email address.' }));
-      return false;
-    }
-    setFormErrors((prev) => ({ ...prev, email: '' }));
-    return true;
-  };
 
   const resetForm = () => {
     setFormName('');
     setFormMobile('');
     setFormWhatsapp('');
-    setFormEmail('');
-    setSameAsMobile(false);
-    setFormErrors({ name: '', mobile: '', whatsapp: '', email: '' });
+    setSameAsContact(false);
+    setFormErrors({ name: '', mobile: '', whatsapp: '' });
     setEditingId(null);
   };
 
   const handleAddOrUpdateMember = () => {
-    if (!validateName() || !validateMobile() || !validateWhatsapp() || !validateEmail()) {
+    if (!validateName() || !validateMobile() || !validateWhatsapp()) {
       return;
     }
+
+    // If WhatsApp is empty, use contact number as fallback
+    const finalWhatsapp = formWhatsapp || formMobile;
 
     const newMember: TeamMember = {
       id: editingId || Date.now().toString(),
       name: formName,
       mobile: formMobile,
-      whatsapp: formWhatsapp,
-      email: formEmail,
+      whatsapp: finalWhatsapp,
       role: activeTab.slice(0, -1),
     };
 
@@ -213,13 +253,13 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({ onBack }) =
   const addMemberToTab = (member: TeamMember) => {
     switch (activeTab) {
       case 'owners':
-        setOwners([...owners, member]);
+        setOwnersData([...ownersData, member]);
         break;
       case 'composers':
-        setComposers([...composers, member]);
+        setComposersData([...composersData, member]);
         break;
       case 'operators':
-        setOperators([...operators, member]);
+        setOperatorsData([...operatorsData, member]);
         break;
     }
   };
@@ -227,13 +267,13 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({ onBack }) =
   const updateMemberInTab = (member: TeamMember) => {
     switch (activeTab) {
       case 'owners':
-        setOwners(owners.map((m) => (m.id === member.id ? member : m)));
+        setOwnersData(ownersData.map((m) => (m.id === member.id ? member : m)));
         break;
       case 'composers':
-        setComposers(composers.map((m) => (m.id === member.id ? member : m)));
+        setComposersData(composersData.map((m) => (m.id === member.id ? member : m)));
         break;
       case 'operators':
-        setOperators(operators.map((m) => (m.id === member.id ? member : m)));
+        setOperatorsData(operatorsData.map((m) => (m.id === member.id ? member : m)));
         break;
     }
   };
@@ -253,13 +293,13 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({ onBack }) =
         onPress: () => {
           switch (activeTab) {
             case 'owners':
-              setOwners(owners.filter((m) => m.id !== id));
+              setOwnersData(ownersData.filter((m) => m.id !== id));
               break;
             case 'composers':
-              setComposers(composers.filter((m) => m.id !== id));
+              setComposersData(composersData.filter((m) => m.id !== id));
               break;
             case 'operators':
-              setOperators(operators.filter((m) => m.id !== id));
+              setOperatorsData(operatorsData.filter((m) => m.id !== id));
               break;
           }
         },
@@ -271,7 +311,6 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({ onBack }) =
     setFormName(member.name);
     setFormMobile(member.mobile);
     setFormWhatsapp(member.whatsapp);
-    setFormEmail(member.email || '');
     setEditingId(member.id);
     setShowModal(true);
   };
@@ -323,53 +362,59 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({ onBack }) =
         <ScrollView style={scss.membersList} showsVerticalScrollIndicator={false}>
           {getTabData().length === 0 ? (
             <View style={scss.emptyState}>
-              <Ionicons name="person-add-outline" size={48} color={darkMode ? '#6B7280' : '#D1D5DB'} />
+              <TouchableOpacity style={scss.addIconButton} onPress={handleOpenModal}>
+                <Text style={scss.addIcon}>+</Text>
+              </TouchableOpacity>
               <Text style={[scss.emptyStateText, darkMode && scss.emptyStateTextDark]}>{getEmptyStateText()}</Text>
+              <Text style={[scss.addButtonLabel, darkMode && scss.addButtonLabelDark]}>{getAddButtonText()}</Text>
             </View>
           ) : (
-            getTabData().map((member) => (
-              <View key={member.id} style={[scss.memberCard, darkMode && scss.memberCardDark, member.id === 'primary-owner' && scss.primaryOwnerCard, member.id === 'primary-owner' && darkMode && scss.primaryOwnerCardDark]}>
-                <View style={scss.memberInfo}>
-                  <View style={scss.memberNameRow}>
-                    <Text style={[scss.memberName, darkMode && scss.memberNameDark]}>{member.name}</Text>
-                    {member.id === 'primary-owner' && (
-                      <View style={scss.primaryBadge}>
-                        <Text style={scss.primaryBadgeText}>Primary</Text>
-                      </View>
+            <View>
+              {getTabData().map((member) => (
+                <View key={member.id} style={[scss.memberCard, darkMode && scss.memberCardDark, member.id === 'primary-owner' && scss.primaryOwnerCard, member.id === 'primary-owner' && darkMode && scss.primaryOwnerCardDark]}>
+                  <View style={scss.memberInfo}>
+                    <View style={scss.memberNameRow}>
+                      <Text style={[scss.memberName, darkMode && scss.memberNameDark]}>{member.name}</Text>
+                      {member.id === 'primary-owner' && (
+                        <View style={scss.primaryBadge}>
+                          <Text style={scss.primaryBadgeText}>Primary</Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={[scss.memberDetail, darkMode && scss.memberDetailDark]}>📱 {member.mobile}</Text>
+                    <Text style={[scss.memberDetail, darkMode && scss.memberDetailDark]}>💬 {member.whatsapp}</Text>
+                  </View>
+                  <View style={scss.memberActions}>
+                    {member.id !== 'primary-owner' && (
+                      <>
+                        <TouchableOpacity
+                          style={scss.editBtn}
+                          onPress={() => handleEditMember(member)}
+                        >
+                          <Ionicons name="pencil" size={18} color="#7C3AED" />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={scss.deleteBtn}
+                          onPress={() => handleDeleteMember(member.id)}
+                        >
+                          <Ionicons name="trash" size={18} color={darkMode ? '#FCA5A5' : '#EF4444'} />
+                        </TouchableOpacity>
+                      </>
                     )}
                   </View>
-                  <Text style={[scss.memberDetail, darkMode && scss.memberDetailDark]}>📱 {member.mobile}</Text>
-                  <Text style={[scss.memberDetail, darkMode && scss.memberDetailDark]}>💬 {member.whatsapp}</Text>
-                  {member.email && <Text style={[scss.memberDetail, darkMode && scss.memberDetailDark]}>✉️ {member.email}</Text>}
                 </View>
-                <View style={scss.memberActions}>
-                  {member.id !== 'primary-owner' && (
-                    <>
-                      <TouchableOpacity
-                        style={scss.editBtn}
-                        onPress={() => handleEditMember(member)}
-                      >
-                        <Ionicons name="pencil" size={18} color="#7C3AED" />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={scss.deleteBtn}
-                        onPress={() => handleDeleteMember(member.id)}
-                      >
-                        <Ionicons name="trash" size={18} color={darkMode ? '#FCA5A5' : '#EF4444'} />
-                      </TouchableOpacity>
-                    </>
-                  )}
-                </View>
+              ))}
+              
+              {/* Add Button - Show centered + below members */}
+              <View style={scss.addMemberBelowContainer}>
+                <TouchableOpacity style={scss.addIconButton} onPress={handleOpenModal}>
+                  <Text style={scss.addIcon}>+</Text>
+                </TouchableOpacity>
+                <Text style={[scss.addButtonLabel, darkMode && scss.addButtonLabelDark]}>{getAddButtonText()}</Text>
               </View>
-            ))
+            </View>
           )}
         </ScrollView>
-
-        {/* Add Button */}
-        <TouchableOpacity style={scss.addButton} onPress={handleOpenModal}>
-          <Ionicons name="add-circle" size={24} color="#fff" />
-          <Text style={scss.addButtonText}>{getAddButtonText()}</Text>
-        </TouchableOpacity>
 
         {/* Modal */}
         <Modal visible={showModal} animationType="slide" transparent>
@@ -390,69 +435,74 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({ onBack }) =
 
                 <ScrollView style={scss.formContainer} showsVerticalScrollIndicator={false}>
                   {/* Name Input */}
-                  <Text style={[scss.label, darkMode && scss.labelDark]}>Name *</Text>
-                  <TextInput
-                    style={[scss.input, darkMode && scss.inputDark, formErrors.name && scss.inputError]}
-                    placeholder="Enter full name"
-                    value={formName}
-                    onChangeText={setFormName}
-                    onBlur={validateName}
-                  />
-                  {formErrors.name && <Text style={scss.errorText}>{formErrors.name}</Text>}
-
-                  {/* Mobile Input */}
-                  <Text style={[scss.label, darkMode && scss.labelDark]}>Contact Number *</Text>
-                  <TextInput
-                    style={[scss.input, darkMode && scss.inputDark, formErrors.mobile && scss.inputError]}
-                    placeholder="10-digit mobile number"
-                    placeholderTextColor={darkMode ? '#9CA3AF' : '#999'}
-                    keyboardType="numeric"
-                    value={formMobile}
-                    onChangeText={handleMobileChange}
-                    onBlur={validateMobile}
-                  />
-                  {formErrors.mobile && <Text style={scss.errorText}>{formErrors.mobile}</Text>}
-
-                  {/* WhatsApp Toggle */}
-                  <View style={scss.toggleRow}>
-                    <Text style={[scss.label, darkMode && scss.labelDark]}>WhatsApp same as contact number?</Text>
-                    <Switch
-                      value={sameAsMobile}
-                      onValueChange={handleToggleSameAsMobile}
-                      thumbColor={sameAsMobile ? '#7C3AED' : '#ccc'}
-                      trackColor={{ true: '#E9D5FF', false: darkMode ? '#4B5563' : '#E5E7EB' }}
+                  <View style={scss.formGroup}>
+                    <Text style={[scss.label, darkMode && scss.labelDark]}>Name <Text style={{ color: '#EF4444' }}>*</Text></Text>
+                    <TextInput
+                      style={[scss.input, darkMode && scss.inputDark, formErrors.name && scss.inputError]}
+                      placeholder="Enter full name"
+                      value={formName}
+                      onChangeText={setFormName}
+                      onBlur={validateName}
+                      placeholderTextColor="#9CA3AF"
+                      maxLength={30}
                     />
+                    {formErrors.name && <Text style={scss.errorText}>{formErrors.name}</Text>}
                   </View>
 
-                  {/* WhatsApp Input */}
-                  {!sameAsMobile && (
-                    <>
-                      <Text style={[scss.label, darkMode && scss.labelDark]}>WhatsApp Number *</Text>
+                  {/* Contact Number and WhatsApp Number with Toggle */}
+                  <View style={scss.rowGroup}>
+                    {/* Contact Number */}
+                    <View style={scss.halfWidth}>
+                      <Text style={[scss.label, darkMode && scss.labelDark]}>
+                        Contact Number <Text style={{ color: '#EF4444' }}>*</Text>
+                      </Text>
+                      <TextInput
+                        style={[scss.input, darkMode && scss.inputDark, formErrors.mobile && scss.inputError]}
+                        placeholder="+91-9876543210"
+                        value={formMobile}
+                        onChangeText={handleMobileChange}
+                        onBlur={validateMobile}
+                        keyboardType="phone-pad"
+                        placeholderTextColor="#9CA3AF"
+                        maxLength={10}
+                      />
+                      {formErrors.mobile && <Text style={scss.errorText}>{formErrors.mobile}</Text>}
+                    </View>
+
+                    {/* WhatsApp Number with Toggle Below */}
+                    <View style={scss.halfWidth}>
+                      <Text style={[scss.label, darkMode && scss.labelDark]}>
+                        WhatsApp Number
+                      </Text>
                       <TextInput
                         style={[scss.input, darkMode && scss.inputDark, formErrors.whatsapp && scss.inputError]}
-                        placeholder="10-digit WhatsApp number"
-                        placeholderTextColor={darkMode ? '#9CA3AF' : '#999'}
-                        keyboardType="numeric"
+                        placeholder="+91-9876543210"
                         value={formWhatsapp}
                         onChangeText={handleWhatsappChange}
                         onBlur={validateWhatsapp}
+                        keyboardType="phone-pad"
+                        editable={!sameAsContact}
+                        placeholderTextColor="#9CA3AF"
+                        maxLength={10}
                       />
-                      {formErrors.whatsapp && <Text style={scss.errorText}>{formErrors.whatsapp}</Text>}
-                    </>
-                  )}
-
-                  {/* Email Input */}
-                  <Text style={[scss.label, darkMode && scss.labelDark]}>Email (Optional)</Text>
-                  <TextInput
-                    style={[scss.input, darkMode && scss.inputDark, formErrors.email && scss.inputError]}
-                    placeholder="Enter email address"
-                    placeholderTextColor={darkMode ? '#9CA3AF' : '#999'}
-                    keyboardType="email-address"
-                    value={formEmail}
-                    onChangeText={setFormEmail}
-                    onBlur={validateEmail}
-                  />
-                  {formErrors.email && <Text style={scss.errorText}>{formErrors.email}</Text>}
+                      {formErrors.whatsapp ? (
+                        <Text style={scss.errorText}>{formErrors.whatsapp}</Text>
+                      ) : null}
+                      
+                      {/* Same as Contact Toggle Below WhatsApp */}
+                      <View style={scss.toggleBelowWrapper}>
+                        <View style={scss.switchOutlineWrapper}>
+                          <Switch
+                            value={sameAsContact}
+                            onValueChange={handleToggleSameAsContact}
+                            trackColor={{ false: '#E5E7EB', true: '#A855F7' }}
+                            thumbColor={sameAsContact ? '#fff' : '#fff'}
+                          />
+                        </View>
+                        <Text style={[scss.toggleLabelSmall, darkMode && scss.toggleLabelSmallDark]}>Same as Contact</Text>
+                      </View>
+                    </View>
+                  </View>
                 </ScrollView>
 
                 {/* Modal Actions */}
@@ -461,7 +511,7 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({ onBack }) =
                     <Text style={[scss.cancelBtnText, darkMode && scss.cancelBtnTextDark]}>Cancel</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={scss.submitBtn} onPress={handleAddOrUpdateMember}>
-                    <Text style={scss.submitBtnText}>{editingId ? 'Update' : 'Add'}</Text>
+                    <Text style={scss.submitBtnText}>{editingId ? 'Update' : 'Add Member'}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -575,6 +625,40 @@ const scss = StyleSheet.create({
   emptyStateTextDark: {
     color: '#D1D5DB',
   },
+  addIconButton: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#7C3AED',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#7C3AED',
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
+  },
+  addIcon: {
+    fontSize: 48,
+    color: '#fff',
+    fontWeight: '300',
+  },
+  addButtonLabel: {
+    marginTop: 12,
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#7C3AED',
+  },
+  addButtonLabelDark: {
+    color: '#A78BFA',
+  },
+  addMemberBelowContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+    marginTop: 20,
+  },
   memberCard: {
     flexDirection: 'row',
     backgroundColor: '#fff',
@@ -658,7 +742,7 @@ const scss = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#EC4899',
+    backgroundColor: '#7C3AED',
     marginHorizontal: 16,
     marginBottom: 16,
     paddingVertical: 13,
@@ -702,7 +786,7 @@ const scss = StyleSheet.create({
     borderBottomColor: '#4B5563',
   },
   modalTitle: {
-    fontSize: 16,
+    fontSize: 24,
     fontWeight: '700',
     color: '#111827',
   },
@@ -714,23 +798,23 @@ const scss = StyleSheet.create({
     paddingVertical: 16,
   },
   label: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '600',
     color: '#111827',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   labelDark: {
     color: '#F3F4F6',
   },
   input: {
+    height: 48,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 14,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 0,
+    fontSize: 16,
     color: '#111827',
-    marginBottom: 14,
     backgroundColor: '#F9F9FF',
   },
   inputDark: {
@@ -744,7 +828,7 @@ const scss = StyleSheet.create({
   errorText: {
     color: '#EF4444',
     fontSize: 12,
-    marginTop: -10,
+    marginTop: 6,
     marginBottom: 10,
     fontWeight: '500',
   },
@@ -753,6 +837,57 @@ const scss = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 14,
+  },
+  formGroup: {
+    marginBottom: 20,
+  },
+  toggleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    marginBottom: 20,
+    gap: 12,
+  },
+  switchOutlineWrapper: {
+    borderWidth: 1.5,
+    borderColor: '#E5E7EB',
+    borderRadius: 24,
+    paddingHorizontal: 2,
+    paddingVertical: 2,
+  },
+  toggleLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  toggleLabelDark: {
+    color: '#F3F4F6',
+  },
+  toggleBelowWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    marginTop: 12,
+  },
+  toggleLabelSmall: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: 16,
+  },
+  toggleLabelSmallDark: {
+    color: '#D1D5DB',
+  },
+  rowGroup: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 20,
+    alignItems: 'flex-start',
+  },
+  halfWidth: {
+    flex: 1,
+    marginBottom: 0,
   },
   modalActions: {
     flexDirection: 'row',
@@ -787,14 +922,20 @@ const scss = StyleSheet.create({
   submitBtn: {
     flex: 1,
     paddingVertical: 12,
-    borderRadius: 10,
+    borderRadius: 12,
     backgroundColor: '#7C3AED',
     alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#7C3AED',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   submitBtnText: {
     color: '#fff',
+    fontSize: 17,
     fontWeight: '600',
-    fontSize: 14,
+    letterSpacing: 0.3,
   },
 });
 

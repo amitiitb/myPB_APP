@@ -2,17 +2,17 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Dimensions,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -25,18 +25,12 @@ const BusinessProfileStepOne: React.FC = () => {
   const [contactNumber, setContactNumber] = useState(phoneNumber || '');
   const [whatsappNumber, setWhatsappNumber] = useState('');
   const [sameAsContact, setSameAsContact] = useState(false);
-  const [address, setAddress] = useState('');
-  const [gstin, setGstin] = useState('');
   const [formErrors, setFormErrors] = useState({
     ownerName: '',
     pressName: '',
-    address: '',
-    gstin: '',
   });
 
   const scrollViewRef = React.useRef<ScrollView>(null);
-
-  const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
   const handleToggleSameAsContact = () => {
     setSameAsContact((prev) => {
@@ -61,17 +55,6 @@ const BusinessProfileStepOne: React.FC = () => {
     setWhatsappNumber(cleaned);
   };
 
-  const handleAddressChange = (text: string) => {
-    if (text.length <= 60) {
-      setAddress(text);
-    }
-  };
-
-  const handleGstinChange = (text: string) => {
-    const cleaned = text.toUpperCase().slice(0, 15);
-    setGstin(cleaned);
-  };
-
   const validateOwnerName = () => {
     if (!ownerName.trim()) {
       setFormErrors((prev) => ({ ...prev, ownerName: "Owner's name is required (max 30 characters)." }));
@@ -83,28 +66,18 @@ const BusinessProfileStepOne: React.FC = () => {
 
   const validatePressName = () => {
     if (!pressName.trim()) {
-      setFormErrors((prev) => ({ ...prev, pressName: "Press name is required (max 30 characters)." }));
+      setFormErrors((prev) => ({ ...prev, pressName: "Business name is required (max 30 characters)." }));
       return false;
     }
     setFormErrors((prev) => ({ ...prev, pressName: '' }));
     return true;
   };
 
-  const validateGstin = () => {
-    if (gstin && !GSTIN_REGEX.test(gstin)) {
-      setFormErrors((prev) => ({ ...prev, gstin: 'Enter a valid 15-character GSTIN.' }));
-      return false;
-    }
-    setFormErrors((prev) => ({ ...prev, gstin: '' }));
-    return true;
-  };
-
   const handleNext = () => {
     const isOwnerNameValid = validateOwnerName();
     const isPressNameValid = validatePressName();
-    const isGstinValid = validateGstin();
 
-    if (!isOwnerNameValid || !isPressNameValid || !isGstinValid) {
+    if (!isOwnerNameValid || !isPressNameValid) {
       // Scroll to top to show errors
       scrollViewRef.current?.scrollTo({ y: 0, animated: true });
       return;
@@ -117,6 +90,7 @@ const BusinessProfileStepOne: React.FC = () => {
         ownerName: ownerName.trim(),
         phoneNumber: contactNumber,
         whatsappNumber: whatsappNumber,
+        pressName: pressName.trim(),
       }
     });
   };
@@ -129,12 +103,22 @@ const BusinessProfileStepOne: React.FC = () => {
       >
         <ScrollView ref={scrollViewRef} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           {/* Header Section */}
-          <Text style={styles.title}>Business Profile Setup</Text>
+          <View style={styles.headerContainer}>
+            <TouchableOpacity style={styles.backArrow} onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={24} color="#111827" />
+            </TouchableOpacity>
+            <Text style={styles.title}>Business Profile Setup</Text>
+            <View style={styles.placeholderSpace} />
+          </View>
           <Text style={styles.subtitle}>Step 1 of 3: Account Creation</Text>
+          <View style={styles.progressBar}>
+            <View style={styles.progressFill} />
+          </View>
 
-          {/* Form Fields */}
-          <View style={styles.gridRow}>
-            <View style={styles.gridCol}>
+          {/* Form Card */}
+          <View style={styles.formCard}>
+            {/* Owner's Name */}
+            <View style={styles.fieldContainer}>
               <Text style={styles.label}>Owner's Name <Text style={{ color: '#EF4444' }}>*</Text></Text>
               <TextInput
                 style={[styles.input, formErrors.ownerName && styles.inputError]}
@@ -147,8 +131,10 @@ const BusinessProfileStepOne: React.FC = () => {
               />
               {formErrors.ownerName ? <Text style={styles.errorText}>{formErrors.ownerName}</Text> : null}
             </View>
-            <View style={styles.gridCol}>
-              <Text style={styles.label}>Press Name <Text style={{ color: '#EF4444' }}>*</Text></Text>
+
+            {/* Business Name */}
+            <View style={styles.fieldContainer}>
+              <Text style={styles.label}>Business Name <Text style={{ color: '#EF4444' }}>*</Text></Text>
               <TextInput
                 style={[styles.input, formErrors.pressName && styles.inputError]}
                 placeholder="e.g., Kumar Printers"
@@ -160,82 +146,40 @@ const BusinessProfileStepOne: React.FC = () => {
               />
               {formErrors.pressName ? <Text style={styles.errorText}>{formErrors.pressName}</Text> : null}
             </View>
-          </View>
 
-          {/* Contact Number + WhatsApp Number Row */}
-          <View style={styles.gridRow}>
-            <View style={styles.gridCol}>
-              <Text style={styles.label}>Contact Number</Text>
-              <TextInput
-                style={[styles.input, styles.disabledInput]}
-                placeholder="9879879870"
-                value={contactNumber}
-                onChangeText={handleContactChange}
-                keyboardType="phone-pad"
-                placeholderTextColor="#9CA3AF"
-                editable={false}
-                maxLength={10}
-              />
+            {/* Divider */}
+            <View style={styles.divider} />
+
+            {/* WhatsApp Number with Same as Contact Toggle */}
+            <View style={styles.rowGroup}>
+              {/* WhatsApp Number */}
+              <View style={styles.halfWidth}>
+                <Text style={styles.label}>WhatsApp Number</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="+91-9876543210"
+                  value={whatsappNumber}
+                  onChangeText={handleWhatsappChange}
+                  keyboardType="phone-pad"
+                  editable={!sameAsContact}
+                  placeholderTextColor="#9CA3AF"
+                  maxLength={10}
+                />
+              </View>
+
+              {/* Same as Contact Toggle */}
+              <View style={styles.toggleSideWrapper}>
+                <View style={styles.switchOutlineWrapper}>
+                  <Switch
+                    value={sameAsContact}
+                    onValueChange={handleToggleSameAsContact}
+                    trackColor={{ false: '#E5E7EB', true: '#A855F7' }}
+                    thumbColor={sameAsContact ? '#fff' : '#fff'}
+                  />
+                </View>
+                <Text style={styles.toggleLabelSmall}>Same as Contact</Text>
+              </View>
             </View>
-            <View style={styles.gridCol}>
-              <Text style={styles.label}>WhatsApp Number</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="9879879870"
-                value={whatsappNumber}
-                onChangeText={handleWhatsappChange}
-                keyboardType="phone-pad"
-                editable={!sameAsContact}
-                placeholderTextColor="#9CA3AF"
-                maxLength={10}
-              />
-            </View>
-          </View>
-
-          {/* Same as Contact Toggle Below WhatsApp */}
-          <View style={styles.toggleRow}>
-            <Switch
-              value={sameAsContact}
-              onValueChange={handleToggleSameAsContact}
-              trackColor={{ false: '#E5E7EB', true: '#A855F7' }}
-              thumbColor={sameAsContact ? '#fff' : '#fff'}
-            />
-            <Text style={styles.toggleLabel}>Same as Contact</Text>
-          </View>
-
-          {/* Address (Map Location) */}
-          <View style={styles.fullRow}>
-            <Text style={styles.label}>Address (Map Location)</Text>
-            <View style={styles.inputIconWrapper}>
-              <TextInput
-                style={[styles.textArea, { paddingRight: 36 }]}
-                placeholder="Search for your business address"
-                value={address}
-                onChangeText={handleAddressChange}
-                placeholderTextColor="#9CA3AF"
-                multiline={true}
-                maxLength={60}
-                numberOfLines={3}
-              />
-              <Ionicons name="location-outline" size={20} color="#A855F7" style={styles.inputIconTextArea} />
-            </View>
-            <Text style={styles.helperText}>Max 60 characters. ({60 - address.length} remaining)</Text>
-          </View>
-
-          {/* GSTIN (Optional) */}
-          <View style={styles.fullRow}>
-            <Text style={styles.label}>GSTIN (Optional)</Text>
-            <TextInput
-              style={[styles.input, formErrors.gstin && styles.inputError]}
-              placeholder="Enter your GST number"
-              value={gstin}
-              onChangeText={handleGstinChange}
-              onBlur={validateGstin}
-              placeholderTextColor="#9CA3AF"
-              maxLength={15}
-              autoCapitalize="characters"
-            />
-            {formErrors.gstin ? <Text style={styles.errorText}>{formErrors.gstin}</Text> : null}
           </View>
 
           {/* Next Button */}
@@ -262,14 +206,30 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
+    paddingTop: 24,
     paddingBottom: 40,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  backArrow: {
+    padding: 4,
+  },
+  placeholderSpace: {
+    width: 32,
+  },
+  headerSection: {
+    marginBottom: 32,
   },
   title: {
     fontSize: 24,
     fontWeight: '700',
     color: '#111827',
     textAlign: 'center',
-    marginTop: 20,
+    flex: 1,
   },
   subtitle: {
     fontSize: 14,
@@ -278,44 +238,48 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 24,
   },
-  gridRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 18,
+  progressBar: {
+    height: 4,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 2,
+    overflow: 'hidden',
+    marginBottom: 24,
   },
-  gridCol: {
-    flex: 1,
-    marginRight: 8,
+  progressFill: {
+    height: '100%',
+    width: '33%',
+    backgroundColor: '#7C3AED',
+    borderRadius: 2,
+  },
+  formCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  fieldContainer: {
+    marginBottom: 20,
   },
   label: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#374151',
     fontWeight: '600',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   input: {
     height: 48,
-    backgroundColor: '#fff',
-    borderRadius: 10,
+    backgroundColor: '#F9F9FF',
+    borderRadius: 12,
     borderColor: '#E5E7EB',
     borderWidth: 1,
-    fontSize: 15,
-    paddingHorizontal: 14,
-    marginBottom: 4,
+    fontSize: 16,
+    paddingHorizontal: 16,
     color: '#111827',
-  },
-  textArea: {
-    minHeight: 72,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    borderColor: '#E5E7EB',
-    borderWidth: 1,
-    fontSize: 15,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 4,
-    color: '#111827',
-    textAlignVertical: 'top',
   },
   inputError: {
     borderColor: '#EF4444',
@@ -328,13 +292,102 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 12,
     color: '#EF4444',
-    marginTop: 4,
+    marginTop: 6,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginVertical: 16,
+  },
+  toggleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    marginBottom: 20,
+  },
+  toggleSideWrapper: {
+    flex: 0.8,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 32,
+    gap: 6,
+  },
+  switchOutlineWrapper: {
+    borderWidth: 1.5,
+    borderColor: '#E5E7EB',
+    borderRadius: 24,
+    paddingHorizontal: 2,
+    paddingVertical: 2,
+  },
+  toggleLabel: {
+    fontSize: 15,
+    color: '#374151',
+    fontWeight: '500',
+    marginLeft: 12,
+  },
+  toggleLabelSmall: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: 16,
+  },
+  rowGroup: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 20,
+    alignItems: 'flex-start',
+  },
+  halfWidth: {
+    flex: 1.5,
     marginBottom: 0,
+  },
+  nextBtn: {
+    marginTop: 16,
+    width: '100%',
+    height: 52,
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  nextBtnGradient: {
+    width: '100%',
+    height: 52,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  nextBtnText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
+  // Unused styles (kept for reference)
+  textArea: {
+    minHeight: 72,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    borderColor: '#E5E7EB',
+    borderWidth: 1,
+    fontSize: 15,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 4,
+    color: '#111827',
+    textAlignVertical: 'top',
+    textAlign: 'center',
   },
   helperText: {
     fontSize: 12,
     color: '#6B7280',
     marginTop: 4,
+    textAlign: 'center',
   },
   fullRow: {
     marginBottom: 18,
@@ -343,12 +396,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 18,
-    marginLeft: '52%',
-  },
-  toggleLabel: {
-    fontSize: 13,
-    color: '#6B7280',
-    marginLeft: 6,
+    justifyContent: 'center',
   },
   inputIconWrapper: {
     position: 'relative',
@@ -363,30 +411,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 12,
     top: 12,
-  },
-  nextBtn: {
-    marginTop: 24,
-    width: '100%',
-    height: 52,
-    borderRadius: 10,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 3,
-  },
-  nextBtnGradient: {
-    width: '100%',
-    height: 52,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  nextBtnText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
   },
 });
 

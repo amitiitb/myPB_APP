@@ -5,8 +5,8 @@ import { Platform, StyleSheet, View } from 'react-native';
 
 interface FooterNavProps {
   scss?: any;
-  activeTab: 'home' | 'orders' | 'finance' | 'inventory' | 'customers';
-  onTabPress: (tab: 'home' | 'orders' | 'finance' | 'inventory' | 'customers') => void;
+  activeTab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports';
+  onTabPress: (tab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports') => void;
   onlyOrders?: boolean;
 }
 

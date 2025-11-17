@@ -25,14 +25,23 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
       <View style={styles.headerRightRow}>
         {/* Language Toggle */}
         {onLanguageToggle && (
-          <TouchableOpacity style={styles.languageToggle} onPress={onLanguageToggle}>
-            <Text style={styles.languageText}>
-              {language === 'en' ? 'हिंदी' : 'English'}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.languageToggleContainer}>
+            <TouchableOpacity 
+              style={[styles.languageToggleBtn, language === 'en' && styles.languageToggleBtnActive]} 
+              onPress={onLanguageToggle}
+            >
+              <Text style={[styles.languageToggleBtnText, language === 'en' && styles.languageToggleBtnTextActive]}>EN</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.languageToggleBtn, language === 'hi' && styles.languageToggleBtnActive]} 
+              onPress={onLanguageToggle}
+            >
+              <Text style={[styles.languageToggleBtnText, language === 'hi' && styles.languageToggleBtnTextActive]}>HI</Text>
+            </TouchableOpacity>
+          </View>
         )}
         {/* Notification Bell */}
-        <TouchableOpacity style={styles.iconWrapper} onPress={onNotificationPress}>
+        <TouchableOpacity style={styles.bellIconWrapper} onPress={onNotificationPress}>
           <Ionicons name="notifications-outline" size={24} color="#fff" />
           {notificationCount > 0 && (
             <View style={styles.badge}>
@@ -41,8 +50,8 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
           )}
         </TouchableOpacity>
         {/* Settings Icon */}
-        <TouchableOpacity style={styles.iconWrapper} onPress={onSettingsPress}>
-          <Ionicons name="settings-outline" size={24} color="#fff" />
+        <TouchableOpacity style={styles.bellIconWrapper} onPress={onSettingsPress}>
+          <Ionicons name="settings" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
     </View>
@@ -67,6 +76,7 @@ const styles = StyleSheet.create({
   headerRightRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 16,
   },
   languageToggle: {
     backgroundColor: 'rgba(255,255,255,0.65)',
@@ -80,7 +90,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.04,
     shadowRadius: 3,
     elevation: 1,
-    marginRight: 12,
   },
   languageText: {
     fontSize: 13,
@@ -88,8 +97,33 @@ const styles = StyleSheet.create({
     color: '#4B5563',
     opacity: 0.95,
   },
-  iconWrapper: {
-    marginLeft: 12,
+  languageToggleContainer: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 14,
+    padding: 2,
+    gap: 2,
+  },
+  languageToggleBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+    minWidth: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  languageToggleBtnActive: {
+    backgroundColor: '#fff',
+  },
+  languageToggleBtnText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.6)',
+  },
+  languageToggleBtnTextActive: {
+    color: '#7C3AED',
+  },
+  bellIconWrapper: {
     position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',

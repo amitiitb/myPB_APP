@@ -1,41 +1,177 @@
 import AddOrderStep1 from '@/components/AddOrderStep1';
 import FooterNav from '@/components/FooterNav';
 import HeaderBar from '@/components/HeaderBar';
+import NotificationsScreen from '@/components/NotificationsScreen';
 import SettingsScreen from '@/components/SettingsScreen';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
+import { useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Dimensions,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import CustomersScreen from './(tabs)/customers';
 import FinanceScreen from './(tabs)/finance';
 import InventoryScreen from './(tabs)/inventory';
 import OrdersScreen from './(tabs)/orders';
+import ReportsScreen from './(tabs)/reports';
 
 const { width } = Dimensions.get('window');
 
 const DashboardScreen: React.FC = () => {
   const { darkMode } = useTheme();
   const { language, setLanguage, t } = useLanguage();
+  const params = useLocalSearchParams<{
+    owners?: string;
+    composers?: string;
+    operators?: string;
+    ownerName?: string;
+    phoneNumber?: string;
+    whatsappNumber?: string;
+    pressName?: string;
+  }>();
+
+  // Parse team data from params
+  const [owners] = useState(() => {
+    try {
+      return params.owners ? JSON.parse(params.owners) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [composers] = useState(() => {
+    try {
+      return params.composers ? JSON.parse(params.composers) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [operators] = useState(() => {
+    try {
+      return params.operators ? JSON.parse(params.operators) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const ownerName = params.ownerName || 'Account Owner';
+  const phoneNumber = params.phoneNumber || '9876543210';
+  const whatsappNumber = params.whatsappNumber || phoneNumber;
+  const pressName = params.pressName || 'Press Name';
   const [dateFilter, setDateFilter] = useState('Last 7 Days');
-  const [activeTab, setActiveTab] = useState<'home' | 'orders' | 'finance' | 'inventory' | 'customers'>('home');
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [activeTab, setActiveTab] = useState<'home' | 'orders' | 'finance' | 'inventory' | 'reports'>('home');
   const [showAddOrder, setShowAddOrder] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const notificationCount = 4;
+
+  const dateFilterOptions = ['Today', 'Yesterday', 'Last 7 Days', 'Last 30 Days', 'Current Month', 'All Time'];
+
+  const getDaysInMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  };
+
+  const getFirstDayOfMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+  };
+
+  const renderCalendar = () => {
+    const days = [];
+    const daysInMonth = getDaysInMonth(selectedDate);
+    const firstDay = getFirstDayOfMonth(selectedDate);
+    const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+    // Day names
+    dayNames.forEach((day) => {
+      days.push(
+        <Text key={`day-${day}`} style={[scss.calendarDayName, darkMode && scss.calendarDayNameDark]}>
+          {day}
+        </Text>
+      );
+    });
+
+    // Empty cells for days before month starts
+    for (let i = 0; i < firstDay; i++) {
+      days.push(<View key={`empty-${i}`} style={[scss.calendarDay, scss.calendarDayEmpty]} />);
+    }
+
+    // Days of month
+    for (let i = 1; i <= daysInMonth; i++) {
+      const currentDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), i);
+      const isSelected = startDate && i === startDate.getDate() && selectedDate.getMonth() === startDate.getMonth();
+      const isInRange =
+        startDate &&
+        endDate &&
+        currentDate >= startDate &&
+        currentDate <= endDate;
+
+      days.push(
+        <TouchableOpacity
+          key={`day-${i}`}
+          style={[
+            scss.calendarDay,
+            isSelected && scss.calendarDaySelected,
+            isInRange && scss.calendarDayInRange,
+          ]}
+          onPress={() => {
+            if (!startDate) {
+              setStartDate(currentDate);
+            } else if (!endDate) {
+              if (currentDate < startDate) {
+                setEndDate(startDate);
+                setStartDate(currentDate);
+              } else {
+                setEndDate(currentDate);
+              }
+            } else {
+              setStartDate(currentDate);
+              setEndDate(null);
+            }
+          }}
+        >
+          <Text style={[scss.calendarDayText, isSelected && scss.calendarDayTextSelected]}>
+            {i}
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+
+    return days;
+  };
 
   // Show settings screen
   if (showSettings) {
-    return <SettingsScreen onBack={() => setShowSettings(false)} />;
+    return (
+      <SettingsScreen 
+        onBack={() => setShowSettings(false)} 
+        ownerName={ownerName}
+        ownerPhone={phoneNumber}
+        ownerWhatsapp={whatsappNumber}
+        pressName={pressName}
+        owners={owners}
+        composers={composers}
+        operators={operators}
+      />
+    );
+  }
+
+  // Show notifications screen
+  if (showNotifications) {
+    return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
   }
 
   // Footer navigation handler
@@ -66,10 +202,10 @@ const DashboardScreen: React.FC = () => {
         <FooterNav activeTab={activeTab} onTabPress={handleTabPress} />
       </>
     );
-  } else if (activeTab === 'customers') {
+  } else if (activeTab === 'reports') {
     mainContent = (
       <>
-        <CustomersScreen />
+        <ReportsScreen />
         <FooterNav activeTab={activeTab} onTabPress={handleTabPress} />
       </>
     );
@@ -80,11 +216,77 @@ const DashboardScreen: React.FC = () => {
           {/* Business Reports Section */}
           <View style={scss.sectionHeader}>
             <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>{t('dashboard.businessReports')}</Text>
-            <TouchableOpacity style={[scss.dateFilterBtn, darkMode && scss.dateFilterBtnDark]}>
+            <TouchableOpacity style={[scss.dateFilterBtn, darkMode && scss.dateFilterBtnDark]} onPress={() => setShowDatePicker(!showDatePicker)}>
               <Ionicons name="calendar-outline" size={16} color={darkMode ? '#9CA3AF' : '#6B7280'} style={{ marginRight: 6 }} />
               <Text style={[scss.dateFilterText, darkMode && scss.dateFilterTextDark]}>{dateFilter}</Text>
+              <Ionicons name="chevron-down" size={14} color={darkMode ? '#9CA3AF' : '#6B7280'} style={{ marginLeft: 6 }} />
             </TouchableOpacity>
           </View>
+
+          {/* Date Filter Dropdown */}
+          {showDatePicker && (
+            <View style={[scss.datePickerDropdown, darkMode && scss.datePickerDropdownDark]}>
+              {/* Quick Filter Options */}
+              <View style={scss.quickFilterContainer}>
+                {dateFilterOptions.map((option) => (
+                  <TouchableOpacity
+                    key={option}
+                    style={[scss.quickFilterOption, dateFilter === option && scss.quickFilterOptionActive]}
+                    onPress={() => {
+                      setDateFilter(option);
+                      setStartDate(null);
+                      setEndDate(null);
+                      setShowDatePicker(false);
+                    }}
+                  >
+                    <Text
+                      style={[
+                        scss.quickFilterOptionText,
+                        darkMode && scss.quickFilterOptionTextDark,
+                        dateFilter === option && scss.quickFilterOptionTextActive,
+                      ]}
+                    >
+                      {option}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* Calendar */}
+              <View style={scss.calendarContainer}>
+                <View style={scss.calendarHeader}>
+                  <TouchableOpacity
+                    onPress={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() - 1))}
+                  >
+                    <Text style={[scss.calendarNavText, darkMode && scss.calendarNavTextDark]}>{'<'}</Text>
+                  </TouchableOpacity>
+                  <Text style={[scss.calendarTitle, darkMode && scss.calendarTitleDark]}>
+                    {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1))}
+                  >
+                    <Text style={[scss.calendarNavText, darkMode && scss.calendarNavTextDark]}>{'>'}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={scss.calendarGrid}>{renderCalendar()}</View>
+              </View>
+
+              {/* Apply Button */}
+              {startDate && endDate && (
+                <TouchableOpacity
+                  style={[scss.applyBtn]}
+                  onPress={() => {
+                    const rangeStr = `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
+                    setDateFilter(rangeStr);
+                    setShowDatePicker(false);
+                  }}
+                >
+                  <Text style={scss.applyBtnText}>Apply Range</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
           {/* Report Cards Grid */}
           <View style={scss.reportGrid}>
             {/* Card 1: Total Orders */}
@@ -125,16 +327,16 @@ const DashboardScreen: React.FC = () => {
               <View style={scss.reportSubRow}><Text style={[scss.reportSubLabelSmall, darkMode && scss.reportSubLabelDark]}>{t('dashboard.highest')}</Text><Text style={[scss.reportSubValueSmall, darkMode && scss.reportSubValueDark]}>0</Text></View>
               <View style={scss.reportSubRow}><Text style={[scss.reportSubLabelSmall, darkMode && scss.reportSubLabelDark]}>{t('dashboard.lowest')}</Text><Text style={[scss.reportSubValueSmall, darkMode && scss.reportSubValueDark]}>0</Text></View>
             </TouchableOpacity>
-            {/* Card 4: Total Customers */}
+            {/* Card 4: Total Reports */}
             <TouchableOpacity
               style={[scss.reportCard, darkMode && scss.reportCardDark]}
               activeOpacity={0.8}
-              onPress={() => setActiveTab('customers')}
+              onPress={() => setActiveTab('reports')}
             >
               <Text style={[scss.reportBigNum, { color: '#EF4444' }]}>5</Text>
-              <Text style={[scss.reportCardTitle, darkMode && scss.reportCardTitleDark]}>{t('dashboard.totalCustomers')}</Text>
-              <View style={scss.reportSubRow}><Ionicons name="person-add-outline" size={16} color="#10B981" style={{ marginRight: 4 }} /><Text style={[scss.reportSubLabelSmall, darkMode && scss.reportSubLabelDark]}>{t('dashboard.new')}:</Text><Text style={[scss.reportSubValueSmall, darkMode && scss.reportSubValueDark]}>0</Text></View>
-              <View style={scss.reportSubRow}><Ionicons name="repeat-outline" size={16} color="#7C3AED" style={{ marginRight: 4 }} /><Text style={[scss.reportSubLabelSmall, darkMode && scss.reportSubLabelDark]}>{t('dashboard.repeated')}:</Text><Text style={[scss.reportSubValueSmall, darkMode && scss.reportSubValueDark]}>0</Text></View>
+              <Text style={[scss.reportCardTitle, darkMode && scss.reportCardTitleDark]}>{t('dashboard.totalReports')}</Text>
+              <View style={scss.reportSubRow}><Ionicons name="document-text-outline" size={16} color="#10B981" style={{ marginRight: 4 }} /><Text style={[scss.reportSubLabelSmall, darkMode && scss.reportSubLabelDark]}>{t('dashboard.new')}:</Text><Text style={[scss.reportSubValueSmall, darkMode && scss.reportSubValueDark]}>0</Text></View>
+              <View style={scss.reportSubRow}><Ionicons name="download-outline" size={16} color="#7C3AED" style={{ marginRight: 4 }} /><Text style={[scss.reportSubLabelSmall, darkMode && scss.reportSubLabelDark]}>{t('dashboard.generated')}:</Text><Text style={[scss.reportSubValueSmall, darkMode && scss.reportSubValueDark]}>0</Text></View>
             </TouchableOpacity>
           </View>
 
@@ -170,7 +372,7 @@ const DashboardScreen: React.FC = () => {
   return (
     <SafeAreaView style={[scss.safeArea, darkMode && scss.safeAreaDark]}>
       {/* Show different content based on activeTab */}
-      {activeTab === 'orders' || activeTab === 'finance' || activeTab === 'inventory' || activeTab === 'customers' ? (
+      {activeTab === 'orders' || activeTab === 'finance' || activeTab === 'inventory' || activeTab === 'reports' ? (
         mainContent
       ) : (
         <>
@@ -181,7 +383,7 @@ const DashboardScreen: React.FC = () => {
               notificationCount={notificationCount}
               language={language}
               onLanguageToggle={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-              onNotificationPress={() => console.log('Notifications pressed')}
+              onNotificationPress={() => setShowNotifications(true)}
               onSettingsPress={() => setShowSettings(true)}
             />
           )}
@@ -234,6 +436,7 @@ const scss = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: '5%',
+    paddingTop: 20,
     paddingBottom: 120,
   },
   sectionHeader: {
@@ -263,6 +466,158 @@ const scss = StyleSheet.create({
   dateFilterBtnDark: {
     backgroundColor: '#374151',
     borderColor: '#4B5563',
+  },
+  datePickerDropdown: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E5E7EB',
+    borderWidth: 1,
+    borderRadius: 10,
+    marginBottom: 12,
+    padding: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  datePickerDropdownDark: {
+    backgroundColor: '#1F2937',
+    borderColor: '#374151',
+  },
+  quickFilterContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 10,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  quickFilterOption: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    backgroundColor: '#F3F4F6',
+  },
+  quickFilterOptionActive: {
+    backgroundColor: '#7C3AED',
+  },
+  quickFilterOptionText: {
+    fontSize: 13,
+    color: '#374151',
+    fontWeight: '500',
+  },
+  quickFilterOptionTextDark: {
+    color: '#F3F4F6',
+  },
+  quickFilterOptionTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  calendarContainer: {
+    marginTop: 8,
+  },
+  calendarHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  calendarNavText: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#7C3AED',
+  },
+  calendarNavTextDark: {
+    color: '#A78BFA',
+  },
+  calendarTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  calendarTitleDark: {
+    color: '#F3F4F6',
+  },
+  calendarGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  calendarDayName: {
+    width: '14.28%',
+    textAlign: 'center',
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginBottom: 4,
+  },
+  calendarDayNameDark: {
+    color: '#D1D5DB',
+  },
+  calendarDay: {
+    width: '14.28%',
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 6,
+    marginBottom: 4,
+  },
+  calendarDayEmpty: {
+    height: 0,
+    marginBottom: 0,
+  },
+  calendarDaySelected: {
+    backgroundColor: '#7C3AED',
+  },
+  calendarDayInRange: {
+    backgroundColor: '#EDE9FE',
+  },
+  calendarDayText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#111827',
+  },
+  calendarDayTextDark: {
+    color: '#F3F4F6',
+  },
+  calendarDayTextSelected: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  applyBtn: {
+    backgroundColor: '#7C3AED',
+    borderRadius: 8,
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  applyBtnText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  dateFilterOption: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    marginBottom: 4,
+  },
+  dateFilterOptionActive: {
+    backgroundColor: '#7C3AED',
+  },
+  dateFilterOptionText: {
+    fontSize: 14,
+    color: '#374151',
+    fontWeight: '500',
+  },
+  dateFilterOptionTextDarkInactive: {
+    color: '#E5E7EB',
+  },
+  dateFilterOptionTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
   dateFilterText: {
     fontSize: 13,

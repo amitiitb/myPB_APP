@@ -14,10 +14,11 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const BusinessProfileStepTwo: React.FC = () => {
-  const { ownerName, phoneNumber, whatsappNumber } = useLocalSearchParams<{
+  const { ownerName, phoneNumber, whatsappNumber, pressName } = useLocalSearchParams<{
     ownerName: string;
     phoneNumber: string;
     whatsappNumber: string;
+    pressName: string;
   }>();
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [error, setError] = useState('');
@@ -44,16 +45,10 @@ const BusinessProfileStepTwo: React.FC = () => {
       'Handbills',
       'Posters (Vinyl Poster)',
       'Flex',
-      'Banners / Signage',
-      'Stickers',
-      'Labels',
     ],
     'Merchandise & Packaging': [
-      'T-shirts',
+      'T-Shirts',
       'Mugs',
-      'Grocery Bags',
-      'Plastic Films',
-      'Packaging',
     ],
   };
 
@@ -82,6 +77,7 @@ const BusinessProfileStepTwo: React.FC = () => {
         ownerName: ownerName || '',
         phoneNumber: phoneNumber || '',
         whatsappNumber: whatsappNumber || '',
+        pressName: pressName || '',
       }
     });
   };
@@ -102,6 +98,9 @@ const BusinessProfileStepTwo: React.FC = () => {
             <View style={styles.placeholderSpace} />
           </View>
           <Text style={styles.subtitle}>Step 2 of 3: Services Selection</Text>
+          <View style={styles.progressBar}>
+            <View style={styles.progressFill} />
+          </View>
 
           {/* Service Categories */}
           {Object.entries(serviceCategories).map(([category, services]) => (
@@ -186,6 +185,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 4,
     marginBottom: 24,
+  },
+  progressBar: {
+    height: 4,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 2,
+    overflow: 'hidden',
+    marginBottom: 24,
+  },
+  progressFill: {
+    height: '100%',
+    width: '66%',
+    backgroundColor: '#7C3AED',
+    borderRadius: 2,
   },
   categorySection: {
     marginBottom: 24,

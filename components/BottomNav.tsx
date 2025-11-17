@@ -3,8 +3,8 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface BottomNavProps {
-  activeTab: 'home' | 'orders' | 'finance' | 'inventory' | 'customers';
-  onTabPress: (tab: 'home' | 'orders' | 'finance' | 'inventory' | 'customers') => void;
+  activeTab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports';
+  onTabPress: (tab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports') => void;
   onlyOrders?: boolean;
 }
 
@@ -47,11 +47,11 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabPress, onlyOrders
         </View>
         <Text style={activeTab === 'inventory' ? styles.navTabTextActive : styles.navTabText}>Inventory</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={activeTab === 'customers' ? styles.navTabActive : styles.navTab} onPress={() => onTabPress('customers')}>
-        <View style={activeTab === 'customers' ? styles.activeTabBg : styles.iconContainer}>
-          <Ionicons name="people-outline" size={22} color={activeTab === 'customers' ? '#7C3AED' : '#6B7280'} />
+      <TouchableOpacity style={activeTab === 'reports' ? styles.navTabActive : styles.navTab} onPress={() => onTabPress('reports')}>
+        <View style={activeTab === 'reports' ? styles.activeTabBg : styles.iconContainer}>
+          <Ionicons name="document-text-outline" size={22} color={activeTab === 'reports' ? '#7C3AED' : '#6B7280'} />
         </View>
-        <Text style={activeTab === 'customers' ? styles.navTabTextActive : styles.navTabText}>Customers</Text>
+        <Text style={activeTab === 'reports' ? styles.navTabTextActive : styles.navTabText}>Reports</Text>
       </TouchableOpacity>
     </View>
   );

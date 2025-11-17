@@ -25,7 +25,7 @@ export const ICONS = {
   orders: 'document-text',
   finance: 'wallet',
   inventory: 'cube',
-  customers: 'people',
+  reports: 'document-text',
   
   // Actions
   add: 'add-circle',

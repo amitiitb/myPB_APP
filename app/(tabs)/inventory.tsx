@@ -1,3 +1,4 @@
+import FooterNav from '@/components/FooterNav';
 import HeaderBar from '@/components/HeaderBar';
 import SettingsScreen from '@/components/SettingsScreen';
 import { useLanguage } from '@/context/LanguageContext';
@@ -38,7 +39,10 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ activeTab, onTabPress
           <Text style={[scss.placeholderText, darkMode && scss.placeholderTextDark]}>{t('inventory.noItems')}</Text>
         </View>
       </ScrollView>
-    </View>
+      </View>
+      {!showSettings && activeTab && onTabPress && (
+        <FooterNav activeTab={activeTab} onTabPress={onTabPress} />
+      )}
     </>
   );
 };

@@ -39,13 +39,13 @@ export const hi = {
     totalOrders: 'कुल ऑर्डर',
     totalSales: 'कुल बिक्रय',
     avgOrderInRs: 'औसत ऑर्डर (रुपये में)',
-    totalCustomers: 'कुल ग्राहक',
+    totalReports: 'कुल रिपोर्ट',
     inProgress: 'प्रगति में',
     delivered: 'वितरित',
     received: 'प्राप्त',
     due: 'बकाया',
     new: 'नया',
-    repeated: 'दोहराया गया',
+    generated: 'उत्पन्न',
     highest: 'सर्वोच्च',
     lowest: 'न्यूनतम',
     last7Days: 'पिछले 7 दिन',
@@ -101,16 +101,15 @@ export const hi = {
     stock: 'स्टॉक',
   },
 
-  // Customers
-  customers: {
-    customers: 'ग्राहक',
-    noCustomers: 'अभी कोई ग्राहक नहीं है। अपना पहला ग्राहक जोड़ें!',
-    addCustomer: 'ग्राहक जोड़ें',
-    customerName: 'ग्राहक का नाम',
-    phone: 'फोन',
-    email: 'ईमेल',
-    address: 'पता',
-    totalOrders: 'कुल ऑर्डर',
+  // Reports
+  reports: {
+    reports: 'रिपोर्ट',
+    noReports: 'अभी कोई रिपोर्ट नहीं है। अपनी पहली रिपोर्ट जेनरेट करें!',
+    generateReport: 'रिपोर्ट जेनरेट करें',
+    reportName: 'रिपोर्ट नाम',
+    reportDate: 'रिपोर्ट तारीख',
+    reportType: 'रिपोर्ट प्रकार',
+    downloadReport: 'रिपोर्ट डाउनलोड करें',
   },
 
   // Settings

@@ -6,11 +6,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert, Dimensions, Keyboard, KeyboardAvoidingView,
-    Platform,
-    ScrollView, StyleSheet,
-    TextInput,
-    TouchableOpacity, useColorScheme, View
+  Alert, Dimensions, Keyboard, KeyboardAvoidingView,
+  Platform,
+  ScrollView, StyleSheet,
+  TextInput,
+  TouchableOpacity, useColorScheme, View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -153,17 +153,21 @@ export default function LoginScreen() {
 
             {/* Continue Button */}
             <TouchableOpacity
-              style={[styles.continueButtonWrapper, isLoading && styles.continueButtonDisabled]}
+              style={styles.continueButtonWrapper}
               onPress={handleContinue}
-              disabled={isLoading}
+              disabled={isLoading || !phoneNumber || phoneNumber.length !== 10 || !/^[6-9]/.test(phoneNumber)}
             >
               <LinearGradient
-                colors={['#A855F7', '#7C3AED']}
+                colors={
+                  isLoading || !phoneNumber || phoneNumber.length !== 10 || !/^[6-9]/.test(phoneNumber)
+                    ? ['#D1D5DB', '#D1D5DB']
+                    : ['#A855F7', '#7C3AED']
+                }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.continueGradient}
               >
-                <ThemedText style={styles.continueButtonText}>
+                <ThemedText style={[styles.continueButtonText, (isLoading || !phoneNumber || phoneNumber.length !== 10 || !/^[6-9]/.test(phoneNumber)) && styles.continueButtonTextDisabled]}>
                   {isLoading
                     ? t('login.processing')
                     : t('login.continueButton')}
@@ -300,14 +304,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 17,
+    fontSize: 14,
     fontWeight: '600',
-    color: '#111827',
-    marginTop: 16,
-    marginBottom: 12,
+    color: '#9CA3AF',
+    marginBottom: 16,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
   },
   inputContainer: {
-    marginBottom: 24,
+    marginBottom: 40,
   },
   phoneInputContainer: {
     flexDirection: 'row',
@@ -365,6 +370,9 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  continueButtonTextDisabled: {
+    color: '#9CA3AF',
   },
   footer: {
     flexDirection: 'row',

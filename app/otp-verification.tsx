@@ -4,11 +4,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
-    Alert, Dimensions, Keyboard, KeyboardAvoidingView,
-    Platform,
-    ScrollView, StyleSheet,
-    TextInput,
-    TouchableOpacity, useColorScheme, View
+  Alert, Dimensions, Keyboard, KeyboardAvoidingView,
+  Platform,
+  ScrollView, StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity, useColorScheme, View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -21,6 +22,7 @@ export default function OTPVerificationScreen() {
   const [language, setLanguage] = useState<'en' | 'hi'>('en');
   const [resendTimer, setResendTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
   const inputRefs = useRef<TextInput[]>([]);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
@@ -67,19 +69,15 @@ export default function OTPVerificationScreen() {
           setIsLoading(true);
           setTimeout(() => {
             setIsLoading(false);
-            Alert.alert(
-              language === 'en' ? 'Success' : 'सफलता',
-              language === 'en' ? 'OTP verified successfully!' : 'OTP सफलतापूर्वक सत्यापित!',
-              [
-                {
-                  text: language === 'en' ? 'Continue' : 'जारी रखें',
-                  onPress: () => router.replace({
-                    pathname: '/BusinessProfileStepOne',
-                    params: { phoneNumber: phoneNumber || '' }
-                  }),
-                },
-              ]
-            );
+            // Show success toast
+            setShowSuccessToast(true);
+            // Auto-close toast and navigate after 1 second
+            setTimeout(() => {
+              router.replace({
+                pathname: '/BusinessProfileStepOne',
+                params: { phoneNumber: phoneNumber || '' }
+              });
+            }, 1000);
           }, 1500);
         }
       }, 150); // slight delay to allow keyboard to close
@@ -109,19 +107,15 @@ export default function OTPVerificationScreen() {
       setIsLoading(false);
 
       // For demo purposes, accept any OTP
-      Alert.alert(
-        language === 'en' ? 'Success' : 'सफलता',
-        language === 'en' ? 'OTP verified successfully!' : 'OTP सफलतापूर्वक सत्यापित!',
-        [
-          {
-            text: language === 'en' ? 'Continue' : 'जारी रखें',
-            onPress: () => router.replace({
-              pathname: '/BusinessProfileStepOne',
-              params: { phoneNumber: phoneNumber || '' }
-            }),
-          },
-        ]
-      );
+      // Show success toast
+      setShowSuccessToast(true);
+      // Auto-close toast and navigate after 1 second
+      setTimeout(() => {
+        router.replace({
+          pathname: '/BusinessProfileStepOne',
+          params: { phoneNumber: phoneNumber || '' }
+        });
+      }, 1000);
     }, 1500);
   };
 
@@ -203,18 +197,22 @@ export default function OTPVerificationScreen() {
 
               {/* Verify Button */}
               <TouchableOpacity
-                style={[styles.verifyButton, isLoading && styles.verifyButtonDisabled, { padding: 0, backgroundColor: 'transparent', shadowColor: 'transparent' }]}
+                style={styles.verifyButton}
                 onPress={handleVerifyOTP}
-                disabled={isLoading}
+                disabled={isLoading || !otp.every((d) => d.length === 1)}
                 activeOpacity={0.85}
               >
                 <LinearGradient
-                  colors={['#A855F7', '#7C3AED']}
+                  colors={
+                    isLoading || !otp.every((d) => d.length === 1)
+                      ? ['#D1D5DB', '#D1D5DB']
+                      : ['#A855F7', '#7C3AED']
+                  }
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.verifyButtonGradient}
                 >
-                  <ThemedText style={styles.verifyButtonText}>
+                  <ThemedText style={[styles.verifyButtonText, (isLoading || !otp.every((d) => d.length === 1)) && styles.verifyButtonTextDisabled]}>
                     {isLoading
                       ? (language === 'en' ? 'Verifying...' : 'सत्यापित हो रहा है...')
                       : (language === 'en' ? 'Verify OTP' : 'OTP सत्यापित करें')}
@@ -250,6 +248,17 @@ export default function OTPVerificationScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Success Toast */}
+      {showSuccessToast && (
+        <View style={styles.toastContainer}>
+          <View style={styles.toast}>
+            <Text style={styles.toastText}>
+              {language === 'en' ? 'OTP verified successfully!' : 'OTP सफलतापूर्वक सत्यापित!'}
+            </Text>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -390,6 +399,10 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
+  verifyButtonTextDisabled: {
+    color: '#9CA3AF',
+    textShadowColor: 'transparent',
+  },
   resendContainer: {
     alignItems: 'center',
   },
@@ -422,5 +435,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6B7280',
     fontWeight: '500',
+  },
+  toastContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    pointerEvents: 'none',
+  },
+  toast: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderRadius: 12,
+  },
+  toastText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '500',
+    textAlign: 'center',
   },
 });
