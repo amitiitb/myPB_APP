@@ -1,25 +1,36 @@
 import FooterNav from '@/components/FooterNav';
 import HeaderBar from '@/components/HeaderBar';
+import NotificationsScreen from '@/components/NotificationsScreen';
 import SettingsScreen from '@/components/SettingsScreen';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 interface InventoryScreenProps {
-  activeTab?: 'home' | 'orders' | 'finance' | 'inventory' | 'customers';
-  onTabPress?: (tab: 'home' | 'orders' | 'finance' | 'inventory' | 'customers') => void;
+  activeTab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports';
+  onTabPress: (tab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports') => void;
 }
 
 const InventoryScreen: React.FC<InventoryScreenProps> = ({ activeTab, onTabPress }) => {
   const { darkMode } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const [showSettings, setShowSettings] = React.useState(false);
+  const [showNotifications, setShowNotifications] = React.useState(false);
   const notificationCount = 4;
 
   // Show settings screen
   if (showSettings) {
-    return <SettingsScreen onBack={() => setShowSettings(false)} />;
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <SettingsScreen onBack={() => setShowSettings(false)} />
+      </SafeAreaView>
+    );
+  }
+
+  // Show notifications screen
+  if (showNotifications) {
+    return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
   }
 
   return (
@@ -29,7 +40,7 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ activeTab, onTabPress
         notificationCount={notificationCount}
         language={language}
         onLanguageToggle={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-        onNotificationPress={() => console.log('Notifications pressed')}
+        onNotificationPress={() => setShowNotifications(true)}
         onSettingsPress={() => setShowSettings(true)}
       />
       <View style={[scss.container, darkMode && scss.containerDark]}>

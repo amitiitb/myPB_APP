@@ -342,10 +342,10 @@ const BusinessProfileStepThree: React.FC = () => {
             <TouchableOpacity style={styles.backArrow} onPress={handleBack}>
               <Ionicons name="arrow-back" size={24} color="#111827" />
             </TouchableOpacity>
-            <Text style={styles.title}>Business Profile Setup</Text>
+            <Text style={styles.title}>Invite your team</Text>
             <View style={styles.placeholderSpace} />
           </View>
-          <Text style={styles.subtitle}>Step 3 of 3: Team Management</Text>
+          <Text style={styles.subtitle}>Step 3 of 3</Text>
           <View style={styles.progressBar}>
             <View style={styles.progressFill} />
           </View>
@@ -448,6 +448,9 @@ const BusinessProfileStepThree: React.FC = () => {
 
       {/* Floating Finish Setup Button */}
       <View style={styles.floatingButtonContainer}>
+        <TouchableOpacity style={styles.skipBtn} onPress={handleFinishSetup}>
+          <Text style={styles.skipBtnText}>Skip for now</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.finishBtn} onPress={handleFinishSetup}>
           <LinearGradient
             colors={['#A855F7', '#7C3AED']}
@@ -762,9 +765,26 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
+    flexDirection: 'row',
+    gap: 12,
+  },
+  skipBtn: {
+    flex: 1,
+    height: 52,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: '#D1D5DB',
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  skipBtnText: {
+    color: '#6B7280',
+    fontSize: 16,
+    fontWeight: '600',
   },
   finishBtn: {
-    width: '100%',
+    flex: 1,
     height: 52,
     borderRadius: 10,
     overflow: 'hidden',

@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Animated, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View, Linking, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useLanguage } from '../context/LanguageContext';
@@ -37,6 +37,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
   const [showTeamManagement, setShowTeamManagement] = useState(false);
   const [address, setAddress] = useState('');
   const [gstin, setGstin] = useState('');
+  const [supportExpanded, setSupportExpanded] = useState(false);
   const router = useRouter();
   const blinkAnim = React.useRef(new Animated.Value(1)).current;
 
@@ -79,6 +80,26 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
     setGstin(cleaned);
   };
 
+  // Support actions
+  const handleCall = () => {
+    Linking.openURL('tel:+917991828898').catch(() => {
+      Alert.alert('Error', 'Unable to initiate call.');
+    });
+  };
+
+  const handleWhatsApp = () => {
+    const url = 'https://wa.me/917991828898';
+    Linking.openURL(url).catch(() => {
+      Alert.alert('Error', 'Unable to open WhatsApp.');
+    });
+  };
+
+  const handleMail = () => {
+    Linking.openURL('mailto:contact@printbandhan.com').catch(() => {
+      Alert.alert('Error', 'Unable to open mail client.');
+    });
+  };
+
   // Show MyProfileScreen if needed
   if (showMyProfile) {
     return (
@@ -109,12 +130,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
   }
 
   return (
-    <SafeAreaView style={[scss.safeArea, darkMode && scss.safeAreaDark]}>
+    <View style={[scss.container, darkMode && scss.containerDark]}>
       <View style={[scss.header, darkMode && scss.headerDark]}>
-        <TouchableOpacity onPress={onBack}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Ionicons name="settings" size={26} color="#fff" style={{ marginLeft: 12, marginRight: 4 }} />
         <Text style={scss.headerTitle}>{t('settings.settings')}</Text>
       </View>
       <ScrollView contentContainerStyle={scss.scrollContent} showsVerticalScrollIndicator={false}>
@@ -134,7 +151,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
         </TouchableOpacity>
         <View style={scss.row}>
           <View style={[scss.iconCircle, darkMode && scss.iconCircleDark]}><Ionicons name="moon" size={22} color={darkMode ? '#c4b5fd' : '#a78bfa'} /></View>
-          <View style={scss.rowText}><Text style={[scss.rowTitle, darkMode && scss.rowTitleDark]}>{t('settings.appearance')}</Text><Text style={[scss.rowDesc, darkMode && scss.rowDescDark]}>{t('settings.switchDarkMode')}</Text></View>
+          <View style={scss.rowText}><Text style={[scss.rowTitle, darkMode && scss.rowTitleDark]}>Dark Mode</Text><Text style={[scss.rowDesc, darkMode && scss.rowDescDark]}>Enable dark theme for the app</Text></View>
           <Switch value={darkMode} onValueChange={setDarkMode} thumbColor={darkMode ? '#7C3AED' : '#ccc'} trackColor={{ true: '#E9D5FF', false: '#E5E7EB' }} />
         </View>
         <View style={scss.row}>
@@ -146,37 +163,96 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
           </View>
         </View>
       </View>
+      
       {/* Support Section */}
-      <View style={[scss.card, darkMode && scss.cardDark]}>
-        <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>{t('settings.support')}</Text>
-        <TouchableOpacity style={scss.row}>
-          <View style={[scss.iconCircle, darkMode && scss.iconCircleDark]}><Ionicons name="help-circle" size={22} color={darkMode ? '#c4b5fd' : '#a78bfa'} /></View>
-          <View style={scss.rowText}><Text style={[scss.rowTitle, darkMode && scss.rowTitleDark]}>{t('settings.helpSupport')}</Text><Text style={[scss.rowDesc, darkMode && scss.rowDescDark]}>{t('settings.getHelp')}</Text></View>
-          <Ionicons name="chevron-forward" size={20} color={darkMode ? '#6B7280' : '#a1a1aa'} />
+      <View style={[scss.supportSection, darkMode && scss.supportSectionDark]}>
+        <Text style={[scss.supportSectionTitle, darkMode && scss.supportSectionTitleDark]}>SUPPORT</Text>
+        
+        <TouchableOpacity
+          style={[scss.supportRow, darkMode && scss.supportRowDark, { marginBottom: supportExpanded ? 0 : 0 }]}
+          onPress={() => setSupportExpanded((prev) => !prev)}
+          activeOpacity={0.8}
+        >
+          <View style={[scss.supportIconCircle, darkMode && scss.supportIconCircleDark]}> 
+            <Ionicons name="help-circle-outline" size={22} color="#7C3AED" />
+          </View>
+          <View style={scss.supportTextBlock}>
+            <Text style={[scss.supportRowTitle, darkMode && scss.supportRowTitleDark]}>Help & Support</Text>
+            <Text style={[scss.supportRowDesc, darkMode && scss.supportRowDescDark]}>Get help and contact support</Text>
+          </View>
+          <Ionicons name={supportExpanded ? 'chevron-up' : 'chevron-down'} size={20} color={darkMode ? '#9CA3AF' : '#6B7280'} />
         </TouchableOpacity>
-        <View style={[scss.row, { opacity: 0.5 }]}> 
-          <View style={[scss.iconCircle, darkMode && scss.iconCircleDark]}><Ionicons name="people" size={22} color={darkMode ? '#c4b5fd' : '#a78bfa'} /></View>
-          <View style={scss.rowText}><Text style={[scss.rowTitle, darkMode && scss.rowTitleDark]}>{t('settings.connectCommunity')}</Text><Text style={[scss.rowDesc, darkMode && scss.rowDescDark]}>{t('settings.connectOthers')}</Text></View>
-          <Animated.View style={[scss.comingSoon, { opacity: blinkAnim }]}><Text style={scss.comingSoonText}>{t('settings.comingSoon')}</Text></Animated.View>
-        </View>
+        
+        {supportExpanded && (
+          <View style={scss.expandedOptions}>
+            <TouchableOpacity style={[scss.supportCard, darkMode && scss.supportCardDark]} onPress={handleCall} activeOpacity={0.8}>
+              <View style={[scss.supportIconWrap, darkMode && scss.iconCircleDark]}>
+                <Ionicons name="call" size={22} color="#22C55E" />
+              </View>
+              <View style={scss.supportTextWrap}>
+                <Text style={[scss.supportTitle, darkMode && scss.rowTitleDark]}>Talk to us</Text>
+                <Text style={[scss.supportSubtitle, darkMode && scss.rowDescDark]}>Call Time: 10am - 9pm</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#A1A1AA" />
+            </TouchableOpacity>
+            <TouchableOpacity style={[scss.supportCard, darkMode && scss.supportCardDark]} onPress={handleWhatsApp} activeOpacity={0.8}>
+              <View style={[scss.supportIconWrap, darkMode && scss.iconCircleDark]}>
+                <Ionicons name="logo-whatsapp" size={22} color="#25D366" />
+              </View>
+              <View style={scss.supportTextWrap}>
+                <Text style={[scss.supportTitle, darkMode && scss.rowTitleDark]}>Chat with us</Text>
+                <Text style={[scss.supportSubtitle, darkMode && scss.rowDescDark]}>PrintBandhan Account On Whatsapp</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#A1A1AA" />
+            </TouchableOpacity>
+            <TouchableOpacity style={[scss.supportCard, darkMode && scss.supportCardDark]} onPress={handleMail} activeOpacity={0.8}>
+              <View style={[scss.supportIconWrap, darkMode && scss.iconCircleDark]}>
+                <Ionicons name="mail-outline" size={22} color="#2563EB" />
+              </View>
+              <View style={scss.supportTextWrap}>
+                <Text style={[scss.supportTitle, darkMode && scss.rowTitleDark]}>Mail Us</Text>
+                <Text style={[scss.supportSubtitle, darkMode && scss.rowDescDark]}>contact@printbandhan.com</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#A1A1AA" />
+            </TouchableOpacity>
+          </View>
+        )}
+        
+        <TouchableOpacity
+          style={[scss.supportRow, scss.supportRowLast, darkMode && scss.supportRowDark]}
+          activeOpacity={0.8}
+        >
+          <View style={[scss.supportIconCircle, darkMode && scss.supportIconCircleDark]}> 
+            <Ionicons name="people-circle-outline" size={22} color="#F59E42" />
+          </View>
+          <View style={scss.supportTextBlock}>
+            <Text style={[scss.supportRowTitle, darkMode && scss.supportRowTitleDark]}>Connect with Community</Text>
+            <Text style={[scss.supportRowDesc, darkMode && scss.supportRowDescDark]}>Connect with other printing press owners</Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Animated.View style={[scss.comingSoon, { opacity: blinkAnim }]}> 
+              <Text style={scss.comingSoonText}>Coming Soon</Text>
+            </Animated.View>
+          </View>
+        </TouchableOpacity>
       </View>
-      {/* Log Out Button */}
+
       <TouchableOpacity style={scss.logoutBtn} onPress={handleLogout}>
         <Ionicons name="log-out" size={20} color="#fff" style={{ marginRight: 8 }} />
         <Text style={scss.logoutBtnText}>{t('common.logout')}</Text>
       </TouchableOpacity>
       <Text style={scss.footerText}>dil se printing 🇮🇳</Text>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const scss = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
     backgroundColor: '#F9F9FF',
   },
-  safeAreaDark: {
+  containerDark: {
     backgroundColor: '#1F2937',
   },
   scrollContent: {
@@ -186,6 +262,7 @@ const scss = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#7C3AED',
     paddingHorizontal: 20,
     height: 64,
@@ -194,11 +271,9 @@ const scss = StyleSheet.create({
     backgroundColor: '#6D28D9',
   },
   headerTitle: {
-    flex: 1,
     color: '#fff',
     fontSize: 20,
     fontWeight: '700',
-    marginLeft: 16,
   },
   card: {
     backgroundColor: '#fff',
@@ -250,26 +325,42 @@ const scss = StyleSheet.create({
   langToggleWrap: {
     flexDirection: 'row',
     backgroundColor: '#ede9fe',
-    borderRadius: 16,
+    borderRadius: 20,
     overflow: 'hidden',
     marginLeft: 8,
+    borderWidth: 2,
+    borderColor: '#a78bfa',
+    shadowColor: '#a78bfa',
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
   langBtn: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
+    paddingHorizontal: 22,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minWidth: 60,
+    transitionProperty: 'background-color',
+    transitionDuration: '200ms',
   },
   langBtnActive: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: '#7C3AED',
+    borderRadius: 20,
   },
   langBtnText: {
     color: '#6B7280',
     fontWeight: '600',
-    fontSize: 13,
+    fontSize: 14,
+    textAlign: 'center',
   },
   langBtnTextActive: {
-    color: '#7C3AED',
+    color: '#fff',
     fontWeight: '700',
+    textAlign: 'center',
   },
   comingSoon: {
     backgroundColor: '#A855F7',
@@ -329,7 +420,46 @@ const scss = StyleSheet.create({
   iconCircleDark: {
     backgroundColor: '#4B5563',
   },
-  // Profile Edit Section Styles
+  // Support Card Styles
+  supportCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    marginBottom: 14,
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
+  },
+  supportCardDark: {
+    backgroundColor: '#374151',
+  },
+  supportIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  supportTextWrap: {
+    flex: 1,
+  },
+  supportTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  supportSubtitle: {
+    fontSize: 13,
+    color: '#6B7280',
+  },
   profileEditSection: {
     marginTop: 16,
     paddingTop: 16,
@@ -421,6 +551,83 @@ const scss = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  // Support Section Styles
+  supportSection: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    marginHorizontal: 18,
+    marginTop: 8,
+    paddingVertical: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  supportSectionDark: {
+    backgroundColor: '#374151',
+  },
+  supportSectionTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#9CA3AF',
+    letterSpacing: 0.5,
+    paddingHorizontal: 18,
+    marginBottom: 12,
+  },
+  supportSectionTitleDark: {
+    color: '#9CA3AF',
+  },
+  supportRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  supportRowDark: {
+    borderBottomColor: '#4B5563',
+  },
+  supportRowLast: {
+    borderBottomWidth: 0,
+  },
+  supportIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  supportIconCircleDark: {
+    backgroundColor: '#4B5563',
+  },
+  supportTextBlock: {
+    flex: 1,
+  },
+  supportRowTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  supportRowTitleDark: {
+    color: '#F3F4F6',
+  },
+  supportRowDesc: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  supportRowDescDark: {
+    color: '#D1D5DB',
+  },
+  expandedOptions: {
+    paddingHorizontal: 18,
+    paddingTop: 8,
+    paddingBottom: 8,
   },
 });
 

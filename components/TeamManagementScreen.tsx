@@ -549,7 +549,7 @@ const scss = StyleSheet.create({
   headerTitle: {
     flex: 1,
     color: '#fff',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
     marginLeft: 16,
   },

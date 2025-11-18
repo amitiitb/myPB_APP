@@ -107,10 +107,10 @@ const BusinessProfileStepOne: React.FC = () => {
             <TouchableOpacity style={styles.backArrow} onPress={() => router.back()}>
               <Ionicons name="arrow-back" size={24} color="#111827" />
             </TouchableOpacity>
-            <Text style={styles.title}>Business Profile Setup</Text>
+            <Text style={styles.title}>Profile Setup</Text>
             <View style={styles.placeholderSpace} />
           </View>
-          <Text style={styles.subtitle}>Step 1 of 3: Account Creation</Text>
+          <Text style={styles.subtitle}>Step 1 of 3</Text>
           <View style={styles.progressBar}>
             <View style={styles.progressFill} />
           </View>

@@ -6,12 +6,12 @@ import SettingsScreen from '@/components/SettingsScreen';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface FinanceScreenProps {
-  activeTab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports';
-  onTabPress: (tab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports') => void;
+  activeTab?: 'home' | 'orders' | 'finance' | 'inventory' | 'customers';
+  onTabPress?: (tab: 'home' | 'orders' | 'finance' | 'inventory' | 'customers') => void;
 }
 
 const FinanceScreen: React.FC<FinanceScreenProps> = ({ activeTab, onTabPress }) => {
@@ -25,7 +25,6 @@ const FinanceScreen: React.FC<FinanceScreenProps> = ({ activeTab, onTabPress }) 
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [search, setSearch] = useState('');
   const [showSettings, setShowSettings] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
   const notificationCount = 4;
 
   const dateFilterOptions = ['Today', 'Yesterday', 'Last 7 Days', 'Last 30 Days', 'Current Month', 'All Time'];
@@ -104,88 +103,13 @@ const FinanceScreen: React.FC<FinanceScreenProps> = ({ activeTab, onTabPress }) 
 
   // Show settings screen
   if (showSettings) {
-    return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <SettingsScreen onBack={() => setShowSettings(false)} />
-      </SafeAreaView>
-    );
+    return <SettingsScreen onBack={() => setShowSettings(false)} />;
   }
 
   // Show notifications screen
   if (showNotifications) {
     return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
   }
-
-
-  // Use the same orders array as dashboard (replace with real data source in production)
-  const orders = [
-    {
-      id: '#3npYbi',
-      customerName: 'Amit',
-      productType: 'Marriage Card',
-      delivery: '10 Nov',
-      deliveryDate: 'November 10th, 2025',
-      designVersions: 1,
-      amount: 20000,
-      advancePaid: 2000,
-      pending: 18000,
-      status: 'Ready to Deliver',
-      contact: '9876543210',
-      orderPlaced: '06 Nov, 2025',
-      customerType: 'individual',
-      whatsapp: '+91 88790 49091',
-      material: "Card (10*12)",
-      quantity: 1998,
-      printingType: 'Digital',
-      inkColor: 'Red, Orange',
-      attachments: { sample: 'View', orderForm: 'View (1)', voiceNote: 'None' },
-    },
-    {
-      id: '#7kqRst',
-      customerName: 'Rohit Singh',
-      productType: 'Sticker',
-      delivery: '24 Nov',
-      designVersions: undefined,
-      amount: 233000,
-      advancePaid: 500,
-      pending: 232787,
-      status: 'Composing',
-      contact: '9876543211',
-      orderPlaced: '01 Nov, 2025',
-      customerType: 'business',
-      whatsapp: '+91 88790 49091',
-      material: 'Vinyl',
-      quantity: 5000,
-      printingType: 'Offset',
-      inkColor: 'CMYK',
-      attachments: { sample: 'None', orderForm: 'View (2)', voiceNote: 'None' },
-    },
-    {
-      id: '#2mxPqw',
-      customerName: 'Priya Sharma',
-      productType: 'Wedding Invitation',
-      delivery: '28 Nov',
-      designVersions: 2,
-      amount: 15000,
-      advancePaid: 0,
-      pending: 15000,
-      status: 'Order Placed',
-      contact: '9123456789',
-      orderPlaced: '15 Nov, 2025',
-      customerType: 'individual',
-      whatsapp: '+91 91234 56789',
-      material: 'Premium Card Stock',
-      quantity: 250,
-      printingType: 'Digital',
-      inkColor: 'Gold, Maroon',
-      attachments: { sample: 'View', orderForm: 'View (1)', voiceNote: 'View' },
-    },
-  ];
-
-  // Calculate received, balance, and total sales
-  const received = orders.reduce((sum, order) => sum + ((order.amount || 0) - (order.pending || 0)), 0);
-  const balance = orders.reduce((sum, order) => sum + (order.pending || 0), 0);
-  const totalSales = received + balance;
 
   return (
     <>
@@ -285,15 +209,15 @@ const FinanceScreen: React.FC<FinanceScreenProps> = ({ activeTab, onTabPress }) 
         <View style={scss.summaryRow}>
           <View style={[scss.summaryCard, darkMode && scss.summaryCardDark]}>
             <Text style={[scss.summaryLabel, darkMode && scss.summaryLabelDark]}>{t('dashboard.totalSales')}</Text>
-            <Text style={[scss.summaryValue, darkMode && scss.summaryValueDark]}>Rs. {totalSales.toLocaleString()}</Text>
+            <Text style={[scss.summaryValue, darkMode && scss.summaryValueDark]}>Rs. 0</Text>
           </View>
           <View style={[scss.summaryCard, darkMode && scss.summaryCardDark]}>
             <Text style={[scss.summaryLabel, darkMode && scss.summaryLabelDark]}>{t('dashboard.received')}</Text>
-            <Text style={[scss.summaryValue, { color: '#16A34A' }, darkMode && scss.summaryValueDark]}>Rs. {received.toLocaleString()}</Text>
+            <Text style={[scss.summaryValue, { color: '#16A34A' }, darkMode && scss.summaryValueDark]}>Rs. 0</Text>
           </View>
           <View style={[scss.summaryCard, darkMode && scss.summaryCardDark]}>
             <Text style={[scss.summaryLabel, darkMode && scss.summaryLabelDark]}>{t('finance.balance')}</Text>
-            <Text style={[scss.summaryValue, { color: '#EF4444' }, darkMode && scss.summaryValueDark]}>Rs. {balance.toLocaleString()}</Text>
+            <Text style={[scss.summaryValue, { color: '#EF4444' }, darkMode && scss.summaryValueDark]}>Rs. 0</Text>
           </View>
         </View>
 

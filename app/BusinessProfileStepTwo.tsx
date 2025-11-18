@@ -94,10 +94,10 @@ const BusinessProfileStepTwo: React.FC = () => {
             <TouchableOpacity style={styles.backArrow} onPress={handleBack}>
               <Ionicons name="arrow-back" size={24} color="#111827" />
             </TouchableOpacity>
-            <Text style={styles.title}>Business Profile Setup</Text>
+            <Text style={styles.title}>Services you offer</Text>
             <View style={styles.placeholderSpace} />
           </View>
-          <Text style={styles.subtitle}>Step 2 of 3: Services Selection</Text>
+          <Text style={styles.subtitle}>Step 2 of 3</Text>
           <View style={styles.progressBar}>
             <View style={styles.progressFill} />
           </View>

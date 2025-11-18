@@ -1,4 +1,5 @@
 import BottomNav from '@/components/BottomNav';
+import { useTheme } from '@/context/ThemeContext';
 import { BlurView } from 'expo-blur';
 import React from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
@@ -11,9 +12,11 @@ interface FooterNavProps {
 }
 
 const FooterNav: React.FC<FooterNavProps> = ({ scss, activeTab, onTabPress, onlyOrders }) => {
+  const { darkMode } = useTheme();
+  
   return (
     <View style={styles.footerContainer} pointerEvents="box-none">
-      <BlurView intensity={80} tint="light" style={styles.bottomNavBar}>
+      <BlurView intensity={80} tint={darkMode ? 'dark' : 'light'} style={styles.bottomNavBar}>
         <BottomNav activeTab={activeTab} onTabPress={onTabPress} onlyOrders={onlyOrders} />
       </BlurView>
     </View>
