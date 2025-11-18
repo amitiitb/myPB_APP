@@ -6,11 +6,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Alert, Dimensions, Keyboard, KeyboardAvoidingView,
-  Platform,
-  ScrollView, StyleSheet,
-  TextInput,
-  TouchableOpacity, useColorScheme, View
+    Alert, Dimensions, Keyboard, KeyboardAvoidingView,
+    Platform,
+    ScrollView, StyleSheet,
+    TextInput,
+    TouchableOpacity, useColorScheme, View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -81,12 +81,18 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: '#F8F4FF' }]}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+    <LinearGradient
+      colors={['#F3E8FF', '#DBEAFE', '#D1FAE5']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={styles.container}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardView}
+        >
+          <ScrollView contentContainerStyle={styles.scrollContent}>
           {/* Language Toggle */}
           <TouchableOpacity style={styles.languageToggle} onPress={() => setLanguage(language === 'en' ? 'hi' : 'en')}>
             <ThemedText style={styles.languageText}>
@@ -192,6 +198,7 @@ export default function LoginScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
+    </LinearGradient>
   );
 }
 
@@ -209,27 +216,26 @@ const styles = StyleSheet.create({
   },
   languageToggle: {
     alignSelf: 'flex-end',
-    backgroundColor: 'rgba(255,255,255,0.65)',
+    backgroundColor: 'rgba(124, 58, 237, 0.15)',
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 3,
-    elevation: 1,
+    borderWidth: 1.5,
+    borderColor: '#7C3AED',
+    shadowColor: '#7C3AED',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 2,
   },
   languageText: {
     fontSize: 13,
-    fontWeight: '500',
-    color: '#4B5563',
-    opacity: 0.95,
+    fontWeight: '600',
+    color: '#7C3AED',
   },
   topSection: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 4,
   },
   tagline: {
     fontSize: 16,
@@ -240,10 +246,10 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#111827',
+    color: '#7C3AED',
     textAlign: 'center',
     marginBottom: 6,
-    textShadowColor: 'rgba(0,0,0,0.12)',
+    textShadowColor: 'rgba(124, 58, 237, 0.25)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
     letterSpacing: 0.2,
@@ -259,14 +265,15 @@ const styles = StyleSheet.create({
   },
   heroImageContainer: {
     width: '100%',
-    height: 200,
-    marginTop: 24,
+    height: 240,
+    marginTop: 16,
+    marginBottom: 8,
     alignItems: 'center',
   },
   heroImage: {
-    width: '90%',
+    width: '100%',
     height: '100%',
-    borderRadius: 16,
+    borderRadius: 20,
     overflow: 'hidden',
   },
   card: {
@@ -274,7 +281,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
-    padding: 24,
+    padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
@@ -282,7 +289,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   titleContainer: {
-    marginBottom: 16,
+    marginBottom: 8,
   },
   welcomeText: {
     fontSize: 20,
@@ -295,24 +302,24 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   subtitle: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '400',
     color: '#374151',
     textAlign: 'center',
-    marginTop: 8,
-    lineHeight: 22,
-    marginBottom: 12,
+    marginTop: 4,
+    lineHeight: 20,
+    marginBottom: 8,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: '#9CA3AF',
-    marginBottom: 16,
+    marginBottom: 12,
     letterSpacing: 0.5,
     textTransform: 'uppercase',
   },
   inputContainer: {
-    marginBottom: 40,
+    marginBottom: 20,
   },
   phoneInputContainer: {
     flexDirection: 'row',
@@ -354,7 +361,7 @@ const styles = StyleSheet.create({
   continueButtonWrapper: {
     borderRadius: 12,
     overflow: 'hidden',
-    marginBottom: 24,
+    marginBottom: 16,
   },
   continueGradient: {
     height: 50,

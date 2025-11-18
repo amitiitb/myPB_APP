@@ -9,14 +9,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Dimensions,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Dimensions,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -194,7 +194,7 @@ const DashboardScreen: React.FC = () => {
   if (showSettings) {
     return (
       <>
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={[scss.safeArea, darkMode && scss.safeAreaDark]}>
           <SettingsScreen 
             onBack={() => setShowSettings(false)} 
             ownerName={ownerName}
@@ -735,18 +735,15 @@ const scss = StyleSheet.create({
   sectionTitleDark: {
     color: '#FFFFFF',
   },
-  dateFilterBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    gap: 6,
-  },
-  dateFilterBtnDark: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
-  },
+  // dateFilterBtn: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   backgroundColor: 'rgba(255,255,255,0.2)',
+  //   borderRadius: 10,
+  //   paddingHorizontal: 12,
+  //   paddingVertical: 8,
+  //   gap: 6,
+  // },
   datePickerDropdown: {
     backgroundColor: '#FFFFFF',
     borderColor: '#E5E7EB',

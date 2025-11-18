@@ -17,7 +17,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabPress, onlyOrders
       <View style={styles.bottomNavContent}>
         <TouchableOpacity style={styles.navTabActive}>
           <View style={styles.activeTabBg}>
-            <Ionicons name="file-tray-stacked-outline" size={22} color="#7C3AED" />
+            <Ionicons name="file-tray-stacked-outline" size={26} color="#7C3AED" />
           </View>
           <Text style={styles.navTabTextActive}>Orders</Text>
         </TouchableOpacity>
@@ -30,31 +30,31 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabPress, onlyOrders
       <View style={[styles.bottomNavContent, darkMode && styles.bottomNavContentDark]}>
         <TouchableOpacity style={activeTab === 'home' ? styles.navTabActive : styles.navTab} onPress={() => onTabPress('home')}>
         <View style={activeTab === 'home' ? styles.activeTabBg : styles.iconContainer}>
-          <Ionicons name="home" size={22} color={activeTab === 'home' ? '#7C3AED' : '#6B7280'} />
+          <Ionicons name="home" size={26} color={activeTab === 'home' ? '#7C3AED' : '#6B7280'} />
         </View>
         <Text style={activeTab === 'home' ? styles.navTabTextActive : [styles.navTabText, darkMode && styles.navTabTextDark]}>Home</Text>
       </TouchableOpacity>
       <TouchableOpacity style={activeTab === 'orders' ? styles.navTabActive : styles.navTab} onPress={() => onTabPress('orders')}>
         <View style={activeTab === 'orders' ? styles.activeTabBg : styles.iconContainer}>
-          <Ionicons name="file-tray-stacked-outline" size={22} color={activeTab === 'orders' ? '#7C3AED' : '#6B7280'} />
+          <Ionicons name="file-tray-stacked-outline" size={26} color={activeTab === 'orders' ? '#7C3AED' : '#6B7280'} />
         </View>
         <Text style={activeTab === 'orders' ? styles.navTabTextActive : [styles.navTabText, darkMode && styles.navTabTextDark]}>Orders</Text>
       </TouchableOpacity>
       <TouchableOpacity style={activeTab === 'finance' ? styles.navTabActive : styles.navTab} onPress={() => onTabPress('finance')}>
         <View style={activeTab === 'finance' ? styles.activeTabBg : styles.iconContainer}>
-          <Text style={{ fontSize: 22, color: activeTab === 'finance' ? '#7C3AED' : '#6B7280', fontWeight: '600' }}>₹</Text>
+          <Text style={{ fontSize: 26, color: activeTab === 'finance' ? '#7C3AED' : '#6B7280', fontWeight: '600' }}>₹</Text>
         </View>
         <Text style={activeTab === 'finance' ? styles.navTabTextActive : [styles.navTabText, darkMode && styles.navTabTextDark]}>Finance</Text>
       </TouchableOpacity>
       <TouchableOpacity style={activeTab === 'inventory' ? styles.navTabActive : styles.navTab} onPress={() => onTabPress('inventory')}>
         <View style={activeTab === 'inventory' ? styles.activeTabBg : styles.iconContainer}>
-          <Ionicons name="layers-outline" size={22} color={activeTab === 'inventory' ? '#7C3AED' : '#6B7280'} />
+          <Ionicons name="layers-outline" size={26} color={activeTab === 'inventory' ? '#7C3AED' : '#6B7280'} />
         </View>
         <Text style={activeTab === 'inventory' ? styles.navTabTextActive : [styles.navTabText, darkMode && styles.navTabTextDark]}>Inventory</Text>
       </TouchableOpacity>
       <TouchableOpacity style={activeTab === 'reports' ? styles.navTabActive : styles.navTab} onPress={() => onTabPress('reports')}>
         <View style={activeTab === 'reports' ? styles.activeTabBg : styles.iconContainer}>
-          <Ionicons name="bar-chart-outline" size={22} color={activeTab === 'reports' ? '#7C3AED' : '#6B7280'} />
+          <Ionicons name="bar-chart-outline" size={26} color={activeTab === 'reports' ? '#7C3AED' : '#6B7280'} />
         </View>
         <Text style={activeTab === 'reports' ? styles.navTabTextActive : [styles.navTabText, darkMode && styles.navTabTextDark]}>Reports</Text>
       </TouchableOpacity>
@@ -78,41 +78,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     paddingHorizontal: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    paddingBottom: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
   },
   bottomNavContentDark: {
-    backgroundColor: 'rgba(31, 41, 55, 0.85)',
+    backgroundColor: 'rgba(31, 41, 55, 0.95)',
   },
   navTab: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
+    paddingVertical: 12,
   },
   navTabActive: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
+    paddingVertical: 12,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
+    width: 56,
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 2,
   },
   activeTabBg: {
     backgroundColor: 'rgba(124, 58, 237, 0.12)',
-    borderRadius: 16,
-    width: 48,
-    height: 48,
+    borderRadius: 18,
+    width: 56,
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 2,
   },
   navTabText: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#6B7280',
     fontWeight: '600',
     marginTop: 4,

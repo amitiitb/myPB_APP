@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useRef, useState } from 'react';
 import {
     Keyboard, KeyboardAvoidingView,
@@ -40,12 +41,18 @@ export default function EnterOtpScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={{ flex: 1 }}
-      >
-        <View style={styles.container}>
+    <LinearGradient
+      colors={['#F3E8FF', '#DBEAFE', '#D1FAE5']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={styles.safeArea}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={{ flex: 1 }}
+        >
+          <View style={styles.container}>
           <Text style={styles.heading}>Enter OTP</Text>
           <Text style={styles.subtext}>
             A 6-digit code was sent to +91 7991828898
@@ -77,12 +84,19 @@ export default function EnterOtpScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.verifyButton}
+            style={styles.verifyButtonWrapper}
             onPress={handleVerify}
             disabled={otp.length !== OTP_LENGTH}
             activeOpacity={otp.length === OTP_LENGTH ? 0.8 : 1}
           >
-            <Text style={styles.verifyButtonText}>Verify OTP</Text>
+            <LinearGradient
+              colors={otp.length === OTP_LENGTH ? ['#A855F7', '#7C3AED'] : ['#D1D5DB', '#D1D5DB']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.verifyButton}
+            >
+              <Text style={[styles.verifyButtonText, otp.length !== OTP_LENGTH && styles.verifyButtonTextDisabled]}>Verify OTP</Text>
+            </LinearGradient>
           </TouchableOpacity>
 
           {timer > 0 ? (
@@ -98,16 +112,15 @@ export default function EnterOtpScreen() {
           <Text style={styles.footerNote}>
             Didn't receive code? You can go back and try again.
           </Text>
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+          </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </LinearGradient>
   );
-}
-
-const styles = StyleSheet.create({
+}const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F7F7FB',
+    backgroundColor: 'transparent',
   },
   container: {
     flex: 1,
@@ -118,7 +131,7 @@ const styles = StyleSheet.create({
   heading: {
     fontWeight: '700',
     fontSize: 22,
-    color: '#1F2937',
+    color: '#7C3AED',
     marginTop: 50,
     textAlign: 'center',
   },
@@ -132,13 +145,18 @@ const styles = StyleSheet.create({
     width: '80%',
     height: 56,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderWidth: 2,
+    borderColor: '#7C3AED',
     backgroundColor: '#FFFFFF',
     marginTop: 32,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    shadowColor: '#7C3AED',
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
   otpInput: {
     ...StyleSheet.absoluteFillObject,
@@ -157,29 +175,34 @@ const styles = StyleSheet.create({
     width: 24,
     textAlign: 'center',
     fontSize: 20,
-    color: '#4B5563',
+    color: '#7C3AED',
     letterSpacing: 14,
-    fontWeight: '500',
+    fontWeight: '600',
     borderBottomWidth: 0,
   },
-  verifyButton: {
+  verifyButtonWrapper: {
     width: '80%',
-    height: 50,
     borderRadius: 10,
-    backgroundColor: '#C6A4F6',
-    justifyContent: 'center',
-    alignItems: 'center',
+    overflow: 'hidden',
     marginTop: 30,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
+    shadowColor: '#7C3AED',
+    shadowOpacity: 0.25,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
-    elevation: 3,
+    elevation: 4,
+  },
+  verifyButton: {
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   verifyButtonText: {
     color: '#FFFFFF',
     fontWeight: '600',
     fontSize: 16,
+  },
+  verifyButtonTextDisabled: {
+    color: '#9CA3AF',
   },
   resendText: {
     fontSize: 14,
