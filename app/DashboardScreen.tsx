@@ -5,17 +5,18 @@ import NotificationsScreen from '@/components/NotificationsScreen';
 import SettingsScreen from '@/components/SettingsScreen';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Dimensions,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    Dimensions,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -325,36 +326,41 @@ const DashboardScreen: React.FC = () => {
       <>
         <ScrollView contentContainerStyle={scss.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Hero Section with Key Insight */}
-          <View style={[scss.heroCard, darkMode && scss.heroCardDark]}>
+          <LinearGradient
+            colors={darkMode ? ['#5B21B6', '#BE185D', '#D97706'] : ['#7C3AED', '#EC4899', '#F59E0B']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={scss.heroCard}
+          >
             <View style={scss.heroTop}>
               <View>
-                <Text style={[scss.heroLabel, darkMode && scss.heroLabelDark]}>Today's Performance</Text>
-                <Text style={[scss.heroValue, darkMode && scss.heroValueDark]}>{orders.length} Active Orders</Text>
+                <Text style={[scss.heroLabel, darkMode && scss.heroLabelDark]}>{t('dashboard.todaysPerformance')}</Text>
+                <Text style={[scss.heroValue, darkMode && scss.heroValueDark]}>{orders.length} {t('dashboard.activeOrders')}</Text>
               </View>
               <TouchableOpacity 
                 style={[scss.dateFilterBtn, darkMode && scss.dateFilterBtnDark]} 
                 onPress={() => setShowDatePicker(!showDatePicker)}
                 activeOpacity={0.7}
               >
-                <Ionicons name="calendar-outline" size={18} color={darkMode ? '#A78BFA' : '#7C3AED'} />
-                <Text style={[scss.dateFilterText, darkMode && scss.dateFilterTextDark]}>{dateFilter}</Text>
+                <Ionicons name="calendar-outline" size={16} color="#FFFFFF" />
+                <Text style={[scss.dateFilterBtnText]}>{dateFilter}</Text>
               </TouchableOpacity>
             </View>
             <View style={scss.heroBottom}>
               <View style={scss.heroMetric}>
                 <Ionicons name="time-outline" size={18} color="#10B981" />
-                <Text style={[scss.heroMetricText, darkMode && scss.heroMetricTextDark]}>{orders.filter(o => o.status !== 'Delivered' && o.status !== 'Completed').length} in production</Text>
+                <Text style={[scss.heroMetricText, darkMode && scss.heroMetricTextDark]}>{orders.filter(o => o.status !== 'Delivered' && o.status !== 'Completed').length} {t('dashboard.inProduction')}</Text>
               </View>
               <View style={scss.heroMetric}>
                 <Ionicons name="checkmark-circle-outline" size={18} color="#7C3AED" />
-                <Text style={[scss.heroMetricText, darkMode && scss.heroMetricTextDark]}>{orders.filter(o => o.status === 'Delivered' || o.status === 'Completed').length} delivered today</Text>
+                <Text style={[scss.heroMetricText, darkMode && scss.heroMetricTextDark]}>{orders.filter(o => o.status === 'Delivered' || o.status === 'Completed').length} {t('dashboard.deliveredToday')}</Text>
               </View>
             </View>
-          </View>
+          </LinearGradient>
 
           {/* Date Filter Dropdown */}
           {showDatePicker && (
-            <View style={[scss.datePickerDropdown, darkMode && scss.datePickerDropdownDark]}>
+            <View style={[scss.datePickerDropdown, darkMode && scss.datePickerDropdownDark, scss.datePickerRight]}>
               {/* Quick Filter Options */}
               <View style={[scss.quickFilterContainer, darkMode && scss.quickFilterContainerDark]}>
                 {dateFilterOptions.map((option) => (
@@ -420,109 +426,89 @@ const DashboardScreen: React.FC = () => {
               )}
             </View>
           )}
-          {/* Insights Grid */}
-          <View style={scss.insightsGrid}>
-            {/* Revenue Card - Full Width */}
-            <TouchableOpacity
-              style={[scss.insightCardFull, darkMode && scss.insightCardDark]}
-              activeOpacity={0.7}
-              onPress={() => setActiveTab('finance')}
-            >
-              <View style={scss.insightCardContent}>
-                <View style={scss.insightLeft}>
-                  <View style={[scss.insightIconBg, { backgroundColor: '#D1FAE5' }]}>
-                    <Ionicons name="wallet" size={24} color="#10B981" />
-                  </View>
-                  <View style={scss.insightInfo}>
-                    <Text style={[scss.insightLabel, darkMode && scss.insightLabelDark]}>MONTHLY REVENUE</Text>
-                    <Text style={[scss.insightValue, darkMode && scss.insightValueDark]}>₹{totalRevenue.toLocaleString()}</Text>
-                    <Text style={[scss.insightSubtext, darkMode && scss.insightSubtextDark]}>₹{totalPending.toLocaleString()} pending collection</Text>
-                  </View>
-                </View>
-                <Ionicons name="chevron-forward" size={20} color={darkMode ? '#6B7280' : '#9CA3AF'} />
+          {/* Insights Grid - Revenue Card */}
+          <TouchableOpacity
+            style={[scss.revenueCard, darkMode && scss.revenueCardDark]}
+            activeOpacity={0.7}
+            onPress={() => setActiveTab('finance')}
+          >
+            <View style={scss.revenueHeader}>
+              <View style={scss.revenueIconWrapper}>
+                <Ionicons name="wallet" size={24} color="#FFFFFF" />
               </View>
-            </TouchableOpacity>
-
-            {/* Workflow Status */}
-            <TouchableOpacity
-              style={[scss.insightCard, darkMode && scss.insightCardDark]}
-              activeOpacity={0.7}
-              onPress={() => setActiveTab('orders')}
-            >
-              <View style={[scss.insightIconBg, { backgroundColor: '#FEF3C7' }]}>
-                <Ionicons name="print" size={22} color="#F59E0B" />
+              <Text style={scss.revenueTitle}>{t('dashboard.monthlyRevenue')}</Text>
+            </View>
+            <Text style={scss.revenueAmount}>₹{totalRevenue.toLocaleString()}</Text>
+            <View style={scss.revenueFooter}>
+              <View style={scss.revenueMetric}>
+                <Ionicons name="arrow-down-circle" size={16} color="#10B981" />
+                <Text style={scss.revenueMetricText}>₹{received.toLocaleString()} {t('finance.received')}</Text>
               </View>
-              <Text style={[scss.insightLabel, darkMode && scss.insightLabelDark, { marginTop: 12 }]}>PRINTING</Text>
-              <Text style={[scss.insightValue, darkMode && scss.insightValueDark]}>1</Text>
-              <Text style={[scss.insightSubtext, darkMode && scss.insightSubtextDark]}>Order in queue</Text>
-            </TouchableOpacity>
-
-            {/* Proofreading */}
-            <TouchableOpacity
-              style={[scss.insightCard, darkMode && scss.insightCardDark]}
-              activeOpacity={0.7}
-              onPress={() => setActiveTab('orders')}
-            >
-              <View style={[scss.insightIconBg, { backgroundColor: '#E0E7FF' }]}>
-                <Ionicons name="glasses" size={22} color="#6366F1" />
+              <View style={scss.revenueMetric}>
+                <Ionicons name="time" size={16} color="#F59E0B" />
+                <Text style={scss.revenueMetricText}>₹{totalPending.toLocaleString()} {t('dashboard.pendingCollection')}</Text>
               </View>
-              <Text style={[scss.insightLabel, darkMode && scss.insightLabelDark, { marginTop: 12 }]}>PROOFING</Text>
-              <Text style={[scss.insightValue, darkMode && scss.insightValueDark]}>1</Text>
-              <Text style={[scss.insightSubtext, darkMode && scss.insightSubtextDark]}>Awaiting review</Text>
-            </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableOpacity>
 
-          {/* Order Overview Section */}
-          <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>Order Pipeline</Text>
-          <View style={[scss.orderOverviewCard, darkMode && scss.orderOverviewCardDark]}>
-            {/* Active Orders */}
+          {/* Order Pipeline Section */}
+          <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>{t('dashboard.orderPipeline')}</Text>
+          <View style={scss.pipelineGrid}>
+            {/* Active Orders Card */}
             <TouchableOpacity 
-              style={scss.orderStatusRow}
+              style={[scss.pipelineCard, { borderLeftColor: '#3B82F6' }, darkMode && scss.pipelineCardDark]}
               onPress={() => setActiveTab('orders')}
               activeOpacity={0.7}
             >
-              <View style={scss.orderStatusLeft}>
-                <View style={[scss.statusDot, { backgroundColor: '#3B82F6' }]} />
-                <Text style={[scss.orderStatusLabel, darkMode && scss.orderStatusLabelDark]}>Active Orders</Text>
+              <View style={[scss.pipelineIconBg, { backgroundColor: '#DBEAFE' }]}>
+                <Ionicons name="document-text" size={24} color="#3B82F6" />
               </View>
-              <View style={scss.orderStatusRight}>
-                <Text style={[scss.orderStatusCount, darkMode && scss.orderStatusCountDark]}>2</Text>
-              </View>
+              <Text style={[scss.pipelineCount, darkMode && scss.pipelineCountDark]}>2</Text>
+              <Text style={[scss.pipelineLabel, darkMode && scss.pipelineLabelDark]}>{t('dashboard.activeOrders')}</Text>
             </TouchableOpacity>
 
-            {/* Proofreading */}
+            {/* Printing Card */}
             <TouchableOpacity 
-              style={scss.orderStatusRow}
+              style={[scss.pipelineCard, { borderLeftColor: '#F59E0B' }, darkMode && scss.pipelineCardDark]}
               onPress={() => setActiveTab('orders')}
               activeOpacity={0.7}
             >
-              <View style={scss.orderStatusLeft}>
-                <View style={[scss.statusDot, { backgroundColor: '#F59E0B' }]} />
-                <Text style={[scss.orderStatusLabel, darkMode && scss.orderStatusLabelDark]}>In Proofreading</Text>
+              <View style={[scss.pipelineIconBg, { backgroundColor: '#FEF3C7' }]}>
+                <Ionicons name="print" size={24} color="#F59E0B" />
               </View>
-              <View style={scss.orderStatusRight}>
-                <Text style={[scss.orderStatusCount, darkMode && scss.orderStatusCountDark]}>1</Text>
-              </View>
+              <Text style={[scss.pipelineCount, darkMode && scss.pipelineCountDark]}>1</Text>
+              <Text style={[scss.pipelineLabel, darkMode && scss.pipelineLabelDark]}>{t('dashboard.printing')}</Text>
             </TouchableOpacity>
 
-            {/* Delivered */}
+            {/* Proofreading Card */}
             <TouchableOpacity 
-              style={[scss.orderStatusRow, scss.orderStatusRowLast]}
+              style={[scss.pipelineCard, { borderLeftColor: '#6366F1' }, darkMode && scss.pipelineCardDark]}
               onPress={() => setActiveTab('orders')}
               activeOpacity={0.7}
             >
-              <View style={scss.orderStatusLeft}>
-                <View style={[scss.statusDot, { backgroundColor: '#10B981' }]} />
-                <Text style={[scss.orderStatusLabel, darkMode && scss.orderStatusLabelDark]}>Completed</Text>
+              <View style={[scss.pipelineIconBg, { backgroundColor: '#E0E7FF' }]}>
+                <Ionicons name="glasses" size={24} color="#6366F1" />
               </View>
-              <View style={scss.orderStatusRight}>
-                <Text style={[scss.orderStatusCount, darkMode && scss.orderStatusCountDark]}>1</Text>
+              <Text style={[scss.pipelineCount, darkMode && scss.pipelineCountDark]}>1</Text>
+              <Text style={[scss.pipelineLabel, darkMode && scss.pipelineLabelDark]}>{t('dashboard.proofing')}</Text>
+            </TouchableOpacity>
+
+            {/* Completed Card */}
+            <TouchableOpacity 
+              style={[scss.pipelineCard, { borderLeftColor: '#10B981' }, darkMode && scss.pipelineCardDark]}
+              onPress={() => setActiveTab('orders')}
+              activeOpacity={0.7}
+            >
+              <View style={[scss.pipelineIconBg, { backgroundColor: '#D1FAE5' }]}>
+                <Ionicons name="checkmark-circle" size={24} color="#10B981" />
               </View>
+              <Text style={[scss.pipelineCount, darkMode && scss.pipelineCountDark]}>1</Text>
+              <Text style={[scss.pipelineLabel, darkMode && scss.pipelineLabelDark]}>{t('dashboard.completed')}</Text>
             </TouchableOpacity>
           </View>
 
           {/* Category Breakdown Section */}
-          <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>Popular Categories</Text>
+          <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>{t('dashboard.popularCategories')}</Text>
           <View style={[scss.categoryBreakdownCard, darkMode && scss.categoryBreakdownCardDark]}>
             <View style={scss.categoryRow}>
               {/* Sticker */}
@@ -632,18 +618,54 @@ const scss = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    backgroundColor: '#F9F9FF',
+    backgroundColor: '#7C3AED',
   },
   safeAreaDark: {
-    backgroundColor: '#1F2937',
+    backgroundColor: '#5B21B6',
   },
   scrollContent: {
     paddingHorizontal: '5%',
     paddingTop: 20,
     paddingBottom: 120,
+    backgroundColor: '#FFFFFF',
+  },
+  dateFilterBtnContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F3F4F6',
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    gap: 8,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  dateFilterBtnContainerDark: {
+    backgroundColor: '#374151',
+    borderColor: '#4B5563',
+  },
+  dateFilterBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    gap: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.35)',
+  },
+  dateFilterBtnText: {
+    fontSize: 11,
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  dateFilterBtnDark: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderColor: 'rgba(255,255,255,0.25)',
   },
   heroCard: {
-    backgroundColor: '#7C3AED',
     borderRadius: 20,
     padding: 24,
     marginBottom: 24,
@@ -654,7 +676,7 @@ const scss = StyleSheet.create({
     elevation: 8,
   },
   heroCardDark: {
-    backgroundColor: '#5B21B6',
+    // Dark mode handled by LinearGradient colors prop
   },
   heroTop: {
     flexDirection: 'row',
@@ -711,7 +733,7 @@ const scss = StyleSheet.create({
     color: '#111827',
   },
   sectionTitleDark: {
-    color: '#F3F4F6',
+    color: '#FFFFFF',
   },
   dateFilterBtn: {
     flexDirection: 'row',
@@ -737,6 +759,13 @@ const scss = StyleSheet.create({
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
+  },
+  datePickerRight: {
+    position: 'absolute',
+    right: '5%',
+    top: 185,
+    width: '60%',
+    zIndex: 10,
   },
   datePickerDropdownDark: {
     backgroundColor: '#1F2937',
@@ -989,82 +1018,118 @@ const scss = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 24,
   },
-  insightCardFull: {
+  revenueCard: {
     width: '100%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 14,
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    backgroundColor: '#7C3AED',
+    borderRadius: 20,
+    padding: 24,
+    marginBottom: 24,
+    shadowColor: '#7C3AED',
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 8,
   },
-  insightCard: {
-    width: '48%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 14,
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+  revenueCardDark: {
+    backgroundColor: '#5B21B6',
   },
-  insightCardDark: {
-    backgroundColor: '#374151',
-  },
-  insightCardContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  insightLeft: {
+  revenueHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
-    flex: 1,
+    gap: 12,
+    marginBottom: 16,
   },
-  insightIconBg: {
+  revenueIconWrapper: {
     width: 48,
     height: 48,
     borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  insightInfo: {
-    flex: 1,
-  },
-  insightLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#6B7280',
-    marginBottom: 4,
-    letterSpacing: 0.8,
+  revenueTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.9)',
+    letterSpacing: 0.5,
     textTransform: 'uppercase',
   },
-  insightLabelDark: {
-    color: '#9CA3AF',
+  revenueAmount: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    marginBottom: 16,
+    letterSpacing: -1,
   },
-  insightValue: {
+  revenueFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 16,
+  },
+  revenueMetric: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 10,
+    padding: 10,
+  },
+  revenueMetricText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    flex: 1,
+  },
+  pipelineGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  pipelineCard: {
+    width: '48%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 12,
+    borderLeftWidth: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+    alignItems: 'center',
+  },
+  pipelineCardDark: {
+    backgroundColor: '#374151',
+  },
+  pipelineIconBg: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  pipelineCount: {
     fontSize: 24,
     fontWeight: '800',
     color: '#111827',
     marginBottom: 2,
     letterSpacing: -0.5,
   },
-  insightValueDark: {
-    color: '#F3F4F6',
+  pipelineCountDark: {
+    color: '#FFFFFF',
   },
-  insightSubtext: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#9CA3AF',
-  },
-  insightSubtextDark: {
+  pipelineLabel: {
+    fontSize: 11,
+    fontWeight: '600',
     color: '#6B7280',
+    textAlign: 'center',
+  },
+  pipelineLabelDark: {
+    color: '#D1D5DB',
   },
   reportPercentDrop: {
     color: '#EF4444',
@@ -1160,7 +1225,7 @@ const scss = StyleSheet.create({
     color: '#111827',
   },
   orderStatusLabelDark: {
-    color: '#E5E7EB',
+    color: '#FFFFFF',
   },
   orderStatusRight: {
     flexDirection: 'row',
@@ -1172,7 +1237,7 @@ const scss = StyleSheet.create({
     color: '#111827',
   },
   orderStatusCountDark: {
-    color: '#F3F4F6',
+    color: '#FFFFFF',
   },
   orderOverviewBox: {
     width: '100%',

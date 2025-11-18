@@ -5,6 +5,7 @@ import NotificationsScreen from '@/components/NotificationsScreen';
 import SettingsScreen from '@/components/SettingsScreen';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -281,19 +282,30 @@ const FinanceScreen: React.FC<FinanceScreenProps> = ({ activeTab, onTabPress }) 
           </View>
         )}
 
-        {/* Summary Cards */}
+        {/* Total Sales Card - Full Width */}
+        <LinearGradient
+          colors={darkMode ? ['#5B21B6', '#BE185D', '#D97706'] : ['#7C3AED', '#EC4899', '#F59E0B']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={scss.totalSalesCard}
+        >
+          <Text style={[scss.totalSalesLabel, darkMode && scss.totalSalesLabelDark]}>{t('dashboard.totalSales')}</Text>
+          <Text style={[scss.totalSalesValue, darkMode && scss.totalSalesValueDark]}>₹{totalSales.toLocaleString()}</Text>
+        </LinearGradient>
+
+        {/* Summary Cards - Three Components */}
         <View style={scss.summaryRow}>
           <View style={[scss.summaryCard, darkMode && scss.summaryCardDark]}>
-            <Text style={[scss.summaryLabel, darkMode && scss.summaryLabelDark]}>{t('dashboard.totalSales')}</Text>
-            <Text style={[scss.summaryValue, darkMode && scss.summaryValueDark]}>Rs. {totalSales.toLocaleString()}</Text>
+            <Text style={[scss.summaryLabel, darkMode && scss.summaryLabelDark]}>Received</Text>
+            <Text style={[scss.summaryValue, { color: '#16A34A' }, darkMode && scss.summaryValueDark]}>₹{received.toLocaleString()}</Text>
           </View>
           <View style={[scss.summaryCard, darkMode && scss.summaryCardDark]}>
-            <Text style={[scss.summaryLabel, darkMode && scss.summaryLabelDark]}>{t('dashboard.received')}</Text>
-            <Text style={[scss.summaryValue, { color: '#16A34A' }, darkMode && scss.summaryValueDark]}>Rs. {received.toLocaleString()}</Text>
+            <Text style={[scss.summaryLabel, darkMode && scss.summaryLabelDark]}>Advance</Text>
+            <Text style={[scss.summaryValue, { color: '#F59E0B' }, darkMode && scss.summaryValueDark]}>₹{orders.reduce((sum, order) => sum + (order.advancePaid || 0), 0).toLocaleString()}</Text>
           </View>
           <View style={[scss.summaryCard, darkMode && scss.summaryCardDark]}>
-            <Text style={[scss.summaryLabel, darkMode && scss.summaryLabelDark]}>{t('finance.balance')}</Text>
-            <Text style={[scss.summaryValue, { color: '#EF4444' }, darkMode && scss.summaryValueDark]}>Rs. {balance.toLocaleString()}</Text>
+            <Text style={[scss.summaryLabel, darkMode && scss.summaryLabelDark]}>Pending</Text>
+            <Text style={[scss.summaryValue, { color: '#EF4444' }, darkMode && scss.summaryValueDark]}>₹{balance.toLocaleString()}</Text>
           </View>
         </View>
 
@@ -332,7 +344,7 @@ const FinanceScreen: React.FC<FinanceScreenProps> = ({ activeTab, onTabPress }) 
 const scss = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9F9FF',
+    backgroundColor: '#FFFFFF',
   },
   containerDark: {
     backgroundColor: '#1F2937',
@@ -573,6 +585,48 @@ const scss = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '600',
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    marginTop: 12,
+  },
+  totalSalesCard: {
+    backgroundColor: '#7C3AED',
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: 16,
+    marginTop: 12,
+    shadowColor: '#7C3AED',
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
+    alignItems: 'center',
+  },
+  totalSalesCardDark: {
+    backgroundColor: '#5B21B6',
+  },
+  totalSalesLabel: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 8,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  totalSalesLabelDark: {
+    color: 'rgba(255,255,255,0.7)',
+  },
+  totalSalesValue: {
+    color: '#FFFFFF',
+    fontSize: 32,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+  },
+  totalSalesValueDark: {
+    color: '#FFFFFF',
   },
   summaryRow: {
     flexDirection: 'row',

@@ -1,3 +1,4 @@
+import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -19,13 +20,14 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
   onNotificationPress,
   onSettingsPress,
 }) => {
+  const { darkMode } = useTheme();
   return (
-    <View style={styles.headerBar}>
-      <Text style={styles.headerTitle}>{title}</Text>
+    <View style={[styles.headerBar, darkMode && styles.headerBarDark]}>
+      <Text style={[styles.headerTitle, darkMode && styles.headerTitleDark]}>{title}</Text>
       <View style={styles.headerRightRow}>
         {/* Language Toggle */}
         {onLanguageToggle && (
-          <View style={styles.languageToggleContainer}>
+          <View style={[styles.languageToggleContainer, darkMode && styles.languageToggleContainerDark]}>
             <TouchableOpacity 
               style={[styles.languageToggleBtn, language === 'en' && styles.languageToggleBtnActive]} 
               onPress={onLanguageToggle}
@@ -42,7 +44,7 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
         )}
         {/* Notification Bell */}
         <TouchableOpacity style={styles.bellIconWrapper} onPress={onNotificationPress}>
-          <Ionicons name="notifications-outline" size={24} color="#fff" />
+          <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
           {notificationCount > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{notificationCount}</Text>
@@ -51,7 +53,7 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
         </TouchableOpacity>
         {/* Settings Icon */}
         <TouchableOpacity style={styles.bellIconWrapper} onPress={onSettingsPress}>
-          <Ionicons name="settings" size={24} color="#fff" />
+          <Ionicons name="settings" size={24} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
     </View>
@@ -67,11 +69,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     justifyContent: 'space-between',
   },
+  headerBarDark: {
+    backgroundColor: '#5B21B6',
+  },
   headerTitle: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 20,
     fontWeight: '700',
     flex: 1,
+  },
+  headerTitleDark: {
+    color: '#FFFFFF',
   },
   headerRightRow: {
     flexDirection: 'row',
@@ -103,6 +111,9 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 2,
     gap: 2,
+  },
+  languageToggleContainerDark: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
   },
   languageToggleBtn: {
     paddingHorizontal: 8,

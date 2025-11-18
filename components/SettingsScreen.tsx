@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Animated, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View, Linking, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, Animated, Linking, SafeAreaView, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
@@ -130,11 +129,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
   }
 
   return (
-    <View style={[scss.container, darkMode && scss.containerDark]}>
-      <View style={[scss.header, darkMode && scss.headerDark]}>
-        <Text style={scss.headerTitle}>{t('settings.settings')}</Text>
-      </View>
-      <ScrollView contentContainerStyle={scss.scrollContent} showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={[scss.safeArea, darkMode && scss.safeAreaDark]}>
+      <View style={[scss.container, darkMode && scss.containerDark]}>
+        <View style={[scss.header, darkMode && scss.headerDark]}>
+          <Text style={scss.headerTitle}>{t('settings.settings')}</Text>
+        </View>
+        <ScrollView contentContainerStyle={scss.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Account Section */}
         <View style={[scss.card, darkMode && scss.cardDark]}>
         <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>{t('settings.account')}</Text>
@@ -243,11 +243,19 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
       </TouchableOpacity>
       <Text style={scss.footerText}>dil se printing 🇮🇳</Text>
       </ScrollView>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const scss = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#7C3AED',
+  },
+  safeAreaDark: {
+    backgroundColor: '#5B21B6',
+  },
   container: {
     flex: 1,
     backgroundColor: '#F9F9FF',
@@ -268,7 +276,7 @@ const scss = StyleSheet.create({
     height: 64,
   },
   headerDark: {
-    backgroundColor: '#6D28D9',
+    backgroundColor: '#7C3AED',
   },
   headerTitle: {
     color: '#fff',

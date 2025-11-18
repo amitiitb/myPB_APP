@@ -61,7 +61,7 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ activeTab, onTabPress
   const scss = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#F9F9FF',
+      backgroundColor: '#FFFFFF',
     },
     containerDark: {
       backgroundColor: '#1F2937',

@@ -1111,7 +1111,7 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
 const scss = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F9F9FF',
+    backgroundColor: '#FFFFFF',
   },
   safeAreaDark: {
     backgroundColor: '#1F2937',
@@ -2191,7 +2191,7 @@ const scss = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 12,
     marginBottom: 8,
-    backgroundColor: '#F9F9FF',
+    backgroundColor: '#FFFFFF',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E5E7EB',
