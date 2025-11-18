@@ -2,17 +2,17 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Dimensions,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Dimensions,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -105,46 +105,65 @@ const BusinessProfileStepOne: React.FC = () => {
           {/* Header Section */}
           <View style={styles.headerContainer}>
             <TouchableOpacity style={styles.backArrow} onPress={() => router.back()}>
-              <Ionicons name="arrow-back" size={24} color="#111827" />
+              <Ionicons name="arrow-back" size={24} color="#7C3AED" />
             </TouchableOpacity>
             <Text style={styles.title}>Profile Setup</Text>
             <View style={styles.placeholderSpace} />
           </View>
-          <Text style={styles.subtitle}>Step 1 of 3</Text>
+          <Text style={styles.subtitle}>Step 1 of 3 • Business Information</Text>
           <View style={styles.progressBar}>
-            <View style={styles.progressFill} />
+            <LinearGradient
+              colors={['#7C3AED', '#A855F7']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.progressFill}
+            />
           </View>
 
           {/* Form Card */}
           <View style={styles.formCard}>
             {/* Owner's Name */}
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Owner's Name <Text style={{ color: '#EF4444' }}>*</Text></Text>
-              <TextInput
-                style={[styles.input, formErrors.ownerName && styles.inputError]}
-                placeholder="e.g., Sunil Kumar"
-                value={ownerName}
-                onChangeText={setOwnerName}
-                onBlur={validateOwnerName}
-                placeholderTextColor="#9CA3AF"
-                maxLength={30}
-              />
-              {formErrors.ownerName ? <Text style={styles.errorText}>{formErrors.ownerName}</Text> : null}
+              <Text style={styles.label}>
+                <Ionicons name="person" size={16} color="#7C3AED" /> Owner's Name <Text style={{ color: '#EF4444' }}>*</Text>
+              </Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={[styles.input, formErrors.ownerName && styles.inputError]}
+                  placeholder="e.g., Sunil Kumar"
+                  value={ownerName}
+                  onChangeText={setOwnerName}
+                  onBlur={validateOwnerName}
+                  placeholderTextColor="#9CA3AF"
+                  maxLength={30}
+                />
+                {ownerName.length > 0 && (
+                  <Ionicons name="checkmark-circle" size={20} color="#10B981" style={styles.inputIcon} />
+                )}
+              </View>
+              {formErrors.ownerName ? <Text style={styles.errorText}><Ionicons name="alert-circle" size={12} color="#EF4444" /> {formErrors.ownerName}</Text> : null}
             </View>
 
             {/* Business Name */}
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Business Name <Text style={{ color: '#EF4444' }}>*</Text></Text>
-              <TextInput
-                style={[styles.input, formErrors.pressName && styles.inputError]}
-                placeholder="e.g., Kumar Printers"
-                value={pressName}
-                onChangeText={setPressName}
-                onBlur={validatePressName}
-                placeholderTextColor="#9CA3AF"
-                maxLength={30}
-              />
-              {formErrors.pressName ? <Text style={styles.errorText}>{formErrors.pressName}</Text> : null}
+              <Text style={styles.label}>
+                <Ionicons name="briefcase" size={16} color="#7C3AED" /> Business Name <Text style={{ color: '#EF4444' }}>*</Text>
+              </Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={[styles.input, formErrors.pressName && styles.inputError]}
+                  placeholder="e.g., Kumar Printers"
+                  value={pressName}
+                  onChangeText={setPressName}
+                  onBlur={validatePressName}
+                  placeholderTextColor="#9CA3AF"
+                  maxLength={30}
+                />
+                {pressName.length > 0 && (
+                  <Ionicons name="checkmark-circle" size={20} color="#10B981" style={styles.inputIcon} />
+                )}
+              </View>
+              {formErrors.pressName ? <Text style={styles.errorText}><Ionicons name="alert-circle" size={12} color="#EF4444" /> {formErrors.pressName}</Text> : null}
             </View>
 
             {/* Divider */}
@@ -154,17 +173,24 @@ const BusinessProfileStepOne: React.FC = () => {
             <View style={styles.rowGroup}>
               {/* WhatsApp Number */}
               <View style={styles.halfWidth}>
-                <Text style={styles.label}>WhatsApp Number</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="+91-9876543210"
-                  value={whatsappNumber}
-                  onChangeText={handleWhatsappChange}
-                  keyboardType="phone-pad"
-                  editable={!sameAsContact}
-                  placeholderTextColor="#9CA3AF"
-                  maxLength={10}
-                />
+                <Text style={styles.label}>
+                  <Ionicons name="logo-whatsapp" size={16} color="#25D366" /> WhatsApp Number
+                </Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    style={[styles.input, sameAsContact && styles.disabledInput]}
+                    placeholder="9876543210"
+                    value={whatsappNumber}
+                    onChangeText={handleWhatsappChange}
+                    keyboardType="phone-pad"
+                    editable={!sameAsContact}
+                    placeholderTextColor="#9CA3AF"
+                    maxLength={10}
+                  />
+                  {whatsappNumber.length === 10 && (
+                    <Ionicons name="checkmark-circle" size={20} color="#10B981" style={styles.inputIcon} />
+                  )}
+                </View>
               </View>
 
               {/* Same as Contact Toggle */}
@@ -202,7 +228,7 @@ const BusinessProfileStepOne: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F9F9FF',
+    backgroundColor: '#FAFAFA',
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -226,10 +252,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#111827',
     textAlign: 'center',
     flex: 1,
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 14,
@@ -248,8 +275,15 @@ const styles = StyleSheet.create({
   progressFill: {
     height: '100%',
     width: '33%',
-    backgroundColor: '#7C3AED',
     borderRadius: 2,
+  },
+  inputWrapper: {
+    position: 'relative',
+  },
+  inputIcon: {
+    position: 'absolute',
+    right: 14,
+    top: 14,
   },
   formCard: {
     backgroundColor: '#fff',

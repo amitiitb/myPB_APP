@@ -94,8 +94,29 @@ export default function LoginScreen() {
         >
           <ScrollView contentContainerStyle={styles.scrollContent}>
           {/* Language Toggle */}
-          <TouchableOpacity style={styles.languageToggle} onPress={() => setLanguage(language === 'en' ? 'hi' : 'en')}>
-            <ThemedText style={styles.languageText}>
+          <TouchableOpacity
+            style={[
+              styles.languageToggle,
+              language === 'hi'
+                ? {
+                    borderColor: '#111',
+                    backgroundColor: 'rgba(0,0,0,0.08)',
+                  }
+                : {
+                    borderColor: '#9CA3AF',
+                    backgroundColor: 'rgba(0,0,0,0.03)',
+                  },
+            ]}
+            onPress={() => setLanguage(language === 'en' ? 'hi' : 'en')}
+          >
+            <ThemedText
+              style={[
+                styles.languageText,
+                language === 'hi'
+                  ? { color: '#111', fontWeight: '700' }
+                  : { color: '#6B7280', fontWeight: '600' },
+              ]}
+            >
               {language === 'en' ? 'हिंदी' : 'English'}
             </ThemedText>
           </TouchableOpacity>
@@ -216,22 +237,15 @@ const styles = StyleSheet.create({
   },
   languageToggle: {
     alignSelf: 'flex-end',
-    backgroundColor: 'rgba(124, 58, 237, 0.15)',
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1.5,
-    borderColor: '#7C3AED',
-    shadowColor: '#7C3AED',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 2,
+    marginBottom: 4,
   },
   languageText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#7C3AED',
+    textAlign: 'center',
   },
   topSection: {
     alignItems: 'center',
@@ -266,7 +280,7 @@ const styles = StyleSheet.create({
   heroImageContainer: {
     width: '100%',
     height: 240,
-    marginTop: 16,
+    marginTop: 8,
     marginBottom: 8,
     alignItems: 'center',
   },
@@ -278,9 +292,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
+    borderRadius: 32,
     padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

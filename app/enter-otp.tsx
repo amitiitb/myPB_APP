@@ -1,3 +1,4 @@
+import { useLanguage } from '@/context/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useRef, useState } from 'react';
 import {
@@ -40,6 +41,7 @@ export default function EnterOtpScreen() {
     // Add verification logic here
   };
 
+  const { language, setLanguage } = useLanguage();
   return (
     <LinearGradient
       colors={['#F3E8FF', '#DBEAFE', '#D1FAE5']}
@@ -53,6 +55,31 @@ export default function EnterOtpScreen() {
           style={{ flex: 1 }}
         >
           <View style={styles.container}>
+            {/* Language Toggle */}
+            <TouchableOpacity
+              style={[
+                {
+                  alignSelf: 'flex-end',
+                  backgroundColor: language === 'hi' ? 'rgba(0,0,0,0.08)' : 'rgba(124, 58, 237, 0.15)',
+                  paddingHorizontal: 14,
+                  paddingVertical: 6,
+                  borderRadius: 20,
+                  borderWidth: 1.5,
+                  borderColor: language === 'hi' ? '#111' : '#7C3AED',
+                  marginBottom: 8,
+                },
+              ]}
+              onPress={() => setLanguage(language === 'en' ? 'hi' : 'en')}
+            >
+              <Text
+                style={[
+                  { fontSize: 13, fontWeight: '600', color: language === 'hi' ? '#111' : '#7C3AED' },
+                  language === 'hi' && { fontWeight: '700' },
+                ]}
+              >
+                {language === 'en' ? '\u0939\u093f\u0902\u0926\u0940' : 'English'}
+              </Text>
+            </TouchableOpacity>
           <Text style={styles.heading}>Enter OTP</Text>
           <Text style={styles.subtext}>
             A 6-digit code was sent to +91 7991828898

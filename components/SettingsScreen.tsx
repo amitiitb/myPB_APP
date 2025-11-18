@@ -270,7 +270,7 @@ const scss = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     backgroundColor: '#7C3AED',
     paddingHorizontal: 20,
     height: 64,

@@ -9,14 +9,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Dimensions,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    Dimensions,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -434,7 +434,7 @@ const DashboardScreen: React.FC = () => {
           >
             <View style={scss.revenueHeader}>
               <View style={scss.revenueIconWrapper}>
-                <Ionicons name="wallet" size={24} color="#FFFFFF" />
+                <Ionicons name="wallet" size={24} color="#7C3AED" />
               </View>
               <Text style={scss.revenueTitle}>{t('dashboard.monthlyRevenue')}</Text>
             </View>
@@ -442,11 +442,11 @@ const DashboardScreen: React.FC = () => {
             <View style={scss.revenueFooter}>
               <View style={scss.revenueMetric}>
                 <Ionicons name="arrow-down-circle" size={16} color="#10B981" />
-                <Text style={scss.revenueMetricText}>₹{received.toLocaleString()} {t('finance.received')}</Text>
+                <Text style={scss.revenueMetricText}>₹{received.toLocaleString()} Received</Text>
               </View>
               <View style={scss.revenueMetric}>
                 <Ionicons name="time" size={16} color="#F59E0B" />
-                <Text style={scss.revenueMetricText}>₹{totalPending.toLocaleString()} {t('dashboard.pendingCollection')}</Text>
+                <Text style={scss.revenueMetricText}>₹{totalPending.toLocaleString()} Pending</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -1017,18 +1017,21 @@ const scss = StyleSheet.create({
   },
   revenueCard: {
     width: '100%',
-    backgroundColor: '#7C3AED',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 24,
     marginBottom: 24,
-    shadowColor: '#7C3AED',
-    shadowOpacity: 0.3,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
     shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
   revenueCardDark: {
-    backgroundColor: '#5B21B6',
+    backgroundColor: '#374151',
+    borderColor: '#4B5563',
   },
   revenueHeader: {
     flexDirection: 'row',
@@ -1040,21 +1043,21 @@ const scss = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: '#EDE9FE',
     justifyContent: 'center',
     alignItems: 'center',
   },
   revenueTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
+    color: '#6B7280',
     letterSpacing: 0.5,
     textTransform: 'uppercase',
   },
   revenueAmount: {
     fontSize: 36,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: '#111827',
     marginBottom: 16,
     letterSpacing: -1,
   },
@@ -1068,14 +1071,16 @@ const scss = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: '#F9FAFB',
     borderRadius: 10,
     padding: 10,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   revenueMetricText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#374151',
     flex: 1,
   },
   pipelineGrid: {
