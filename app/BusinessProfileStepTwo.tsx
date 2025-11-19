@@ -1,3 +1,4 @@
+import StepIndicator from '@/components/StepIndicator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
@@ -11,17 +12,26 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const BusinessProfileStepTwo: React.FC = () => {
-  const { ownerName, phoneNumber, whatsappNumber, pressName } = useLocalSearchParams<{
+  const { ownerName, phoneNumber, whatsappNumber, pressName, latitude, longitude, selectedServices: paramServices } = useLocalSearchParams<{
     ownerName: string;
     phoneNumber: string;
     whatsappNumber: string;
     pressName: string;
+    latitude?: string;
+    longitude?: string;
+    selectedServices?: string;
   }>();
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [selectedServices, setSelectedServices] = useState<string[]>(paramServices ? JSON.parse(paramServices) : []);
   const [error, setError] = useState('');
+
+  // Step indicator data for Business Profile Setup
+  const steps = [
+    { id: 1, label: 'Business Details', completed: true, current: false },
+    { id: 2, label: 'Services', completed: false, current: true },
+    { id: 3, label: 'Team', completed: false, current: false },
+  ];
 
   const serviceCategories = {
     'Printing Services': [
@@ -78,30 +88,35 @@ const BusinessProfileStepTwo: React.FC = () => {
         phoneNumber: phoneNumber || '',
         whatsappNumber: whatsappNumber || '',
         pressName: pressName || '',
+        latitude: latitude || '',
+        longitude: longitude || '',
+        selectedServices: JSON.stringify(selectedServices),
       }
     });
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Step Indicator */}
+      <StepIndicator 
+        steps={steps} 
+        currentStepPage={2}
+        routeParams={{
+          ownerName: ownerName || '',
+          phoneNumber: phoneNumber || '',
+          whatsappNumber: whatsappNumber || '',
+          pressName: pressName || '',
+          latitude: latitude || '',
+          longitude: longitude || '',
+          selectedServices: JSON.stringify(selectedServices),
+        }}
+      />
+
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Header Section with Back Arrow */}
-          <View style={styles.headerContainer}>
-            <TouchableOpacity style={styles.backArrow} onPress={handleBack}>
-              <Ionicons name="arrow-back" size={24} color="#111827" />
-            </TouchableOpacity>
-            <Text style={styles.title}>Services you offer</Text>
-            <View style={styles.placeholderSpace} />
-          </View>
-          <Text style={styles.subtitle}>Step 2 of 3</Text>
-          <View style={styles.progressBar}>
-            <View style={styles.progressFill} />
-          </View>
-
           {/* Service Categories */}
           {Object.entries(serviceCategories).map(([category, services]) => (
             <View key={category} style={styles.categorySection}>
@@ -136,7 +151,7 @@ const BusinessProfileStepTwo: React.FC = () => {
       <View style={styles.floatingButtonContainer}>
         <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
           <LinearGradient
-            colors={['#A855F7', '#7C3AED']}
+            colors={['#7C3AED', '#A855F7']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.nextBtnGradient}
@@ -152,13 +167,12 @@ const BusinessProfileStepTwo: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F9F9FF',
+    backgroundColor: '#ffffff',
   },
   headerContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 4,
+    justifyContent: 'center',
+    marginBottom: 24,
   },
   backArrow: {
     padding: 4,
@@ -176,7 +190,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#111827',
     textAlign: 'center',
-    flex: 1,
   },
   subtitle: {
     fontSize: 14,
@@ -221,8 +234,8 @@ const styles = StyleSheet.create({
     margin: 6,
   },
   chipSelected: {
-    backgroundColor: '#6A0DAD',
-    borderColor: '#6A0DAD',
+    backgroundColor: '#7C3AED',
+    borderColor: '#7C3AED',
   },
   chipText: {
     fontSize: 14,
@@ -243,7 +256,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#F9F9FF',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderTopWidth: 1,

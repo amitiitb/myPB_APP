@@ -1,3 +1,4 @@
+import StepIndicator from '@/components/StepIndicator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
@@ -30,14 +31,24 @@ interface Member {
 }
 
 const BusinessProfileStepThree: React.FC = () => {
-  const { ownerName, phoneNumber, whatsappNumber, pressName } = useLocalSearchParams<{
+  const { ownerName, phoneNumber, whatsappNumber, pressName, latitude, longitude, selectedServices: paramServices } = useLocalSearchParams<{
     ownerName: string;
     phoneNumber: string;
     whatsappNumber: string;
     pressName: string;
+    latitude?: string;
+    longitude?: string;
+    selectedServices?: string;
   }>();
   
   const [activeTab, setActiveTab] = useState<Role>('composers');
+  
+  // Step indicator data for Business Profile Setup
+  const steps = [
+    { id: 1, label: 'Business Details', completed: true, current: false },
+    { id: 2, label: 'Services', completed: true, current: false },
+    { id: 3, label: 'Team', completed: false, current: true },
+  ];
   
   // Initialize owners with primary owner data
   const [owners, setOwners] = useState<Member[]>(() => {
@@ -344,9 +355,9 @@ const BusinessProfileStepThree: React.FC = () => {
       return;
     }
     setError('');
-    // Navigate to dashboard with team data
-    router.replace({
-      pathname: '/DashboardScreen',
+    // Navigate to success screen with team data
+    router.push({
+      pathname: '/SetupSuccessScreen',
       params: {
         owners: JSON.stringify(owners),
         composers: JSON.stringify(composers),
@@ -367,24 +378,26 @@ const BusinessProfileStepThree: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Step Indicator */}
+      <StepIndicator 
+        steps={steps} 
+        currentStepPage={3}
+        routeParams={{
+          ownerName: ownerName || '',
+          phoneNumber: phoneNumber || '',
+          whatsappNumber: whatsappNumber || '',
+          pressName: pressName || '',
+          latitude: latitude || '',
+          longitude: longitude || '',
+          selectedServices: paramServices || '',
+        }}
+      />
+
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Header Section */}
-          <View style={styles.headerContainer}>
-            <TouchableOpacity style={styles.backArrow} onPress={handleBack}>
-              <Ionicons name="arrow-back" size={24} color="#111827" />
-            </TouchableOpacity>
-            <Text style={styles.title}>Invite your team</Text>
-            <View style={styles.placeholderSpace} />
-          </View>
-          <Text style={styles.subtitle}>Step 3 of 3</Text>
-          <View style={styles.progressBar}>
-            <View style={styles.progressFill} />
-          </View>
-
           {/* Tab Navigation */}
           <View style={styles.tabContainer}>
             <TouchableOpacity
@@ -503,7 +516,7 @@ const BusinessProfileStepThree: React.FC = () => {
       <View style={styles.floatingButtonContainer}>
         <TouchableOpacity style={styles.finishBtn} onPress={handleFinishSetup}>
           <LinearGradient
-            colors={['#A855F7', '#7C3AED']}
+            colors={['#7C3AED', '#A855F7']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.finishBtnGradient}
@@ -597,7 +610,7 @@ const BusinessProfileStepThree: React.FC = () => {
                           <Switch
                             value={sameAsContact}
                             onValueChange={handleToggleSameAsContact}
-                            trackColor={{ false: '#E5E7EB', true: '#A855F7' }}
+                            trackColor={{ false: '#E5E7EB', true: '#7C3AED' }}
                             thumbColor={sameAsContact ? '#fff' : '#fff'}
                           />
                         </View>
@@ -610,7 +623,7 @@ const BusinessProfileStepThree: React.FC = () => {
                 {/* Add Button */}
                 <TouchableOpacity style={styles.modalAddBtn} onPress={handleAddMember}>
                   <LinearGradient
-                    colors={['#A855F7', '#7C3AED']}
+                    colors={['#7C3AED', '#A855F7']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={styles.modalAddBtnGradient}
@@ -630,13 +643,12 @@ const BusinessProfileStepThree: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F9F9FF',
+    backgroundColor: '#ffffff',
   },
   headerContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 4,
+    justifyContent: 'center',
+    marginBottom: 24,
   },
   backArrow: {
     padding: 4,
@@ -676,7 +688,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#111827',
     textAlign: 'center',
-    flex: 1,
   },
   subtitle: {
     fontSize: 14,
@@ -689,12 +700,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#EDECF3',
     borderRadius: 14,
-    padding: 4,
+    padding: 6,
     marginBottom: 20,
   },
   tab: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 14,
     alignItems: 'center',
@@ -703,11 +714,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   tabText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#6B7280',
     fontWeight: '500',
   },
   tabTextActive: {
+    fontSize: 13,
     color: '#111827',
     fontWeight: '600',
   },
@@ -758,8 +770,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E7EB',
     borderRadius: 12,
-    padding: 16,
-    marginVertical: 8,
+    padding: 20,
+    marginVertical: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
@@ -810,7 +822,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#F9F9FF',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderTopWidth: 1,

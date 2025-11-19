@@ -1,10 +1,14 @@
+import StepIndicator from '@/components/StepIndicator';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
+    Alert,
     Dimensions,
     Keyboard,
     KeyboardAvoidingView,
+    Linking,
     Platform,
     SafeAreaView,
     ScrollView,
@@ -20,18 +24,87 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 const { width } = Dimensions.get('window');
 
 const BusinessProfileStepOne: React.FC = () => {
-  const { phoneNumber } = useLocalSearchParams<{ phoneNumber: string }>();
-  const [ownerName, setOwnerName] = useState('');
-  const [pressName, setPressName] = useState('');
-  const [contactNumber, setContactNumber] = useState(phoneNumber || '');
-  const [whatsappNumber, setWhatsappNumber] = useState('');
-  const [sameAsContact, setSameAsContact] = useState(false);
+  const { phoneNumber, ownerName: paramOwnerName, pressName: paramPressName, contactNumber: paramContactNumber, whatsappNumber: paramWhatsappNumber, latitude: paramLatitude, longitude: paramLongitude } = useLocalSearchParams<{ 
+    phoneNumber?: string;
+    ownerName?: string;
+    pressName?: string;
+    contactNumber?: string;
+    whatsappNumber?: string;
+    latitude?: string;
+    longitude?: string;
+  }>();
+  const [ownerName, setOwnerName] = useState(paramOwnerName || '');
+  const [pressName, setPressName] = useState(paramPressName || '');
+  const [contactNumber, setContactNumber] = useState(paramContactNumber || phoneNumber || '');
+  const [whatsappNumber, setWhatsappNumber] = useState(paramWhatsappNumber || '');
+  const [sameAsContact, setSameAsContact] = useState(paramWhatsappNumber === paramContactNumber && !!paramContactNumber);
   const [formErrors, setFormErrors] = useState({
     ownerName: '',
     pressName: '',
   });
+  const [latitude, setLatitude] = useState(paramLatitude || '');
+  const [longitude, setLongitude] = useState(paramLongitude || '');
 
   const scrollViewRef = React.useRef<ScrollView>(null);
+
+  // Handler for Locate My Press
+  const handleLocateMyPress = async () => {
+    Alert.alert(
+      'Location Permission',
+      'This app would like to use your location to help you locate your press on the map. Do you want to enable location services?',
+      [
+        {
+          text: 'No',
+          onPress: () => {
+            // User declined location permission
+            Alert.alert('Location Disabled', 'You can enable location services later in your settings.');
+          },
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            try {
+              const { status } = await Location.requestForegroundPermissionsAsync();
+              if (status === 'granted') {
+                const location = await Location.getCurrentPositionAsync();
+                const lat = location.coords.latitude.toFixed(4);
+                const lon = location.coords.longitude.toFixed(4);
+                setLatitude(lat);
+                setLongitude(lon);
+                console.log('Location obtained:', location);
+                
+                // Open maps app with current location
+                const latitude = location.coords.latitude;
+                const longitude = location.coords.longitude;
+                const mapsUrl = Platform.OS === 'ios' 
+                  ? `maps://0,0?q=${latitude},${longitude}`
+                  : `geo:${latitude},${longitude}?q=${latitude},${longitude}`;
+                
+                try {
+                  await Linking.openURL(mapsUrl);
+                } catch (error) {
+                  console.log('Unable to open maps:', error);
+                }
+              } else {
+                Alert.alert('Permission Denied', 'Location permission was not granted.');
+              }
+            } catch (error) {
+              Alert.alert('Error', 'Failed to get location. Please try again.');
+              console.error('Location error:', error);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  // Step indicator data for Business Profile Setup
+  const steps = [
+    { id: 1, label: 'Business Details', completed: false, current: true },
+    { id: 2, label: 'Services', completed: false, current: false },
+    { id: 3, label: 'Team', completed: false, current: false },
+  ];
 
   const handleToggleSameAsContact = () => {
     setSameAsContact((prev) => {
@@ -100,35 +173,33 @@ const BusinessProfileStepOne: React.FC = () => {
         phoneNumber: contactNumber,
         whatsappNumber: whatsappNumber,
         pressName: pressName.trim(),
+        latitude: latitude,
+        longitude: longitude,
       }
     });
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Step Indicator */}
+      <StepIndicator 
+        steps={steps} 
+        currentStepPage={1}
+        routeParams={{
+          ownerName: ownerName.trim(),
+          phoneNumber: contactNumber,
+          whatsappNumber: whatsappNumber,
+          pressName: pressName.trim(),
+          latitude: latitude,
+          longitude: longitude,
+        }}
+      />
+
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1 }}
       >
         <ScrollView ref={scrollViewRef} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-          {/* Header Section */}
-          <View style={styles.headerContainer}>
-            <TouchableOpacity style={styles.backArrow} onPress={() => router.back()}>
-              <Ionicons name="arrow-back" size={24} color="#7C3AED" />
-            </TouchableOpacity>
-            <Text style={styles.title}>Profile Setup</Text>
-            <View style={styles.placeholderSpace} />
-          </View>
-          <Text style={styles.subtitle}>Step 1 of 3 • Business Information</Text>
-          <View style={styles.progressBar}>
-            <LinearGradient
-              colors={['#7C3AED', '#A855F7']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.progressFill}
-            />
-          </View>
-
           {/* Form Card */}
           <View style={styles.formCard}>
             {/* Owner's Name */}
@@ -179,48 +250,77 @@ const BusinessProfileStepOne: React.FC = () => {
             <View style={styles.divider} />
 
             {/* WhatsApp Number with Same as Contact Toggle */}
-            <View style={styles.rowGroup}>
-              {/* WhatsApp Number */}
-              <View style={styles.halfWidth}>
-                <Text style={styles.label}>
-                  <Ionicons name="logo-whatsapp" size={16} color="#25D366" /> WhatsApp Number
-                </Text>
-                <View style={styles.inputWrapper}>
-                  <TextInput
-                    style={[styles.input, sameAsContact && styles.disabledInput]}
-                    placeholder="9876543210"
-                    value={whatsappNumber}
-                    onChangeText={handleWhatsappChange}
-                    keyboardType="phone-pad"
-                    editable={!sameAsContact}
-                    placeholderTextColor="#9CA3AF"
-                    maxLength={10}
-                  />
-                  {whatsappNumber.length === 10 && (
-                    <Ionicons name="checkmark-circle" size={20} color="#10B981" style={styles.inputIcon} />
-                  )}
-                </View>
-              </View>
-
-              {/* Same as Contact Toggle */}
-              <View style={styles.toggleSideWrapper}>
-                <View style={styles.switchOutlineWrapper}>
-                  <Switch
-                    value={sameAsContact}
-                    onValueChange={handleToggleSameAsContact}
-                    trackColor={{ false: '#E5E7EB', true: '#A855F7' }}
-                    thumbColor={sameAsContact ? '#fff' : '#fff'}
-                  />
-                </View>
-                <Text style={styles.toggleLabelSmall}>Same as Contact</Text>
+            <View style={styles.fieldContainer}>
+              <Text style={styles.label}>
+                <Ionicons name="logo-whatsapp" size={16} color="#25D366" /> WhatsApp Number
+              </Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={[styles.input, sameAsContact && styles.disabledInput]}
+                  placeholder="9876543210"
+                  value={whatsappNumber}
+                  onChangeText={handleWhatsappChange}
+                  keyboardType="phone-pad"
+                  editable={!sameAsContact}
+                  placeholderTextColor="#9CA3AF"
+                  maxLength={10}
+                />
+                {whatsappNumber.length === 10 && (
+                  <Ionicons name="checkmark-circle" size={20} color="#10B981" style={styles.inputIcon} />
+                )}
               </View>
             </View>
-          </View>
 
-          {/* Next Button */}
+            {/* Same as Contact Toggle */}
+            <View style={styles.toggleCenterWrapper}>
+              <View style={styles.switchOutlineWrapper}>
+                <Switch
+                  value={sameAsContact}
+                  onValueChange={handleToggleSameAsContact}
+                  trackColor={{ false: '#E5E7EB', true: '#7C3AED' }}
+                  thumbColor={sameAsContact ? '#fff' : '#fff'}
+                />
+              </View>
+              <Text style={styles.toggleLabel}>Same as Contact</Text>
+            </View>
+
+            {/* Your Location Heading */}
+            <Text style={styles.label}>
+              <Ionicons name="location" size={16} color="#7C3AED" /> Your Location
+            </Text>
+
+            {/* Locate My Press Option */}
+            {latitude && longitude ? (
+              <View style={styles.locateMeContainer}>
+                <View style={styles.locateMeBoxSuccess}>
+                  <View style={styles.locationContent}>
+                    <Ionicons name="location" size={20} color="#7C3AED" />
+                    <TextInput
+                      style={styles.locationInput}
+                      value={`Lat: ${latitude}, Long: ${longitude}`}
+                      editable={false}
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </View>
+                  <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+                </View>
+              </View>
+            ) : (
+              <TouchableOpacity style={styles.locateMeContainer} onPress={handleLocateMyPress}>
+                <View style={styles.locateMeBox}>
+                  <Ionicons name="location" size={20} color="#7C3AED" />
+                  <Text style={styles.locateMeBoxText}>Locate My Press</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
+        </ScrollView>
+
+        {/* Next Button - Floating */}
+        <View style={styles.floatingButtonContainer}>
           <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
             <LinearGradient
-              colors={['#A855F7', '#7C3AED']}
+              colors={['#7C3AED', '#A855F7']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.nextBtnGradient}
@@ -228,7 +328,7 @@ const BusinessProfileStepOne: React.FC = () => {
               <Text style={styles.nextBtnText}>Next →</Text>
             </LinearGradient>
           </TouchableOpacity>
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -237,18 +337,28 @@ const BusinessProfileStepOne: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#ffffff',
   },
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 24,
-    paddingBottom: 40,
+    paddingBottom: 100,
+  },
+  floatingButtonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
   },
   headerContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 4,
+    justifyContent: 'center',
+    marginBottom: 24,
   },
   backArrow: {
     padding: 4,
@@ -264,15 +374,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#111827',
     textAlign: 'center',
-    flex: 1,
     letterSpacing: -0.5,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#6B7280',
-    textAlign: 'center',
-    marginTop: 4,
-    marginBottom: 24,
   },
   progressBar: {
     height: 4,
@@ -356,6 +458,13 @@ const styles = StyleSheet.create({
     paddingTop: 32,
     gap: 6,
   },
+  toggleCenterWrapper: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    gap: 8,
+  },
   switchOutlineWrapper: {
     borderWidth: 1.5,
     borderColor: '#E5E7EB',
@@ -376,6 +485,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 16,
   },
+  toggleLabelCenter: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '500',
+    textAlign: 'center',
+  },
   rowGroup: {
     flexDirection: 'row',
     gap: 10,
@@ -387,7 +502,6 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   nextBtn: {
-    marginTop: 16,
     width: '100%',
     height: 52,
     borderRadius: 12,
@@ -410,6 +524,65 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     letterSpacing: 0.3,
+  },
+  locateMeContainer: {
+    marginBottom: 20,
+    gap: 10,
+  },
+  locateMeBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 48,
+    backgroundColor: '#F9F9FF',
+    borderRadius: 12,
+    borderColor: '#E5E7EB',
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  locateMeBoxSuccess: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 60,
+    backgroundColor: '#F0FDF4',
+    borderRadius: 12,
+    borderColor: '#10B981',
+    borderWidth: 1.5,
+    paddingHorizontal: 16,
+    gap: 12,
+    justifyContent: 'space-between',
+  },
+  locationContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  coordinatesText: {
+    flex: 1,
+  },
+  coordinateLabel: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
+  coordinateValue: {
+    fontSize: 14,
+    color: '#111827',
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  locateMeBoxText: {
+    fontSize: 16,
+    color: '#7C3AED',
+    fontWeight: '600',
+  },
+  locationInput: {
+    flex: 1,
+    fontSize: 14,
+    color: '#111827',
+    fontWeight: '500',
+    marginLeft: 8,
   },
   // Unused styles (kept for reference)
   textArea: {
