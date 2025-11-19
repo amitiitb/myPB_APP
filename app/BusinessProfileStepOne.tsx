@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
     Dimensions,
+    Keyboard,
     KeyboardAvoidingView,
     Platform,
     SafeAreaView,
@@ -48,11 +49,19 @@ const BusinessProfileStepOne: React.FC = () => {
     const cleaned = text.replace(/\D/g, '').slice(0, 10);
     setContactNumber(cleaned);
     if (sameAsContact) setWhatsappNumber(cleaned);
+    // Dismiss keyboard when 10 digits are entered
+    if (cleaned.length === 10) {
+      Keyboard.dismiss();
+    }
   };
 
   const handleWhatsappChange = (text: string) => {
     const cleaned = text.replace(/\D/g, '').slice(0, 10);
     setWhatsappNumber(cleaned);
+    // Dismiss keyboard when 10 digits are entered
+    if (cleaned.length === 10) {
+      Keyboard.dismiss();
+    }
   };
 
   const validateOwnerName = () => {

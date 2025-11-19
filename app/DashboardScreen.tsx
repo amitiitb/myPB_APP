@@ -213,7 +213,12 @@ const DashboardScreen: React.FC = () => {
 
   // Show notifications screen
   if (showNotifications) {
-    return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
+    return (
+      <>
+        <NotificationsScreen onBack={() => setShowNotifications(false)} activeTab={activeTab} onTabPress={handleTabPress} />
+        <FooterNav activeTab={activeTab} onTabPress={handleTabPress} />
+      </>
+    );
   }
 
   // Orders data for dashboard calculations (should be replaced with real data source in production)
@@ -302,24 +307,15 @@ const DashboardScreen: React.FC = () => {
     );
   } else if (activeTab === 'finance') {
     mainContent = (
-      <>
-        <FinanceScreen activeTab={activeTab} onTabPress={handleTabPress} />
-        <FooterNav activeTab={activeTab} onTabPress={handleTabPress} />
-      </>
+      <FinanceScreen activeTab={activeTab} onTabPress={handleTabPress} />
     );
   } else if (activeTab === 'inventory') {
     mainContent = (
-      <>
-        <InventoryScreen activeTab={activeTab} onTabPress={handleTabPress} />
-        <FooterNav activeTab={activeTab} onTabPress={handleTabPress} />
-      </>
+      <InventoryScreen activeTab={activeTab} onTabPress={handleTabPress} />
     );
   } else if (activeTab === 'reports') {
     mainContent = (
-      <>
-        <ReportsScreen />
-        <FooterNav activeTab={activeTab} onTabPress={handleTabPress} />
-      </>
+      <ReportsScreen activeTab={activeTab} onTabPress={handleTabPress} />
     );
   } else {
     mainContent = (

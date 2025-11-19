@@ -1,3 +1,4 @@
+import FooterNav from '@/components/FooterNav';
 import HeaderBar from '@/components/HeaderBar';
 import NotificationsScreen from '@/components/NotificationsScreen';
 import SettingsScreen from '@/components/SettingsScreen';
@@ -291,10 +292,29 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
 
   // Show notifications screen
   if (showNotifications) {
-    return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
+    return (
+      <>
+        <NotificationsScreen 
+          onBack={() => setShowNotifications(false)} 
+          activeTab={activeTab} 
+          onTabPress={(tab) => { 
+            setShowNotifications(false); 
+            onTabPress(tab); 
+          }} 
+        />
+        <FooterNav 
+          activeTab={activeTab} 
+          onTabPress={(tab) => { 
+            setShowNotifications(false); 
+            onTabPress(tab); 
+          }} 
+        />
+      </>
+    );
   }
 
   return (
+    <>
     <SafeAreaView style={[scss.safeArea, darkMode && scss.safeAreaDark]}>
       {/* Header Bar */}
       <HeaderBar
@@ -933,6 +953,10 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
       )}
 
     </SafeAreaView>
+    {!showSettings && (
+      <FooterNav activeTab={activeTab} onTabPress={onTabPress} />
+    )}
+    </>
   );
 };
 

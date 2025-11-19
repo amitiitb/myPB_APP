@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     pointerEvents: 'none',
-    paddingTop: 60,
+    paddingTop: 120, // moved lower to avoid overlap with language toggle
   },
   toast: {
     backgroundColor: '#10B981',

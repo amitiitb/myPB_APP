@@ -114,7 +114,12 @@ const FinanceScreen: React.FC<FinanceScreenProps> = ({ activeTab, onTabPress }) 
 
   // Show notifications screen
   if (showNotifications) {
-    return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
+    return (
+      <>
+        <NotificationsScreen onBack={() => setShowNotifications(false)} activeTab={activeTab} onTabPress={(tab) => { setShowNotifications(false); onTabPress(tab); }} />
+        <FooterNav activeTab={activeTab} onTabPress={(tab) => { setShowNotifications(false); onTabPress(tab); }} />
+      </>
+    );
   }
 
 
@@ -342,6 +347,31 @@ const FinanceScreen: React.FC<FinanceScreenProps> = ({ activeTab, onTabPress }) 
 };
 
 const scss = StyleSheet.create({
+    sectionTitleDark: {
+      color: '#F3F4F6',
+    },
+    emptyBox: {
+      backgroundColor: '#fff',
+      borderRadius: 10,
+      borderColor: '#E5E7EB',
+      borderWidth: 1,
+      padding: 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 12,
+    },
+    emptyBoxDark: {
+      backgroundColor: '#374151',
+      borderColor: '#4B5563',
+    },
+    emptyText: {
+      color: '#6B7280',
+      fontSize: 15,
+      textAlign: 'center',
+    },
+    emptyTextDark: {
+      color: '#D1D5DB',
+    },
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
@@ -586,12 +616,7 @@ const scss = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
   },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-    marginTop: 12,
-  },
+  // summaryRow defined above, remove duplicate
   totalSalesCard: {
     backgroundColor: '#7C3AED',
     borderRadius: 16,
@@ -697,34 +722,8 @@ const scss = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: '#111827',
-    marginTop: 16,
-    marginBottom: 16,
-  },
-  sectionTitleDark: {
-    color: '#F3F4F6',
-  },
-  emptyBox: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    borderColor: '#E5E7EB',
-    borderWidth: 1,
-    padding: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  emptyBoxDark: {
-    backgroundColor: '#374151',
-    borderColor: '#4B5563',
-  },
-  emptyText: {
-    color: '#6B7280',
-    fontSize: 15,
-    textAlign: 'center',
-  },
-  emptyTextDark: {
-    color: '#D1D5DB',
   },
 });
 
 export default FinanceScreen;
+

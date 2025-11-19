@@ -1,7 +1,6 @@
 import { useTheme } from '@/context/ThemeContext';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface Notification {
@@ -15,9 +14,15 @@ interface Notification {
 
 interface NotificationsScreenProps {
   onBack: () => void;
+  activeTab?: 'home' | 'orders' | 'finance' | 'inventory' | 'reports';
+  onTabPress?: (tab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports') => void;
 }
 
-const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack }) => {
+const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ 
+  onBack, 
+  activeTab = 'home',
+  onTabPress = () => {},
+}) => {
   const { darkMode } = useTheme();
   const [showMore, setShowMore] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([
@@ -91,19 +96,17 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack }) => 
 
   return (
     <SafeAreaView style={[scss.safeArea, darkMode && scss.safeAreaDark]}>
-      {/* Header */}
-      <View style={[scss.headerContainer, { position: 'relative', justifyContent: 'center' }]}> 
-        <TouchableOpacity onPress={onBack} style={[scss.backBtn, { position: 'absolute', left: 16, zIndex: 2 }]}> 
-          <Ionicons name="chevron-back" size={26} color="#fff" />
-        </TouchableOpacity>
-        <Text style={[scss.headerTitle, { position: 'absolute', left: 0, right: 0, textAlign: 'center', zIndex: 1 }]}>Notifications</Text>
-        <TouchableOpacity style={[scss.markAllBtn, { position: 'absolute', right: 16, zIndex: 2 }]} onPress={handleMarkAllAsRead}>
-          <Text style={scss.markAllText}>Mark all as read</Text>
-        </TouchableOpacity>
-      </View>
+      <View style={[scss.container, darkMode && scss.containerDark]}>
+          {/* Header */}
+          <View style={[scss.header, darkMode && scss.headerDark]}>
+            <Text style={scss.headerTitle}>Notifications</Text>
+            <TouchableOpacity style={scss.markAllBtn} onPress={handleMarkAllAsRead}>
+              <Text style={scss.markAllText}>Mark all as read</Text>
+            </TouchableOpacity>
+          </View>
 
-      {/* Notifications List */}
-      <ScrollView contentContainerStyle={scss.scrollContent} showsVerticalScrollIndicator={false}>
+          {/* Notifications List */}
+          <ScrollView contentContainerStyle={scss.scrollContent} showsVerticalScrollIndicator={false}>
         {allNotifications.length === 0 ? (
           <View style={scss.emptyState}>
             <Ionicons name="checkmark-circle-outline" size={64} color={darkMode ? '#6B7280' : '#D1D5DB'} />
@@ -157,6 +160,7 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack }) => 
           </>
         )}
       </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };
@@ -164,33 +168,36 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack }) => 
 const scss = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#7C3AED',
   },
   safeAreaDark: {
-    backgroundColor: '#111827',
+    backgroundColor: '#5B21B6',
   },
-  headerContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: '#F9F9FF',
+  },
+  containerDark: {
+    backgroundColor: '#1F2937',
+  },
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 18,
-    backgroundColor: '#7C3AED',
     justifyContent: 'space-between',
-    gap: 12,
+    backgroundColor: '#7C3AED',
+    paddingHorizontal: 20,
+    height: 64,
   },
-  backBtn: {
-    padding: 6,
+  headerDark: {
+    backgroundColor: '#7C3AED',
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: '800',
+    fontSize: 20,
+    fontWeight: '700',
     color: '#fff',
-    textAlign: 'center',
-    marginLeft: 0,
-    letterSpacing: 0,
   },
   markAllBtn: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
     paddingVertical: 6,
   },
   markAllText: {
@@ -201,6 +208,7 @@ const scss = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 12,
     paddingVertical: 12,
+    paddingBottom: 100,
   },
   emptyState: {
     alignItems: 'center',

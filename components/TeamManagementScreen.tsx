@@ -183,10 +183,19 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
       return false;
     }
     
-    // Check if phone number already exists across all roles
-    if (isPhoneNumberExists(formMobile, editingId || undefined)) {
-      setFormErrors((prev) => ({ ...prev, mobile: 'Phone number already linked to another user.' }));
-      return false;
+    // Only check for duplicates if not editing or if the number has changed
+    if (!editingId) {
+      // Adding new member - check if number exists
+      if (isPhoneNumberExists(formMobile, undefined)) {
+        setFormErrors((prev) => ({ ...prev, mobile: 'Phone number already linked to another user.' }));
+        return false;
+      }
+    } else {
+      // Editing - check if number exists for other members (excluding current)
+      if (isPhoneNumberExists(formMobile, editingId)) {
+        setFormErrors((prev) => ({ ...prev, mobile: 'Phone number already linked to another user.' }));
+        return false;
+      }
     }
     
     setFormErrors((prev) => ({ ...prev, mobile: '' }));
@@ -195,15 +204,26 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
 
   const validateWhatsapp = () => {
     // WhatsApp is optional, only validate if provided
-    if (formWhatsapp.length > 0 && (formWhatsapp.length !== 10 || !/^[6-9]/.test(formWhatsapp))) {
-      setFormErrors((prev) => ({ ...prev, whatsapp: 'Enter a valid 10-digit WhatsApp number.' }));
-      return false;
-    }
-    
-    // Check if WhatsApp number already exists across all roles
-    if (formWhatsapp && isPhoneNumberExists(formWhatsapp, editingId || undefined)) {
-      setFormErrors((prev) => ({ ...prev, whatsapp: 'Phone number already linked to another user.' }));
-      return false;
+    if (formWhatsapp.length > 0) {
+      if (formWhatsapp.length !== 10 || !/^[6-9]/.test(formWhatsapp)) {
+        setFormErrors((prev) => ({ ...prev, whatsapp: 'Enter a valid 10-digit WhatsApp number.' }));
+        return false;
+      }
+      
+      // Only check for duplicates if not editing or if the number has changed
+      if (!editingId) {
+        // Adding new member - check if number exists
+        if (isPhoneNumberExists(formWhatsapp, undefined)) {
+          setFormErrors((prev) => ({ ...prev, whatsapp: 'Phone number already linked to another user.' }));
+          return false;
+        }
+      } else {
+        // Editing - check if number exists for other members (excluding current)
+        if (isPhoneNumberExists(formWhatsapp, editingId)) {
+          setFormErrors((prev) => ({ ...prev, whatsapp: 'Phone number already linked to another user.' }));
+          return false;
+        }
+      }
     }
     
     setFormErrors((prev) => ({ ...prev, whatsapp: '' }));
@@ -225,8 +245,8 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
       return;
     }
 
-    // If WhatsApp is empty, use contact number as fallback
-    const finalWhatsapp = formWhatsapp || formMobile;
+    // Only use contact number as WhatsApp fallback if "Same as Contact" is checked OR if WhatsApp is empty string
+    const finalWhatsapp = formWhatsapp.trim() !== '' ? formWhatsapp : formMobile;
 
     const newMember: TeamMember = {
       id: editingId || Date.now().toString(),
@@ -367,38 +387,43 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
           ) : (
             <View>
               {getTabData().map((member) => (
-                <View key={member.id} style={[scss.memberCard, darkMode && scss.memberCardDark, member.id === 'primary-owner' && scss.primaryOwnerCard, member.id === 'primary-owner' && darkMode && scss.primaryOwnerCardDark]}>
+                <TouchableOpacity
+                  key={member.id}
+                  style={[
+                    scss.memberCard,
+                    { borderColor: '#7C3AED', borderWidth: 1.5, backgroundColor: '#F8F7FF' },
+                    darkMode && { backgroundColor: '#312E81', borderColor: '#A78BFA' },
+                  ]}
+                  activeOpacity={0.85}
+                  onPress={() => handleEditMember(member)}
+                >
                   <View style={scss.memberInfo}>
-                    <View style={scss.memberNameRow}>
-                      <Text style={[scss.memberName, darkMode && scss.memberNameDark]}>{member.name}</Text>
-                      {member.id === 'primary-owner' && (
-                        <View style={scss.primaryBadge}>
-                          <Text style={scss.primaryBadgeText}>Primary</Text>
-                        </View>
-                      )}
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#7C3AED', marginBottom: 2 }}>{member.name}</Text>
+                    <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>Contact: {member.mobile}</Text>
+                    {member.whatsapp && member.whatsapp !== member.mobile && (
+                      <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>WhatsApp: {member.whatsapp}</Text>
+                    )}
+                    <View style={{ backgroundColor: '#EDE9FE', borderRadius: 12, paddingVertical: 4, paddingHorizontal: 12, alignSelf: 'flex-start', marginTop: 8 }}>
+                      <Text style={{ fontSize: 11, fontWeight: '600', color: '#7C3AED' }}>{member.role}</Text>
                     </View>
-                    <Text style={[scss.memberDetail, darkMode && scss.memberDetailDark]}>📱 {member.mobile}</Text>
-                    <Text style={[scss.memberDetail, darkMode && scss.memberDetailDark]}>💬 {member.whatsapp}</Text>
                   </View>
                   <View style={scss.memberActions}>
+                    <TouchableOpacity
+                      style={scss.editBtn}
+                      onPress={() => handleEditMember(member)}
+                    >
+                      <Ionicons name="pencil-outline" size={18} color="#6B7280" />
+                    </TouchableOpacity>
                     {member.id !== 'primary-owner' && (
-                      <>
-                        <TouchableOpacity
-                          style={scss.editBtn}
-                          onPress={() => handleEditMember(member)}
-                        >
-                          <Ionicons name="pencil" size={18} color="#7C3AED" />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={scss.deleteBtn}
-                          onPress={() => handleDeleteMember(member.id)}
-                        >
-                          <Ionicons name="trash" size={18} color={darkMode ? '#FCA5A5' : '#EF4444'} />
-                        </TouchableOpacity>
-                      </>
+                      <TouchableOpacity
+                        style={scss.deleteBtn}
+                        onPress={() => handleDeleteMember(member.id)}
+                      >
+                        <Ionicons name="trash-outline" size={18} color={darkMode ? '#FCA5A5' : '#EF4444'} />
+                      </TouchableOpacity>
                     )}
                   </View>
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           )}
@@ -519,9 +544,6 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
 
                 {/* Modal Actions */}
                 <View style={[scss.modalActions, darkMode && scss.modalActionsDark]}>
-                  <TouchableOpacity style={[scss.cancelBtn, darkMode && scss.cancelBtnDark]} onPress={() => setShowModal(false)}>
-                    <Text style={[scss.cancelBtnText, darkMode && scss.cancelBtnTextDark]}>Cancel</Text>
-                  </TouchableOpacity>
                   <TouchableOpacity style={scss.submitBtn} onPress={handleAddOrUpdateMember}>
                     <Text style={scss.submitBtnText}>{editingId ? 'Update' : 'Add Member'}</Text>
                   </TouchableOpacity>
@@ -903,7 +925,6 @@ const scss = StyleSheet.create({
   },
   modalActions: {
     flexDirection: 'row',
-    gap: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderTopWidth: 1,
@@ -911,25 +932,6 @@ const scss = StyleSheet.create({
   },
   modalActionsDark: {
     borderTopColor: '#4B5563',
-  },
-  cancelBtn: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    alignItems: 'center',
-  },
-  cancelBtnDark: {
-    borderColor: '#4B5563',
-  },
-  cancelBtnText: {
-    color: '#6B7280',
-  },
-  cancelBtnTextDark: {
-    color: '#D1D5DB',
-    fontWeight: '600',
-    fontSize: 14,
   },
   submitBtn: {
     flex: 1,

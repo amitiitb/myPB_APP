@@ -30,7 +30,12 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ activeTab, onTabPress
 
   // Show notifications screen
   if (showNotifications) {
-    return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
+    return (
+      <>
+        <NotificationsScreen onBack={() => setShowNotifications(false)} activeTab={activeTab} onTabPress={(tab) => { setShowNotifications(false); onTabPress(tab); }} />
+        <FooterNav activeTab={activeTab} onTabPress={(tab) => { setShowNotifications(false); onTabPress(tab); }} />
+      </>
+    );
   }
 
   return (

@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -141,11 +142,19 @@ const BusinessProfileStepThree: React.FC = () => {
     if (sameAsContact) {
       setFormWhatsapp(cleaned);
     }
+    // Dismiss keyboard when 10 digits are entered
+    if (cleaned.length === 10) {
+      Keyboard.dismiss();
+    }
   };
 
   const handleWhatsappChange = (text: string) => {
     const cleaned = text.replace(/\D/g, '').slice(0, 10);
     setFormWhatsapp(cleaned);
+    // Dismiss keyboard when 10 digits are entered
+    if (cleaned.length === 10) {
+      Keyboard.dismiss();
+    }
   };
 
   const validateName = () => {
@@ -163,10 +172,19 @@ const BusinessProfileStepThree: React.FC = () => {
       return false;
     }
     
-    // Check if phone number already exists (excluding current member if editing)
-    if (isPhoneNumberExists(formMobile, editingMemberId)) {
-      setFormErrors((prev) => ({ ...prev, mobile: 'Phone number already linked to another user.' }));
-      return false;
+    // Only check for duplicates if not editing or if the number has changed
+    if (!editingMemberId) {
+      // Adding new member - check if number exists
+      if (isPhoneNumberExists(formMobile, null)) {
+        setFormErrors((prev) => ({ ...prev, mobile: 'Phone number already linked to another user.' }));
+        return false;
+      }
+    } else {
+      // Editing - check if number exists for other members (excluding current)
+      if (isPhoneNumberExists(formMobile, editingMemberId)) {
+        setFormErrors((prev) => ({ ...prev, mobile: 'Phone number already linked to another user.' }));
+        return false;
+      }
     }
     
     setFormErrors((prev) => ({ ...prev, mobile: '' }));
@@ -181,10 +199,19 @@ const BusinessProfileStepThree: React.FC = () => {
         return false;
       }
       
-      // Check if WhatsApp number already exists (excluding current member if editing)
-      if (isPhoneNumberExists(formWhatsapp, editingMemberId)) {
-        setFormErrors((prev) => ({ ...prev, whatsapp: 'Phone number already linked to another user.' }));
-        return false;
+      // Only check for duplicates if not editing or if the number has changed
+      if (!editingMemberId) {
+        // Adding new member - check if number exists
+        if (isPhoneNumberExists(formWhatsapp, null)) {
+          setFormErrors((prev) => ({ ...prev, whatsapp: 'Phone number already linked to another user.' }));
+          return false;
+        }
+      } else {
+        // Editing - check if number exists for other members (excluding current)
+        if (isPhoneNumberExists(formWhatsapp, editingMemberId)) {
+          setFormErrors((prev) => ({ ...prev, whatsapp: 'Phone number already linked to another user.' }));
+          return false;
+        }
       }
     }
     
@@ -197,6 +224,7 @@ const BusinessProfileStepThree: React.FC = () => {
     setFormMobile('');
     setFormWhatsapp('');
     setSameAsContact(false);
+    setEditingMemberId(null);
     setFormErrors({
       name: '',
       mobile: '',
@@ -205,11 +233,14 @@ const BusinessProfileStepThree: React.FC = () => {
   };
 
   const handleAddMember = () => {
+    console.log('handleAddMember called', { showModal, editingMemberId, activeTab });
+    
     const isNameValid = validateName();
     const isMobileValid = validateMobile();
     const isWhatsappValid = validateWhatsapp();
 
     if (!isNameValid || !isMobileValid || !isWhatsappValid) {
+      console.log('Validation failed');
       return;
     }
 
@@ -256,6 +287,8 @@ const BusinessProfileStepThree: React.FC = () => {
           : 'Operator',
       };
 
+      console.log('Adding new member:', newMember);
+      
       switch (activeTab) {
         case 'owners':
           setOwners([...owners, newMember]);
@@ -269,6 +302,7 @@ const BusinessProfileStepThree: React.FC = () => {
       }
     }
 
+    console.log('Closing modal and resetting form');
     resetForm();
     setShowModal(false);
   };
@@ -326,6 +360,7 @@ const BusinessProfileStepThree: React.FC = () => {
   };
 
   const openAddModal = () => {
+    console.log('openAddModal called');
     resetForm();
     setShowModal(true);
   };
@@ -387,22 +422,16 @@ const BusinessProfileStepThree: React.FC = () => {
               <Text style={styles.emptyState}>{getEmptyStateText()}</Text>
             ) : (
               getTabData().map((member) => (
-                <TouchableOpacity
+                <View
                   key={member.id}
                   style={[styles.memberCard, { borderColor: '#7C3AED', borderWidth: 1.5, backgroundColor: '#F8F7FF' }]}
-                  activeOpacity={0.85}
-                  onPress={() => {
-                    setEditingMemberId(member.id);
-                    setFormName(member.name);
-                    setFormMobile(member.mobile);
-                    setFormWhatsapp(member.whatsapp);
-                    setShowModal(true);
-                  }}
                 >
                   <View style={styles.memberInfo}>
                     <Text style={{ fontSize: 15, fontWeight: '700', color: '#7C3AED', marginBottom: 2 }}>{member.name}</Text>
                     <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>Contact: {member.mobile}</Text>
-                    <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>WhatsApp: {member.whatsapp}</Text>
+                    {member.whatsapp && member.whatsapp !== member.mobile && (
+                      <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>WhatsApp: {member.whatsapp}</Text>
+                    )}
                     <View style={styles.roleBadge}>
                       <Text style={styles.roleBadgeText}>{member.role}</Text>
                     </View>
@@ -423,13 +452,15 @@ const BusinessProfileStepThree: React.FC = () => {
                     {member.id !== 'primary-owner' && (
                       <TouchableOpacity
                         style={styles.actionButton}
-                        onPress={() => handleDeleteMember(member.id)}
+                        onPress={() => {
+                          handleDeleteMember(member.id);
+                        }}
                       >
                         <Ionicons name="trash-outline" size={18} color="#EF4444" />
                       </TouchableOpacity>
                     )}
                   </View>
-                </TouchableOpacity>
+                </View>
               ))
             )}
             
@@ -491,10 +522,10 @@ const BusinessProfileStepThree: React.FC = () => {
           >
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>{editingMemberId ? 'Edit ' + getAddButtonText() : getAddButtonText()}</Text>
+                <Text style={styles.modalTitle}>{editingMemberId ? 'Edit ' + getAddButtonText().replace('Add ', '') : getAddButtonText()}</Text>
                 <TouchableOpacity onPress={() => {
                   setShowModal(false);
-                  setEditingMemberId(null);
+                  resetForm();
                 }}>
                   <Ionicons name="close" size={28} color="#111827" />
                 </TouchableOpacity>

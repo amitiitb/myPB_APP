@@ -28,7 +28,25 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ activeTab, onTabPress }) 
   }
 
   if (showNotifications) {
-    return <NotificationsScreen onBack={() => setShowNotifications(false)} />;
+    return (
+      <>
+        <NotificationsScreen 
+          onBack={() => setShowNotifications(false)} 
+          activeTab={activeTab || 'reports'} 
+          onTabPress={(tab) => { 
+            setShowNotifications(false); 
+            onTabPress?.(tab); 
+          }} 
+        />
+        <FooterNav 
+          activeTab={activeTab || 'reports'} 
+          onTabPress={(tab) => { 
+            setShowNotifications(false); 
+            onTabPress?.(tab); 
+          }} 
+        />
+      </>
+    );
   }
 
   return (
