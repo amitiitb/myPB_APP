@@ -24,6 +24,7 @@ export default function RootLayout() {
             <Stack.Screen name="BusinessProfileStepOne" options={{ headerShown: false }} />
             <Stack.Screen name="BusinessProfileStepTwo" options={{ headerShown: false }} />
             <Stack.Screen name="BusinessProfileStepThree" options={{ headerShown: false }} />
+            <Stack.Screen name="SetupSuccessScreen" options={{ headerShown: false }} />
             <Stack.Screen name="DashboardScreen" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />

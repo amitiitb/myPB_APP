@@ -77,16 +77,19 @@ const SetupSuccessScreen: React.FC = () => {
             useNativeDriver: true,
         }).start();
 
-        // Trigger confetti animation
-        setTimeout(() => {
+        // Trigger confetti animation with slight delay
+        const confettiTimer = setTimeout(() => {
             if (confettiRef.current) {
                 confettiRef.current.play();
             }
-        }, 200);
+        }, 100);
+
+        return () => clearTimeout(confettiTimer);
     }, [scaleAnim, fadeAnim, bounceAnim, messageSlideAnim]);
 
     const handleGoToDashboard = () => {
-        router.replace({
+        // Navigate to Dashboard screen
+        router.push({
             pathname: '/DashboardScreen',
             params: {
                 owners: owners || '',
@@ -103,12 +106,12 @@ const SetupSuccessScreen: React.FC = () => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <LinearGradient
-                colors={['#F9F5FF', '#FFFFFF']}
+                colors={['#FFFFFF', '#FFFFFF']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.container}
             >
-                {/* Confetti Animation Background */}
+                {/* Confetti Animation Background - Positioned absolutely behind content */}
                 <LottieView
                     ref={confettiRef}
                     source={require('../assets/confetti.json')}
@@ -210,15 +213,16 @@ const SetupSuccessScreen: React.FC = () => {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#ffffff',
+        backgroundColor: '#FFFFFF',
     },
     container: {
         flex: 1,
         paddingHorizontal: 24,
-        paddingTop: 40,
+        paddingTop: 0,
         paddingBottom: 32,
         justifyContent: 'center',
         alignItems: 'center',
+        position: 'relative',
     },
     confetti: {
         position: 'absolute',
@@ -226,13 +230,13 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
-        zIndex: 0,
+        zIndex: 1,
     },
     checkmarkWrapper: {
         marginBottom: 60,
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 10,
+        zIndex: 20,
     },
     checkmarkOuter: {
         shadowColor: '#10B981',
@@ -252,7 +256,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 50,
         maxWidth: '100%',
-        zIndex: 10,
+        zIndex: 20,
     },
     emoji: {
         fontSize: 48,
@@ -318,8 +322,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 12,
         shadowOffset: { width: 0, height: 6 },
-        elevation: 8,
-        zIndex: 10,
+        elevation: 20,
+        zIndex: 30,
     },
     buttonGradient: {
         width: '100%',
