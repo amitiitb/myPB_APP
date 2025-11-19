@@ -956,8 +956,8 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
     {!showSettings && (
       <FooterNav activeTab={activeTab} onTabPress={onTabPress} />
     )}
-    </>
-  );
+  </>;
+};
 };
 
 const scss = StyleSheet.create({
