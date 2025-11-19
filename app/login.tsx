@@ -141,6 +141,7 @@ export default function LoginScreen() {
           {/* Card Section */}
           <View style={styles.card}>
             {/* Title */}
+
             <View style={styles.titleContainer}>
               <ThemedText style={styles.welcomeText}>
                 {t('login.welcome')}
@@ -148,9 +149,8 @@ export default function LoginScreen() {
             </View>
 
             {/* Subtitle */}
-            <ThemedText style={styles.subtitle}>
-              {t('login.subtitle')}
-            </ThemedText>
+
+            {/* Removed subtitle line as requested */}
 
             {/* Section Title */}
             <ThemedText style={styles.sectionTitle}>

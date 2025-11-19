@@ -128,8 +128,7 @@ const BusinessProfileStepTwo: React.FC = () => {
           {/* Error Message */}
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-          {/* Spacer for floating button */}
-          <View style={{ height: 80 }} />
+
         </ScrollView>
       </KeyboardAvoidingView>
 
@@ -170,7 +169,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 20,
-    paddingBottom: 100,
+    paddingBottom: 20,
   },
   title: {
     fontSize: 24,

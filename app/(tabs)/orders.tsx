@@ -5,14 +5,14 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import React, { useState } from 'react';
 import {
-  Alert,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    Alert,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -395,354 +395,207 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
         ) : (
           filteredOrders.map((order) => (
             <View key={order.id}>
-              <View style={[scss.orderCard, darkMode && scss.orderCardDark]}>
-                {/* Main Order Info Row */}
-                <View style={scss.mainOrderRow}>
-                  {/* Left: Order ID + Customer Info */}
-                  <View style={scss.leftSection}>
-                    <View style={scss.orderIDBadge}>
-                      <Text style={scss.orderIDText}>{order.id}</Text>
-                    </View>
-                    <View style={scss.customerInfo}>
-                      <Text style={[scss.customerNameText, darkMode && scss.customerNameTextDark]} numberOfLines={1}>
-                        {order.customerName}
-                      </Text>
-                      <Text style={[scss.productTypeText, darkMode && scss.productTypeTextDark]}>
-                        {order.productType}
-                      </Text>
-                    </View>
-                  </View>
-
-
-
-                  {/* Right: Amount + Actions */}
-                  <View style={scss.rightSection}>
-                    <Text style={[scss.amountText, darkMode && scss.amountTextDark]}>
-                      Rs. {order.amount.toLocaleString()}
-                    </Text>
-                    <View style={scss.actionIcons}>
-                      <TouchableOpacity 
-                        style={[scss.iconButton, { backgroundColor: '#F3E8FF' }]}
-                        onPress={() => openEditModal(order)}
-                      >
-                        <Ionicons name="pencil" size={14} color="#7C3AED" />
-                      </TouchableOpacity>
-                      <TouchableOpacity 
-                        style={[scss.iconButton, { backgroundColor: '#FEE2E2' }]}
-                        onPress={() => {
-                          Alert.alert(
-                            'Cancel Order',
-                            'Are you sure you want to cancel this order?',
-                            [
-                              { text: 'No', style: 'cancel' },
-                              { 
-                                text: 'Yes, Cancel', 
-                                onPress: () => Alert.alert('Success', 'Order cancelled'),
-                                style: 'destructive'
-                              },
-                            ]
-                          );
-                        }}
-                      >
-                        <Ionicons name="trash" size={14} color="#DC2626" />
-                      </TouchableOpacity>
-                    </View>
+              <TouchableOpacity 
+              style={[scss.orderCard, darkMode && scss.orderCardDark]}
+              onPress={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
+              activeOpacity={0.7}
+            >
+              {/* Top Row: Name + Product Type Badge + Actions */}
+              <View style={scss.headerRow}>
+                <View style={scss.nameSection}>
+                  <Text style={[scss.customerNameText, darkMode && scss.customerNameTextDark]} numberOfLines={1}>
+                    {order.customerName}
+                  </Text>
+                  <View style={scss.productBadge}>
+                    <Text style={scss.productBadgeText}>{order.productType}</Text>
                   </View>
                 </View>
-
-                {/* Metrics Row */}
-                <View style={scss.metricsRow}>
-                  <View style={scss.metric}>
-                    <Text style={[scss.metricLabel, darkMode && scss.metricLabelDark]}>Delivery</Text>
-                    <Text style={[scss.metricValue, darkMode && scss.metricValueDark]}>{order.delivery}</Text>
-                  </View>
-                  <View style={scss.metricDivider} />
-                  <View style={scss.metric}>
-                    <Text style={[scss.metricLabel, darkMode && scss.metricLabelDark]}>Pending</Text>
-                    <Text style={[scss.metricValuePending, darkMode && scss.metricValueDark]}>
-                      Rs. {order.pending.toLocaleString()}
-                    </Text>
-                  </View>
-                  {order.designVersions !== undefined && (
-                    <>
-                      <View style={scss.metricDivider} />
-                      <View style={scss.metric}>
-                        <Text style={[scss.metricLabel, darkMode && scss.metricLabelDark]}>Versions</Text>
-                        <Text style={[scss.metricValue, darkMode && scss.metricValueDark]}>{order.designVersions}</Text>
-                      </View>
-                    </>
-                  )}
-                </View>
-
-                {/* Order Status Section - Prominent */}
-                <View style={scss.orderStatusContainer}>
-                  <Text style={[scss.statusSectionLabel, darkMode && scss.statusSectionLabelDark]}>Status</Text>
+                <View style={scss.quickActions}>
                   <TouchableOpacity 
-                    style={[
-                      scss.statusPillButton,
-                      darkMode && scss.statusPillButtonDark,
-                      {
-                        backgroundColor: order.status === 'Order Placed' ? '#DBEAFE' : 
-                                        order.status === 'Composing' ? '#FED7AA' :
-                                        order.status === 'Proofreading' ? '#E0E7FF' :
-                                        order.status === 'Printing' ? '#F3E8FF' :
-                                        order.status === 'Ready to Deliver' ? '#ECFDF5' :
-                                        order.status === 'Delivered' ? '#D1FAE5' : '#F3F4F6'
-                      }
-                    ]}
-                    onPress={() => setStatusDropdownOrderId(statusDropdownOrderId === order.id ? null : order.id)}
+                    style={scss.editIconButton}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      openEditModal(order);
+                    }}
                   >
-                    <View style={scss.statusPillContent}>
-                      <Ionicons 
-                        name={order.status === 'Order Placed' ? 'document-text' :
-                              order.status === 'Composing' ? 'brush' :
-                              order.status === 'Proofreading' ? 'glasses' :
-                              order.status === 'Printing' ? 'print' :
-                              order.status === 'Ready to Deliver' ? 'cube' :
-                              order.status === 'Delivered' ? 'checkmark-done' : 'ellipse'}
-                        size={18}
-                        color={order.status === 'Order Placed' ? '#0284C7' : 
-                               order.status === 'Composing' ? '#D97706' :
-                               order.status === 'Proofreading' ? '#4F46E5' :
-                               order.status === 'Printing' ? '#A855F7' :
-                               order.status === 'Ready to Deliver' ? '#059669' :
-                               order.status === 'Delivered' ? '#10B981' : '#6B7280'}
-                      />
-                      <Text 
-                        style={[
-                          scss.statusPillText,
-                          {
-                            color: order.status === 'Order Placed' ? '#0284C7' : 
-                                   order.status === 'Composing' ? '#D97706' :
-                                   order.status === 'Proofreading' ? '#4F46E5' :
-                                   order.status === 'Printing' ? '#A855F7' :
-                                   order.status === 'Ready to Deliver' ? '#059669' :
-                                   order.status === 'Delivered' ? '#10B981' : '#6B7280'
-                          }
-                        ]}
-                      >
-                        {order.status}
-                      </Text>
-                      <Ionicons 
-                        name={statusDropdownOrderId === order.id ? "chevron-up" : "chevron-down"} 
-                        size={16} 
-                        color={order.status === 'Order Placed' ? '#0284C7' : 
-                               order.status === 'Composing' ? '#D97706' :
-                               order.status === 'Proofreading' ? '#4F46E5' :
-                               order.status === 'Printing' ? '#A855F7' :
-                               order.status === 'Ready to Deliver' ? '#059669' :
-                               order.status === 'Delivered' ? '#10B981' : '#6B7280'}
-                      />
-                    </View>
+                    <Ionicons name="pencil" size={16} color="#7C3AED" />
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={scss.deleteIconButton}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      Alert.alert(
+                        'Cancel Order',
+                        'Are you sure you want to cancel this order?',
+                        [
+                          { text: 'No', style: 'cancel' },
+                          { 
+                            text: 'Yes, Cancel', 
+                            onPress: () => Alert.alert('Success', 'Order cancelled'),
+                            style: 'destructive'
+                          },
+                        ]
+                      );
+                    }}
+                  >
+                    <Ionicons name="close" size={16} color="#DC2626" />
                   </TouchableOpacity>
                 </View>
-
-                {/* Assigned Badge (if exists) */}
-                {order.assignedTo && (
-                  <View style={scss.assignedBadge}>
-                    <Ionicons name="person-circle-outline" size={14} color="#7C3AED" />
-                    <Text style={scss.assignedText}>{order.assignedTo}</Text>
-                  </View>
-                )}
-
-                {/* Status Dropdown Menu */}
-                {statusDropdownOrderId === order.id && (
-                  <View style={[scss.statusDropdownMenu, darkMode && scss.statusDropdownMenuDark]}>
-                    <Text style={[scss.statusDropdownHeader, darkMode && scss.statusDropdownHeaderDark]}>Update Order Status</Text>
-                    
-                    <TouchableOpacity
-                      style={[
-                        scss.statusMenuOption,
-                        darkMode && scss.statusMenuOptionDark,
-                        order.status === 'Order Placed' && scss.statusMenuOptionActive
-                      ]}
-                      onPress={() => updateOrderStatus(order.id, 'Order Placed')}
-                    >
-                      {order.status === 'Order Placed' ? (
-                        <View style={[scss.statusIconBadge, { backgroundColor: '#DBEAFE' }]}>
-                          <Ionicons name="add-circle-outline" size={18} color="#0284C7" />
-                        </View>
-                      ) : (
-                        <Ionicons name="add-circle-outline" size={18} color="#6B7280" />
-                      )}
-                      <View style={scss.statusTextContainer}>
-                        <Text 
-                          style={[
-                            scss.statusMenuOptionText,
-                            darkMode && scss.statusMenuOptionTextDark,
-                            order.status === 'Order Placed' && scss.statusMenuOptionTextActive
-                          ]}
-                        >
-                          Order Placed
-                        </Text>
-                        <Text style={[scss.statusDescription, darkMode && scss.statusDescriptionDark]}>Initial order received</Text>
-                      </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        scss.statusMenuOption,
-                        darkMode && scss.statusMenuOptionDark,
-                        order.status === 'Composing' && scss.statusMenuOptionActive
-                      ]}
-                      onPress={() => updateOrderStatus(order.id, 'Composing')}
-                    >
-                      {order.status === 'Composing' ? (
-                        <View style={[scss.statusIconBadge, { backgroundColor: '#FED7AA' }]}>
-                          <Ionicons name="pencil-outline" size={18} color="#D97706" />
-                        </View>
-                      ) : (
-                        <Ionicons name="pencil-outline" size={18} color="#6B7280" />
-                      )}
-                      <View style={scss.statusTextContainer}>
-                        <Text 
-                          style={[
-                            scss.statusMenuOptionText,
-                            darkMode && scss.statusMenuOptionTextDark,
-                            order.status === 'Composing' && scss.statusMenuOptionTextActive
-                          ]}
-                        >
-                          Composing
-                        </Text>
-                        <Text style={[scss.statusDescription, darkMode && scss.statusDescriptionDark]}>Design work in progress</Text>
-                      </View>
-                      <Ionicons name="chevron-forward" size={14} color="#6B7280" style={scss.statusMenuArrow} />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        scss.statusMenuOption,
-                        darkMode && scss.statusMenuOptionDark,
-                        order.status === 'Proofreading' && scss.statusMenuOptionActive
-                      ]}
-                      onPress={() => updateOrderStatus(order.id, 'Proofreading')}
-                    >
-                      {order.status === 'Proofreading' ? (
-                        <View style={[scss.statusIconBadge, { backgroundColor: '#E0E7FF' }]}>
-                          <Ionicons name="eye-outline" size={18} color="#4F46E5" />
-                        </View>
-                      ) : (
-                        <Ionicons name="eye-outline" size={18} color="#6B7280" />
-                      )}
-                      <View style={scss.statusTextContainer}>
-                        <Text 
-                          style={[
-                            scss.statusMenuOptionText,
-                            darkMode && scss.statusMenuOptionTextDark,
-                            order.status === 'Proofreading' && scss.statusMenuOptionTextActive
-                          ]}
-                        >
-                          Proofreading
-                        </Text>
-                        <Text style={[scss.statusDescription, darkMode && scss.statusDescriptionDark]}>Design review & approval</Text>
-                      </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        scss.statusMenuOption,
-                        darkMode && scss.statusMenuOptionDark,
-                        order.status === 'Printing' && scss.statusMenuOptionActive
-                      ]}
-                      onPress={() => updateOrderStatus(order.id, 'Printing')}
-                    >
-                      {order.status === 'Printing' ? (
-                        <View style={[scss.statusIconBadge, { backgroundColor: '#F3E8FF' }]}>
-                          <Ionicons name="print-outline" size={18} color="#A855F7" />
-                        </View>
-                      ) : (
-                        <Ionicons name="print-outline" size={18} color="#6B7280" />
-                      )}
-                      <View style={scss.statusTextContainer}>
-                        <Text 
-                          style={[
-                            scss.statusMenuOptionText,
-                            darkMode && scss.statusMenuOptionTextDark,
-                            order.status === 'Printing' && scss.statusMenuOptionTextActive
-                          ]}
-                        >
-                          Printing
-                        </Text>
-                        <Text style={[scss.statusDescription, darkMode && scss.statusDescriptionDark]}>Printing in progress</Text>
-                      </View>
-                      <Ionicons name="chevron-forward" size={14} color="#6B7280" style={scss.statusMenuArrow} />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        scss.statusMenuOption,
-                        darkMode && scss.statusMenuOptionDark,
-                        order.status === 'Ready to Deliver' && scss.statusMenuOptionActive
-                      ]}
-                      onPress={() => updateOrderStatus(order.id, 'Ready to Deliver')}
-                    >
-                      {order.status === 'Ready to Deliver' ? (
-                        <View style={[scss.statusIconBadge, { backgroundColor: '#ECFDF5' }]}>
-                          <Ionicons name="cube-outline" size={18} color="#059669" />
-                        </View>
-                      ) : (
-                        <Ionicons name="cube-outline" size={18} color="#6B7280" />
-                      )}
-                      <View style={scss.statusTextContainer}>
-                        <Text 
-                          style={[
-                            scss.statusMenuOptionText,
-                            darkMode && scss.statusMenuOptionTextDark,
-                            order.status === 'Ready to Deliver' && scss.statusMenuOptionTextActive
-                          ]}
-                        >
-                          Ready to Deliver
-                        </Text>
-                        <Text style={[scss.statusDescription, darkMode && scss.statusDescriptionDark]}>Completed, awaiting delivery</Text>
-                      </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        scss.statusMenuOption,
-                        darkMode && scss.statusMenuOptionDark,
-                        order.status === 'Delivered' && scss.statusMenuOptionActive
-                      ]}
-                      onPress={() => updateOrderStatus(order.id, 'Delivered')}
-                    >
-                      {order.status === 'Delivered' ? (
-                        <View style={[scss.statusIconBadge, { backgroundColor: '#D1FAE5' }]}>
-                          <Ionicons name="checkmark-done-outline" size={18} color="#10B981" />
-                        </View>
-                      ) : (
-                        <Ionicons name="checkmark-done-outline" size={18} color="#6B7280" />
-                      )}
-                      <View style={scss.statusTextContainer}>
-                        <Text 
-                          style={[
-                            scss.statusMenuOptionText,
-                            darkMode && scss.statusMenuOptionTextDark,
-                            order.status === 'Delivered' && scss.statusMenuOptionTextActive
-                          ]}
-                        >
-                          Delivered
-                        </Text>
-                        <Text style={[scss.statusDescription, darkMode && scss.statusDescriptionDark]}>Successfully delivered</Text>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                )}
-
-                {/* Show Order Details Link */}
-                {expandedOrderId !== order.id && (
-                  <TouchableOpacity 
-                    style={scss.showDetailsButton}
-                    onPress={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
-                  >
-                    <Text style={scss.showDetailsText}>Show more</Text>
-                    <Ionicons 
-                      name="chevron-down" 
-                      size={16} 
-                      color="#7C3AED" 
-                    />
-                  </TouchableOpacity>
-                )}
               </View>
+
+              {/* Second Row: Delivery + Amount + Pending */}
+              <View style={scss.infoRow}>
+                <View style={scss.infoItem}>
+                  <Text style={[scss.infoLabel, darkMode && scss.infoLabelDark]}>Delivery:</Text>
+                  <Text style={[scss.infoValue, darkMode && scss.infoValueDark]}>{order.delivery}</Text>
+                </View>
+                <View style={scss.infoItem}>
+                  <Text style={[scss.infoLabel, darkMode && scss.infoLabelDark]}>Amount:</Text>
+                  <Text style={[scss.infoValue, darkMode && scss.infoValueDark]}>Rs. {order.amount.toLocaleString()}</Text>
+                </View>
+                <View style={scss.infoItem}>
+                  <Text style={[scss.infoLabel, darkMode && scss.infoLabelDark]}>Pending:</Text>
+                  <Text style={[scss.pendingValue, darkMode && scss.pendingValueDark]}>Rs. {order.pending.toLocaleString()}</Text>
+                </View>
+              </View>
+
+              {/* Third Row: Status Dropdown */}
+              <TouchableOpacity 
+                style={[
+                  scss.statusRow,
+                  {
+                    backgroundColor: order.status === 'Order Placed' ? '#DBEAFE' : 
+                                    order.status === 'Composing' ? '#FED7AA' :
+                                    order.status === 'Proofreading' ? '#E0E7FF' :
+                                    order.status === 'Printing' ? '#F3E8FF' :
+                                    order.status === 'Ready to Deliver' ? '#ECFDF5' :
+                                    order.status === 'Delivered' ? '#D1FAE5' : '#F3F4F6'
+                  }
+                ]}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  setStatusDropdownOrderId(statusDropdownOrderId === order.id ? null : order.id);
+                }}
+              >
+                <Text 
+                  style={[
+                    scss.statusText,
+                    {
+                      color: order.status === 'Order Placed' ? '#0284C7' : 
+                             order.status === 'Composing' ? '#D97706' :
+                             order.status === 'Proofreading' ? '#4F46E5' :
+                             order.status === 'Printing' ? '#A855F7' :
+                             order.status === 'Ready to Deliver' ? '#059669' :
+                             order.status === 'Delivered' ? '#10B981' : '#6B7280'
+                    }
+                  ]}
+                >
+                  {order.status}
+                </Text>
+                <Ionicons 
+                  name={statusDropdownOrderId === order.id ? "chevron-up" : "chevron-down"} 
+                  size={14} 
+                  color={order.status === 'Order Placed' ? '#0284C7' : 
+                         order.status === 'Composing' ? '#D97706' :
+                         order.status === 'Proofreading' ? '#4F46E5' :
+                         order.status === 'Printing' ? '#A855F7' :
+                         order.status === 'Ready to Deliver' ? '#059669' :
+                         order.status === 'Delivered' ? '#10B981' : '#6B7280'}
+                />
+              </TouchableOpacity>
+
+              {/* Status Dropdown Menu */}
+              {statusDropdownOrderId === order.id && (
+                <View style={[scss.statusDropdownMenu, darkMode && scss.statusDropdownMenuDark]}>
+                  <TouchableOpacity
+                    style={[scss.statusMenuOption, order.status === 'Order Placed' && scss.statusMenuOptionActive]}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      updateOrderStatus(order.id, 'Order Placed');
+                    }}
+                  >
+                    <Text style={[scss.statusOptionText, order.status === 'Order Placed' && scss.statusOptionTextActive]}>
+                      Order Placed
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[scss.statusMenuOption, order.status === 'Composing' && scss.statusMenuOptionActive]}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      updateOrderStatus(order.id, 'Composing');
+                    }}
+                  >
+                    <Text style={[scss.statusOptionText, order.status === 'Composing' && scss.statusOptionTextActive]}>
+                      Composing
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[scss.statusMenuOption, order.status === 'Proofreading' && scss.statusMenuOptionActive]}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      updateOrderStatus(order.id, 'Proofreading');
+                    }}
+                  >
+                    <Text style={[scss.statusOptionText, order.status === 'Proofreading' && scss.statusOptionTextActive]}>
+                      Proofreading
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[scss.statusMenuOption, order.status === 'Printing' && scss.statusMenuOptionActive]}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      updateOrderStatus(order.id, 'Printing');
+                    }}
+                  >
+                    <Text style={[scss.statusOptionText, order.status === 'Printing' && scss.statusOptionTextActive]}>
+                      Printing
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[scss.statusMenuOption, order.status === 'Ready to Deliver' && scss.statusMenuOptionActive]}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      updateOrderStatus(order.id, 'Ready to Deliver');
+                    }}
+                  >
+                    <Text style={[scss.statusOptionText, order.status === 'Ready to Deliver' && scss.statusOptionTextActive]}>
+                      Ready to Deliver
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[scss.statusMenuOption, order.status === 'Delivered' && scss.statusMenuOptionActive]}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      updateOrderStatus(order.id, 'Delivered');
+                    }}
+                  >
+                    <Text style={[scss.statusOptionText, order.status === 'Delivered' && scss.statusOptionTextActive]}>
+                      Delivered
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {/* Show Details Link */}
+              <TouchableOpacity 
+                style={scss.showDetailsLink}
+                onPress={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
+              >
+                <Text style={scss.showDetailsLinkText}>
+                  {expandedOrderId === order.id ? 'Hide' : 'Show'} Order Details
+                </Text>
+                <Ionicons 
+                  name={expandedOrderId === order.id ? "chevron-up" : "chevron-down"} 
+                  size={14} 
+                  color="#7C3AED" 
+                />
+              </TouchableOpacity>
+            </TouchableOpacity>
 
               {/* Expanded Order Details */}
               {expandedOrderId === order.id && (
@@ -752,12 +605,12 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
                     {/* Row 1 */}
                     <View style={scss.compactRow}>
                       <View style={scss.compactItem}>
-                        <Text style={[scss.compactLabel, darkMode && scss.compactLabelDark]}>Order Placed</Text>
-                        <Text style={[scss.compactValue, darkMode && scss.compactValueDark]}>{order.orderPlaced || 'N/A'}</Text>
+                        <Text style={[scss.compactLabel, darkMode && scss.compactLabelDark]}>Order ID</Text>
+                        <Text style={[scss.compactValue, darkMode && scss.compactValueDark]}>{order.id}</Text>
                       </View>
                       <View style={scss.compactItem}>
-                        <Text style={[scss.compactLabel, darkMode && scss.compactLabelDark]}>Type</Text>
-                        <Text style={[scss.compactValue, darkMode && scss.compactValueDark]}>{order.customerType || 'N/A'}</Text>
+                        <Text style={[scss.compactLabel, darkMode && scss.compactLabelDark]}>Order Placed</Text>
+                        <Text style={[scss.compactValue, darkMode && scss.compactValueDark]}>{order.orderPlaced || 'N/A'}</Text>
                       </View>
                     </View>
 
@@ -768,8 +621,10 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
                         <Text style={[scss.compactValue, darkMode && scss.compactValueDark]}>{order.contact || 'N/A'}</Text>
                       </View>
                       <View style={scss.compactItem}>
-                        <Text style={[scss.compactLabel, darkMode && scss.compactLabelDark]}>WhatsApp</Text>
-                        <Text style={[scss.compactValue, darkMode && scss.compactValueDark]}>{order.whatsapp || 'N/A'}</Text>
+                        <Text style={[scss.compactLabel, darkMode && scss.compactLabelDark]}>Advance Paid</Text>
+                        <Text style={[scss.compactValueSuccess]}>
+                          Rs. {order.advancePaid?.toLocaleString() || '0'}
+                        </Text>
                       </View>
                     </View>
 
@@ -788,7 +643,7 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
                     {/* Row 4 */}
                     <View style={scss.compactRow}>
                       <View style={scss.compactItem}>
-                        <Text style={[scss.compactLabel, darkMode && scss.compactLabelDark]}>Printing</Text>
+                        <Text style={[scss.compactLabel, darkMode && scss.compactLabelDark]}>Printing Type</Text>
                         <Text style={[scss.compactValue, darkMode && scss.compactValueDark]}>{order.printingType || 'N/A'}</Text>
                       </View>
                       <View style={scss.compactItem}>
@@ -796,34 +651,7 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
                         <Text style={[scss.compactValue, darkMode && scss.compactValueDark]}>{order.inkColor || 'N/A'}</Text>
                       </View>
                     </View>
-
-                    {/* Row 5 */}
-                    <View style={scss.compactRow}>
-                      <View style={scss.compactItem}>
-                        <Text style={[scss.compactLabel, darkMode && scss.compactLabelDark]}>Advance</Text>
-                        <Text style={[scss.compactValueSuccess]}>
-                          Rs. {order.advancePaid?.toLocaleString() || '0'}
-                        </Text>
-                      </View>
-                      <View style={scss.compactItem}>
-                        <Text style={[scss.compactLabel, darkMode && scss.compactLabelDark]}>Delivery</Text>
-                        <Text style={[scss.compactValue, darkMode && scss.compactValueDark]}>{order.delivery}</Text>
-                      </View>
-                    </View>
                   </View>
-
-                  {/* Show Less Button */}
-                  <TouchableOpacity 
-                    style={[scss.showLessButton, darkMode && scss.showLessButtonDark]}
-                    onPress={() => setExpandedOrderId(null)}
-                  >
-                    <Text style={[scss.showLessText, darkMode && scss.showLessTextDark]}>Show less</Text>
-                    <Ionicons 
-                      name="chevron-up" 
-                      size={16} 
-                      color={darkMode ? '#818CF8' : '#6366F1'} 
-                    />
-                  </TouchableOpacity>
                 </View>
               )}
             </View>
@@ -1215,17 +1043,212 @@ const scss = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    padding: 14,
-    marginBottom: 12,
+    padding: 12,
+    marginBottom: 10,
     shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
   },
   orderCardDark: {
     backgroundColor: '#374151',
     borderColor: '#4B5563',
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  nameSection: {
+    flex: 1,
+    gap: 4,
+  },
+  customerNameText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  customerNameTextDark: {
+    color: '#F3F4F6',
+  },
+  productBadge: {
+    backgroundColor: '#F3F4F6',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+  },
+  productBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  quickActions: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  editIconButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteIconButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  infoItem: {
+    flex: 1,
+  },
+  infoLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#6B7280',
+    marginBottom: 2,
+  },
+  infoLabelDark: {
+    color: '#9CA3AF',
+  },
+  infoValue: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  infoValueDark: {
+    color: '#E5E7EB',
+  },
+  pendingValue: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#DC2626',
+  },
+  pendingValueDark: {
+    color: '#F87171',
+  },
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  showDetailsLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  showDetailsLinkText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#7C3AED',
+  },
+  expandedContainer: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 4,
+  },
+  expandedContainerDark: {
+    backgroundColor: '#2D3748',
+  },
+  statusDropdownMenu: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    marginTop: 4,
+    marginBottom: 8,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  statusDropdownMenuDark: {
+    backgroundColor: '#2D3748',
+    borderColor: '#4B5563',
+  },
+  statusMenuOption: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  statusMenuOptionActive: {
+    backgroundColor: '#F3F4F6',
+  },
+  statusOptionText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#374151',
+    textAlign: 'center',
+    flex: 1,
+  },
+  statusOptionTextActive: {
+    fontWeight: '600',
+    color: '#7C3AED',
+  },
+  compactGrid: {
+    flexDirection: 'column',
+    gap: 10,
+  },
+  compactRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  compactItem: {
+    flex: 1,
+    flexDirection: 'column',
+    gap: 3,
+  },
+  compactLabel: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: '#9CA3AF',
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
+  },
+  compactLabelDark: {
+    color: '#D1D5DB',
+  },
+  compactValue: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  compactValueDark: {
+    color: '#F3F4F6',
+  },
+  compactValueSuccess: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#10B981',
   },
   mainOrderRow: {
     flexDirection: 'row',

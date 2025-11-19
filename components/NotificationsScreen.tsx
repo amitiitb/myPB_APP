@@ -92,12 +92,12 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack }) => 
   return (
     <SafeAreaView style={[scss.safeArea, darkMode && scss.safeAreaDark]}>
       {/* Header */}
-      <View style={[scss.headerContainer]}>
-        <TouchableOpacity onPress={onBack} style={scss.backBtn}>
+      <View style={[scss.headerContainer, { position: 'relative', justifyContent: 'center' }]}> 
+        <TouchableOpacity onPress={onBack} style={[scss.backBtn, { position: 'absolute', left: 16, zIndex: 2 }]}> 
           <Ionicons name="chevron-back" size={26} color="#fff" />
         </TouchableOpacity>
-        <Text style={scss.headerTitle}>Notifications</Text>
-        <TouchableOpacity style={scss.markAllBtn} onPress={handleMarkAllAsRead}>
+        <Text style={[scss.headerTitle, { position: 'absolute', left: 0, right: 0, textAlign: 'center', zIndex: 1 }]}>Notifications</Text>
+        <TouchableOpacity style={[scss.markAllBtn, { position: 'absolute', right: 16, zIndex: 2 }]} onPress={handleMarkAllAsRead}>
           <Text style={scss.markAllText}>Mark all as read</Text>
         </TouchableOpacity>
       </View>
@@ -182,11 +182,12 @@ const scss = StyleSheet.create({
     padding: 6,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 24,
+    fontWeight: '800',
     color: '#fff',
-    flex: 1,
-    marginLeft: 8,
+    textAlign: 'center',
+    marginLeft: 0,
+    letterSpacing: 0,
   },
   markAllBtn: {
     paddingHorizontal: 12,

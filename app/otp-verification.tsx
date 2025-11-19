@@ -4,12 +4,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
-  Alert, Dimensions, Keyboard, KeyboardAvoidingView,
-  Platform,
-  ScrollView, StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity, useColorScheme, View
+    Alert, Dimensions, Keyboard, KeyboardAvoidingView,
+    Platform,
+    ScrollView, StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity, useColorScheme, View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -154,8 +154,29 @@ export default function OTPVerificationScreen() {
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           {/* Language Toggle */}
-          <TouchableOpacity style={styles.languageToggle} onPress={toggleLanguage}>
-            <ThemedText style={styles.languageText}>
+          <TouchableOpacity
+            style={[
+              styles.languageToggle,
+              language === 'hi'
+                ? {
+                    borderColor: '#111',
+                    backgroundColor: 'rgba(0,0,0,0.08)',
+                  }
+                : {
+                    borderColor: '#9CA3AF',
+                    backgroundColor: 'rgba(0,0,0,0.03)',
+                  },
+            ]}
+            onPress={toggleLanguage}
+          >
+            <ThemedText
+              style={[
+                styles.languageText,
+                language === 'hi'
+                  ? { color: '#111', fontWeight: '700' }
+                  : { color: '#6B7280', fontWeight: '600' },
+              ]}
+            >
               {language === 'en' ? 'हिंदी' : 'English'}
             </ThemedText>
           </TouchableOpacity>
@@ -277,16 +298,15 @@ const styles = StyleSheet.create({
   },
   languageToggle: {
     alignSelf: 'flex-end',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: 'rgba(255,255,255,0.8)',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
     borderRadius: 20,
-    marginBottom: 20,
+    borderWidth: 1.5,
+    marginBottom: 4,
   },
   languageText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#374151',
+    fontSize: 13,
+    textAlign: 'center',
   },
   content: {
     flex: 1,

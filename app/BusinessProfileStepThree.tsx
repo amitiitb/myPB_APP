@@ -2,18 +2,18 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -83,11 +83,11 @@ const BusinessProfileStepThree: React.FC = () => {
   const getTabDescription = () => {
     switch (activeTab) {
       case 'owners':
-        return 'Owners have full access to manage business settings, orders, and team.';
+        return 'Owners have full access to manage business settings, orders, and team';
       case 'composers':
-        return 'Composers create and upload designs for customer orders and update their status.';
+        return 'Composers create and upload designs for customer orders and update their status';
       case 'operators':
-        return 'Operators handle print production and mark jobs as completed.';
+        return 'Operators handle print production and mark jobs as completed';
     }
   };
 
@@ -381,32 +381,28 @@ const BusinessProfileStepThree: React.FC = () => {
           {/* Description */}
           <Text style={styles.description}>{getTabDescription()}</Text>
 
-          {/* Add Member Button */}
-          <View style={styles.addButtonContainer}>
-            <TouchableOpacity style={styles.addButton} onPress={openAddModal}>
-              <LinearGradient
-                colors={['#A855F7', '#7C3AED']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.addButtonGradient}
-              >
-                <Ionicons name="person-add-outline" size={20} color="#FFFFFF" />
-                <Text style={styles.addButtonText}>{getAddButtonText()}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-
           {/* Members List */}
           <View style={styles.membersList}>
             {getTabData().length === 0 ? (
               <Text style={styles.emptyState}>{getEmptyStateText()}</Text>
             ) : (
               getTabData().map((member) => (
-                <View key={member.id} style={styles.memberCard}>
+                <TouchableOpacity
+                  key={member.id}
+                  style={[styles.memberCard, { borderColor: '#7C3AED', borderWidth: 1.5, backgroundColor: '#F8F7FF' }]}
+                  activeOpacity={0.85}
+                  onPress={() => {
+                    setEditingMemberId(member.id);
+                    setFormName(member.name);
+                    setFormMobile(member.mobile);
+                    setFormWhatsapp(member.whatsapp);
+                    setShowModal(true);
+                  }}
+                >
                   <View style={styles.memberInfo}>
-                    <Text style={styles.memberName}>{member.name}</Text>
-                    <Text style={styles.memberDetail}>Contact: {member.mobile}</Text>
-                    <Text style={styles.memberDetail}>WhatsApp: {member.whatsapp}</Text>
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#7C3AED', marginBottom: 2 }}>{member.name}</Text>
+                    <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>Contact: {member.mobile}</Text>
+                    <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>WhatsApp: {member.whatsapp}</Text>
                     <View style={styles.roleBadge}>
                       <Text style={styles.roleBadgeText}>{member.role}</Text>
                     </View>
@@ -433,9 +429,35 @@ const BusinessProfileStepThree: React.FC = () => {
                       </TouchableOpacity>
                     )}
                   </View>
-                </View>
+                </TouchableOpacity>
               ))
             )}
+            
+            {/* Add Member Button - Always show after members list */}
+            <View style={styles.addButtonContainer}>
+              <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
+                <TouchableOpacity
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 24,
+                    backgroundColor: '#7C3AED',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    shadowColor: '#7C3AED',
+                    shadowOpacity: 0.18,
+                    shadowRadius: 6,
+                    shadowOffset: { width: 0, height: 2 },
+                    elevation: 4,
+                  }}
+                  onPress={openAddModal}
+                  activeOpacity={0.85}
+                >
+                  <Ionicons name="add" size={28} color="#fff" />
+                </TouchableOpacity>
+                <Text style={{ fontSize: 15, fontWeight: '700', color: '#7C3AED', marginTop: 8 }}>{getAddButtonText()}</Text>
+              </View>
+            </View>
           </View>
 
           {/* Error Message */}
@@ -448,9 +470,6 @@ const BusinessProfileStepThree: React.FC = () => {
 
       {/* Floating Finish Setup Button */}
       <View style={styles.floatingButtonContainer}>
-        <TouchableOpacity style={styles.skipBtn} onPress={handleFinishSetup}>
-          <Text style={styles.skipBtnText}>Skip for now</Text>
-        </TouchableOpacity>
         <TouchableOpacity style={styles.finishBtn} onPress={handleFinishSetup}>
           <LinearGradient
             colors={['#A855F7', '#7C3AED']}

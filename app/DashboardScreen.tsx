@@ -438,7 +438,9 @@ const DashboardScreen: React.FC = () => {
               </View>
               <Text style={scss.revenueTitle}>{t('dashboard.monthlyRevenue')}</Text>
             </View>
-            <Text style={scss.revenueAmount}>₹{totalRevenue.toLocaleString()}</Text>
+            <View style={{ alignItems: 'center', width: '100%' }}>
+              <Text style={scss.revenueAmount}>₹{totalRevenue.toLocaleString()}</Text>
+            </View>
             <View style={scss.revenueFooter}>
               <View style={scss.revenueMetric}>
                 <Ionicons name="arrow-down-circle" size={16} color="#10B981" />
@@ -451,60 +453,43 @@ const DashboardScreen: React.FC = () => {
             </View>
           </TouchableOpacity>
 
-          {/* Order Pipeline Section */}
-          <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>{t('dashboard.orderPipeline')}</Text>
-          <View style={scss.pipelineGrid}>
-            {/* Active Orders Card */}
-            <TouchableOpacity 
-              style={[scss.pipelineCard, { borderLeftColor: '#3B82F6' }, darkMode && scss.pipelineCardDark]}
-              onPress={() => setActiveTab('orders')}
-              activeOpacity={0.7}
-            >
-              <View style={[scss.pipelineIconBg, { backgroundColor: '#DBEAFE' }]}>
-                <Ionicons name="document-text" size={24} color="#3B82F6" />
-              </View>
-              <Text style={[scss.pipelineCount, darkMode && scss.pipelineCountDark]}>2</Text>
-              <Text style={[scss.pipelineLabel, darkMode && scss.pipelineLabelDark]}>{t('dashboard.activeOrders')}</Text>
-            </TouchableOpacity>
-
-            {/* Printing Card */}
-            <TouchableOpacity 
-              style={[scss.pipelineCard, { borderLeftColor: '#F59E0B' }, darkMode && scss.pipelineCardDark]}
-              onPress={() => setActiveTab('orders')}
-              activeOpacity={0.7}
-            >
-              <View style={[scss.pipelineIconBg, { backgroundColor: '#FEF3C7' }]}>
-                <Ionicons name="print" size={24} color="#F59E0B" />
-              </View>
-              <Text style={[scss.pipelineCount, darkMode && scss.pipelineCountDark]}>1</Text>
-              <Text style={[scss.pipelineLabel, darkMode && scss.pipelineLabelDark]}>{t('dashboard.printing')}</Text>
-            </TouchableOpacity>
-
-            {/* Proofreading Card */}
-            <TouchableOpacity 
-              style={[scss.pipelineCard, { borderLeftColor: '#6366F1' }, darkMode && scss.pipelineCardDark]}
-              onPress={() => setActiveTab('orders')}
-              activeOpacity={0.7}
-            >
-              <View style={[scss.pipelineIconBg, { backgroundColor: '#E0E7FF' }]}>
-                <Ionicons name="glasses" size={24} color="#6366F1" />
-              </View>
-              <Text style={[scss.pipelineCount, darkMode && scss.pipelineCountDark]}>1</Text>
-              <Text style={[scss.pipelineLabel, darkMode && scss.pipelineLabelDark]}>{t('dashboard.proofing')}</Text>
-            </TouchableOpacity>
-
-            {/* Completed Card */}
-            <TouchableOpacity 
-              style={[scss.pipelineCard, { borderLeftColor: '#10B981' }, darkMode && scss.pipelineCardDark]}
-              onPress={() => setActiveTab('orders')}
-              activeOpacity={0.7}
-            >
-              <View style={[scss.pipelineIconBg, { backgroundColor: '#D1FAE5' }]}>
-                <Ionicons name="checkmark-circle" size={24} color="#10B981" />
-              </View>
-              <Text style={[scss.pipelineCount, darkMode && scss.pipelineCountDark]}>1</Text>
-              <Text style={[scss.pipelineLabel, darkMode && scss.pipelineLabelDark]}>{t('dashboard.completed')}</Text>
-            </TouchableOpacity>
+          {/* Order Status List Section */}
+          <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>Order Status</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 24, marginTop: 12 }}>
+            {[
+              { label: 'Order Placed', color: '#3B82F6', status: 'Order Placed' },
+              { label: 'Printing', color: '#F59E0B', status: 'Printing' },
+              { label: 'Proofing', color: '#6366F1', status: 'Proofing' },
+              { label: 'Completed', color: '#10B981', status: 'Completed' },
+            ].map((item, idx) => {
+              const count = orders.filter(o => (item.status === 'Completed' ? ['Completed', 'Delivered'].includes(o.status) : o.status === item.status)).length;
+              return (
+                <View key={item.label} style={{ alignItems: 'center', flex: 1 }}>
+                  <View style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 18,
+                    backgroundColor: item.color + '22',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginBottom: 6,
+                  }}>
+                    <Ionicons
+                      name={
+                        item.status === 'Order Placed' ? 'document-text' :
+                        item.status === 'Printing' ? 'print' :
+                        item.status === 'Proofing' ? 'eye' :
+                        'checkmark-circle'
+                      }
+                      size={20}
+                      color={item.color}
+                    />
+                  </View>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: item.color, marginBottom: 2 }}>{item.label}</Text>
+                  <Text style={{ fontSize: 22, fontWeight: '800', color: darkMode ? '#fff' : '#111827' }}>{count}</Text>
+                </View>
+              );
+            })}
           </View>
 
           {/* Category Breakdown Section */}
@@ -1089,49 +1074,113 @@ const scss = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 24,
   },
+  pipelineContainer: {
+    marginBottom: 24,
+  },
+  pipelineProgressContainer: {
+    marginBottom: 20,
+    paddingHorizontal: 4,
+  },
+  pipelineProgressBar: {
+    height: 4,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 2,
+    marginBottom: 12,
+    overflow: 'hidden',
+  },
+  pipelineProgressFill: {
+    height: '100%',
+    backgroundColor: '#7C3AED',
+    borderRadius: 2,
+  },
+  pipelineStages: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  pipelineStage: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
   pipelineCard: {
     width: '48%',
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 14,
+    borderRadius: 16,
+    padding: 16,
     marginBottom: 12,
-    borderLeftWidth: 3,
+    borderLeftWidth: 4,
     shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
     alignItems: 'center',
   },
   pipelineCardDark: {
     backgroundColor: '#374151',
   },
+  pipelineCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 12,
+  },
   pipelineIconBg: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+  },
+  pipelineBadge: {
+    backgroundColor: '#3B82F6',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  pipelineBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   pipelineCount: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '800',
     color: '#111827',
-    marginBottom: 2,
+    marginBottom: 4,
     letterSpacing: -0.5,
   },
   pipelineCountDark: {
     color: '#FFFFFF',
   },
   pipelineLabel: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     color: '#6B7280',
     textAlign: 'center',
+    marginBottom: 8,
   },
   pipelineLabelDark: {
     color: '#D1D5DB',
+  },
+  pipelineCardFooter: {
+    marginTop: 4,
+  },
+  pipelineSubText: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: '#9CA3AF',
+    textAlign: 'center',
   },
   reportPercentDrop: {
     color: '#EF4444',

@@ -362,11 +362,7 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
         <ScrollView style={scss.membersList} showsVerticalScrollIndicator={false}>
           {getTabData().length === 0 ? (
             <View style={scss.emptyState}>
-              <TouchableOpacity style={scss.addIconButton} onPress={handleOpenModal}>
-                <Text style={scss.addIcon}>+</Text>
-              </TouchableOpacity>
               <Text style={[scss.emptyStateText, darkMode && scss.emptyStateTextDark]}>{getEmptyStateText()}</Text>
-              <Text style={[scss.addButtonLabel, darkMode && scss.addButtonLabelDark]}>{getAddButtonText()}</Text>
             </View>
           ) : (
             <View>
@@ -404,16 +400,32 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
                   </View>
                 </View>
               ))}
-              
-              {/* Add Button - Show centered + below members */}
-              <View style={scss.addMemberBelowContainer}>
-                <TouchableOpacity style={scss.addIconButton} onPress={handleOpenModal}>
-                  <Text style={scss.addIcon}>+</Text>
-                </TouchableOpacity>
-                <Text style={[scss.addButtonLabel, darkMode && scss.addButtonLabelDark]}>{getAddButtonText()}</Text>
-              </View>
             </View>
           )}
+          
+          {/* Add Member Button - Always show after members list */}
+          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 30, marginBottom: 20 }}>
+            <TouchableOpacity
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 24,
+                backgroundColor: '#7C3AED',
+                justifyContent: 'center',
+                alignItems: 'center',
+                shadowColor: '#7C3AED',
+                shadowOpacity: 0.18,
+                shadowRadius: 6,
+                shadowOffset: { width: 0, height: 2 },
+                elevation: 4,
+              }}
+              onPress={handleOpenModal}
+              activeOpacity={0.85}
+            >
+              <Ionicons name="add" size={28} color="#fff" />
+            </TouchableOpacity>
+            <Text style={[{ fontSize: 15, fontWeight: '700', color: '#7C3AED', marginTop: 8 }, darkMode && { color: '#A78BFA' }]}>{getAddButtonText()}</Text>
+          </View>
         </ScrollView>
 
         {/* Modal */}
