@@ -155,9 +155,19 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
     });
   };
 
+  const handleNameChange = (text: string) => {
+    setFormName(text);
+    if (text.trim()) {
+      setFormErrors((prev) => ({ ...prev, name: '' }));
+    }
+  };
+
   const handleMobileChange = (text: string) => {
     const cleaned = text.replace(/\D/g, '').slice(0, 10);
     setFormMobile(cleaned);
+    if (cleaned.length === 10 && /^[6-9]/.test(cleaned)) {
+      setFormErrors((prev) => ({ ...prev, mobile: '' }));
+    }
     if (sameAsContact) {
       setFormWhatsapp(cleaned);
     }
@@ -166,6 +176,9 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
   const handleWhatsappChange = (text: string) => {
     const cleaned = text.replace(/\D/g, '').slice(0, 10);
     setFormWhatsapp(cleaned);
+    if (cleaned.length === 0 || (cleaned.length === 10 && /^[6-9]/.test(cleaned))) {
+      setFormErrors((prev) => ({ ...prev, whatsapp: '' }));
+    }
   };
 
   const validateName = () => {
@@ -178,24 +191,15 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
   };
 
   const validateMobile = () => {
-    if (formMobile.length !== 10 || !/^[6-9]/.test(formMobile)) {
+    if (!formMobile || formMobile.length !== 10 || !/^[6-9]/.test(formMobile)) {
       setFormErrors((prev) => ({ ...prev, mobile: 'Enter a valid 10-digit contact number.' }));
       return false;
     }
     
-    // Only check for duplicates if not editing or if the number has changed
-    if (!editingId) {
-      // Adding new member - check if number exists
-      if (isPhoneNumberExists(formMobile, undefined)) {
-        setFormErrors((prev) => ({ ...prev, mobile: 'Phone number already linked to another user.' }));
-        return false;
-      }
-    } else {
-      // Editing - check if number exists for other members (excluding current)
-      if (isPhoneNumberExists(formMobile, editingId)) {
-        setFormErrors((prev) => ({ ...prev, mobile: 'Phone number already linked to another user.' }));
-        return false;
-      }
+    // Check for duplicates, excluding current member if editing
+    if (isPhoneNumberExists(formMobile, editingId || undefined)) {
+      setFormErrors((prev) => ({ ...prev, mobile: 'Phone number already linked to another user.' }));
+      return false;
     }
     
     setFormErrors((prev) => ({ ...prev, mobile: '' }));
@@ -210,19 +214,10 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
         return false;
       }
       
-      // Only check for duplicates if not editing or if the number has changed
-      if (!editingId) {
-        // Adding new member - check if number exists
-        if (isPhoneNumberExists(formWhatsapp, undefined)) {
-          setFormErrors((prev) => ({ ...prev, whatsapp: 'Phone number already linked to another user.' }));
-          return false;
-        }
-      } else {
-        // Editing - check if number exists for other members (excluding current)
-        if (isPhoneNumberExists(formWhatsapp, editingId)) {
-          setFormErrors((prev) => ({ ...prev, whatsapp: 'Phone number already linked to another user.' }));
-          return false;
-        }
+      // Check for duplicates, excluding current member if editing
+      if (isPhoneNumberExists(formWhatsapp, editingId || undefined)) {
+        setFormErrors((prev) => ({ ...prev, whatsapp: 'Phone number already linked to another user.' }));
+        return false;
       }
     }
     
@@ -245,8 +240,8 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
       return;
     }
 
-    // Only use contact number as WhatsApp fallback if "Same as Contact" is checked OR if WhatsApp is empty string
-    const finalWhatsapp = formWhatsapp.trim() !== '' ? formWhatsapp : formMobile;
+    // Only use contact number as WhatsApp if user explicitly has "Same as Contact" checked
+    const finalWhatsapp = sameAsContact ? formMobile : (formWhatsapp.trim() !== '' ? formWhatsapp : '');
 
     const newMember: TeamMember = {
       id: editingId || Date.now().toString(),
@@ -331,6 +326,7 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
     setFormName(member.name);
     setFormMobile(member.mobile);
     setFormWhatsapp(member.whatsapp);
+    setSameAsContact(member.mobile === member.whatsapp);
     setEditingId(member.id);
     setShowModal(true);
   };
@@ -341,16 +337,18 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
   };
 
   return (
-    <SafeAreaView style={[scss.safeArea, darkMode && scss.safeAreaDark]}>
-      <View style={[scss.container, darkMode && scss.containerDark]}>
-        {/* Header */}
-        <View style={scss.header}>
-          <TouchableOpacity onPress={onBack}>
-            <Ionicons name="arrow-back" size={24} color="#fff" />
-          </TouchableOpacity>
-          <Text style={scss.headerTitle}>Team Management</Text>
-        </View>
+    <View style={{ flex: 1 }}>
+      {/* Header */}
+      <View style={[scss.header, darkMode && scss.headerDark]}>
+        <TouchableOpacity onPress={onBack}>
+          <Ionicons name="arrow-back" size={24} color="#fff" />
+        </TouchableOpacity>
+        <Text style={scss.headerTitle}>Team Management</Text>
+        <View style={{ width: 24 }} />
+      </View>
 
+      <SafeAreaView style={[scss.safeArea, darkMode && scss.safeAreaDark]} edges={['bottom']}>
+      <View style={[scss.container, darkMode && scss.containerDark]}>
         {/* Tab Navigation */}
         <View style={[scss.tabContainer, darkMode && scss.tabContainerDark]}>
           {(['owners', 'composers', 'operators'] as Role[]).map((tab) => {
@@ -478,8 +476,7 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
                       style={[scss.input, darkMode && scss.inputDark, formErrors.name && scss.inputError]}
                       placeholder="Enter full name"
                       value={formName}
-                      onChangeText={setFormName}
-                      onBlur={validateName}
+                      onChangeText={handleNameChange}
                       placeholderTextColor="#9CA3AF"
                       maxLength={30}
                     />
@@ -498,7 +495,6 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
                         placeholder="+91-9876543210"
                         value={formMobile}
                         onChangeText={handleMobileChange}
-                        onBlur={validateMobile}
                         keyboardType="phone-pad"
                         placeholderTextColor="#9CA3AF"
                         maxLength={10}
@@ -516,7 +512,6 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
                         placeholder="+91-9876543210"
                         value={formWhatsapp}
                         onChangeText={handleWhatsappChange}
-                        onBlur={validateWhatsapp}
                         keyboardType="phone-pad"
                         editable={!sameAsContact}
                         placeholderTextColor="#9CA3AF"
@@ -532,7 +527,7 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
                           <Switch
                             value={sameAsContact}
                             onValueChange={handleToggleSameAsContact}
-                            trackColor={{ false: '#E5E7EB', true: '#A855F7' }}
+                            trackColor={{ false: '#E5E7EB', true: (formMobile === formWhatsapp && formMobile.length === 10) ? '#A855F7' : '#E5E7EB' }}
                             thumbColor={sameAsContact ? '#fff' : '#fff'}
                           />
                         </View>
@@ -553,7 +548,8 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
           </KeyboardAvoidingView>
         </Modal>
       </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 };
 
@@ -575,10 +571,13 @@ const scss = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: '#7C3AED',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 14,
+    paddingHorizontal: 20,
+    height: 64,
+  },
+  headerDark: {
+    backgroundColor: '#5B21B6',
   },
   headerTitle: {
     flex: 1,

@@ -106,7 +106,7 @@ const MyProfileScreen: React.FC<MyProfileScreenProps> = ({
   };
 
   return (
-    <SafeAreaView style={[scss.safeArea, darkMode && scss.safeAreaDark]}>
+    <View style={{ flex: 1 }}>
       {/* Header */}
       <View style={[scss.header, darkMode && scss.headerDark]}>
         <TouchableOpacity onPress={onBack}>
@@ -115,6 +115,8 @@ const MyProfileScreen: React.FC<MyProfileScreenProps> = ({
         <Text style={scss.headerTitle}>My Profile</Text>
         <View style={{ width: 24 }} />
       </View>
+
+      <SafeAreaView style={[scss.safeArea, darkMode && scss.safeAreaDark]} edges={['bottom']}>
 
       <ScrollView contentContainerStyle={scss.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Profile Info Card */}
@@ -125,12 +127,12 @@ const MyProfileScreen: React.FC<MyProfileScreenProps> = ({
             </View>
             <View style={scss.headerInfo}>
               <View style={scss.nameEditContainer}>
-                <Text style={[scss.ownerNameText, darkMode && scss.ownerNameTextDark]}>{ownerName}</Text>
+                <Text style={[scss.ownerNameText, darkMode && scss.ownerNameTextDark]}>{editOwnerName}</Text>
                 <TouchableOpacity style={scss.editIconButton} onPress={() => setShowNameEdit(true)}>
                   <Ionicons name="pencil" size={16} color="#7C3AED" />
                 </TouchableOpacity>
               </View>
-              <Text style={[scss.pressNameText, darkMode && scss.pressNameTextDark]}>{pressName}</Text>
+              <Text style={[scss.pressNameText, darkMode && scss.pressNameTextDark]}>{editBusinessName}</Text>
             </View>
           </View>
         </View>
@@ -146,7 +148,7 @@ const MyProfileScreen: React.FC<MyProfileScreenProps> = ({
               <Text style={[scss.countryCodeDisplay, darkMode && scss.countryCodeDisplayDark]}>🇮🇳 +91</Text>
               <TextInput
                 style={[scss.phoneInputDisplay, darkMode && scss.phoneInputDisplayDark]}
-                value={ownerPhone}
+                value={editContact}
                 editable={false}
               />
             </View>
@@ -159,7 +161,7 @@ const MyProfileScreen: React.FC<MyProfileScreenProps> = ({
               <Text style={[scss.countryCodeDisplay, darkMode && scss.countryCodeDisplayDark]}>🇮🇳 +91</Text>
               <TextInput
                 style={[scss.phoneInputDisplay, darkMode && scss.phoneInputDisplayDark]}
-                value={ownerWhatsapp || ownerPhone}
+                value={editWhatsapp}
                 editable={false}
               />
             </View>
@@ -339,7 +341,8 @@ const MyProfileScreen: React.FC<MyProfileScreenProps> = ({
           </KeyboardAvoidingView>
         </View>
       </Modal>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 };
 
@@ -360,7 +363,7 @@ const scss = StyleSheet.create({
     height: 64,
   },
   headerDark: {
-    backgroundColor: '#6D28D9',
+    backgroundColor: '#5B21B6',
   },
   headerTitle: {
     flex: 1,

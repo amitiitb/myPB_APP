@@ -48,9 +48,16 @@ interface Order {
 interface OrdersScreenProps {
   activeTab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports';
   onTabPress: (tab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports') => void;
+  ownerName?: string;
+  ownerPhone?: string;
+  ownerWhatsapp?: string;
+  pressName?: string;
+  owners?: Array<{ id: string; name: string; mobile: string; whatsapp: string; role: string }>;
+  composers?: Array<{ id: string; name: string; mobile: string; whatsapp: string; role: string }>;
+  operators?: Array<{ id: string; name: string; mobile: string; whatsapp: string; role: string }>;
 }
 
-const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) => {
+const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress, ownerName, ownerPhone, ownerWhatsapp, pressName, owners = [], composers: composersProp = [], operators: operatorsProp = [] }) => {
   const { darkMode } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const [showSettings, setShowSettings] = useState(false);
@@ -164,7 +171,7 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
     ]);
   }, []);
 
-  const orderFilters = ['All', 'Composing', 'Proofreading', 'Printing'];
+  const orderFilters = [t('orders.all'), t('orders.composing'), t('orders.proofreading'), t('orders.printing')];
 
   // Filter orders based on selected filter, status, and search query
   const filteredOrders = orders.filter((order) => {
@@ -284,30 +291,45 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
   // Show settings screen
   if (showSettings) {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <SettingsScreen onBack={() => setShowSettings(false)} />
-      </SafeAreaView>
+      <>
+        <SafeAreaView style={[scss.safeArea, darkMode && scss.safeAreaDark]}>
+          <SettingsScreen 
+            onBack={() => setShowSettings(false)} 
+            ownerName={ownerName}
+            ownerPhone={ownerPhone}
+            ownerWhatsapp={ownerWhatsapp}
+            pressName={pressName}
+            owners={owners}
+            composers={composersProp.length > 0 ? composersProp : composers.map(c => ({ ...c, mobile: '', whatsapp: '', role: 'Composer' }))}
+            operators={operatorsProp.length > 0 ? operatorsProp : operators.map(o => ({ ...o, mobile: '', whatsapp: '', role: 'Operator' }))}
+          />
+        </SafeAreaView>
+        <FooterNav activeTab={activeTab} onTabPress={(tab) => { setShowSettings(false); onTabPress(tab); }} />
+      </>
     );
   }
 
   // Show notifications screen
   if (showNotifications) {
+    const handleTabPress = (tab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports') => {
+      if (tab === 'orders') {
+        setShowNotifications(false);
+        // Do not call onTabPress('orders') to avoid unnecessary rerender, just close notifications
+      } else {
+        setShowNotifications(false);
+        onTabPress(tab);
+      }
+    };
     return (
       <>
         <NotificationsScreen 
           onBack={() => setShowNotifications(false)} 
           activeTab={activeTab} 
-          onTabPress={(tab) => { 
-            setShowNotifications(false); 
-            onTabPress(tab); 
-          }} 
+          onTabPress={handleTabPress}
         />
         <FooterNav 
           activeTab={activeTab} 
-          onTabPress={(tab) => { 
-            setShowNotifications(false); 
-            onTabPress(tab); 
-          }} 
+          onTabPress={handleTabPress}
         />
       </>
     );
@@ -956,8 +978,8 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress }) =>
     {!showSettings && (
       <FooterNav activeTab={activeTab} onTabPress={onTabPress} />
     )}
-  </>;
-};
+    </>
+  );
 };
 
 const scss = StyleSheet.create({

@@ -10,9 +10,16 @@ import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 interface ReportsScreenProps {
   activeTab?: 'home' | 'orders' | 'finance' | 'inventory' | 'reports';
   onTabPress?: (tab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports') => void;
+  ownerName?: string;
+  ownerPhone?: string;
+  ownerWhatsapp?: string;
+  pressName?: string;
+  owners?: Array<{ id: string; name: string; mobile: string; whatsapp: string; role: string }>;
+  composers?: Array<{ id: string; name: string; mobile: string; whatsapp: string; role: string }>;
+  operators?: Array<{ id: string; name: string; mobile: string; whatsapp: string; role: string }>;
 }
 
-const ReportsScreen: React.FC<ReportsScreenProps> = ({ activeTab, onTabPress }) => {
+const ReportsScreen: React.FC<ReportsScreenProps> = ({ activeTab, onTabPress, ownerName, ownerPhone, ownerWhatsapp, pressName, owners = [], composers = [], operators = [] }) => {
   const { darkMode } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const [showSettings, setShowSettings] = React.useState(false);
@@ -21,9 +28,21 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ activeTab, onTabPress }) 
 
   if (showSettings) {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <SettingsScreen onBack={() => setShowSettings(false)} />
-      </SafeAreaView>
+      <>
+        <SafeAreaView style={{ flex: 1 }}>
+          <SettingsScreen 
+            onBack={() => setShowSettings(false)} 
+            ownerName={ownerName}
+            ownerPhone={ownerPhone}
+            ownerWhatsapp={ownerWhatsapp}
+            pressName={pressName}
+            owners={owners}
+            composers={composers}
+            operators={operators}
+          />
+        </SafeAreaView>
+        <FooterNav activeTab={activeTab || 'reports'} onTabPress={(tab) => { setShowSettings(false); onTabPress?.(tab); }} />
+      </>
     );
   }
 
@@ -38,13 +57,15 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ activeTab, onTabPress }) 
             onTabPress?.(tab); 
           }} 
         />
-        <FooterNav 
-          activeTab={activeTab || 'reports'} 
-          onTabPress={(tab) => { 
-            setShowNotifications(false); 
-            onTabPress?.(tab); 
-          }} 
-        />
+        {activeTab && onTabPress && (
+          <FooterNav 
+            activeTab={activeTab} 
+            onTabPress={(tab) => { 
+              setShowNotifications(false); 
+              onTabPress(tab); 
+            }} 
+          />
+        )}
       </>
     );
   }

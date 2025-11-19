@@ -29,6 +29,7 @@ export const hi = {
     customers: 'ग्राहक',
     settings: 'सेटिंग्स',
     dashboard: 'डैशबोर्ड',
+    reports: 'रिपोर्ट',
   },
 
   // Dashboard
@@ -88,6 +89,22 @@ export const hi = {
     readyToDeliver: 'डिलीवरी के लिए तैयार',
     delivered: 'वितरित',
     cancelled: 'रद्द किया गया',
+    assignTo: 'असाइन करें',
+    assignedTo: 'असाइन किया गया',
+    customerName: 'ग्राहक का नाम',
+    productType: 'उत्पाद प्रकार',
+    deliveryDate: 'डिलीवरी तारीख',
+    amount: 'राशि',
+    pending: 'लंबित',
+    status: 'स्थिति',
+    editOrder: 'ऑर्डर संपादित करें',
+    orderDetails: 'ऑर्डर विवरण',
+    contact: 'संपर्क',
+    whatsapp: 'व्हाट्सएप',
+    material: 'सामग्री',
+    quantity: 'मात्रा',
+    printingType: 'प्रिंटिंग प्रकार',
+    inkColor: 'इंक रंग',
   },
 
   // Finance

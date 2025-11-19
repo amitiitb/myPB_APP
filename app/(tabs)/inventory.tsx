@@ -10,9 +10,16 @@ import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 interface InventoryScreenProps {
   activeTab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports';
   onTabPress: (tab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports') => void;
+  ownerName?: string;
+  ownerPhone?: string;
+  ownerWhatsapp?: string;
+  pressName?: string;
+  owners?: Array<{ id: string; name: string; mobile: string; whatsapp: string; role: string }>;
+  composers?: Array<{ id: string; name: string; mobile: string; whatsapp: string; role: string }>;
+  operators?: Array<{ id: string; name: string; mobile: string; whatsapp: string; role: string }>;
 }
 
-const InventoryScreen: React.FC<InventoryScreenProps> = ({ activeTab, onTabPress }) => {
+const InventoryScreen: React.FC<InventoryScreenProps> = ({ activeTab, onTabPress, ownerName, ownerPhone, ownerWhatsapp, pressName, owners = [], composers = [], operators = [] }) => {
   const { darkMode } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const [showSettings, setShowSettings] = React.useState(false);
@@ -22,9 +29,21 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ activeTab, onTabPress
   // Show settings screen
   if (showSettings) {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <SettingsScreen onBack={() => setShowSettings(false)} />
-      </SafeAreaView>
+      <>
+        <SafeAreaView style={{ flex: 1 }}>
+          <SettingsScreen 
+            onBack={() => setShowSettings(false)} 
+            ownerName={ownerName}
+            ownerPhone={ownerPhone}
+            ownerWhatsapp={ownerWhatsapp}
+            pressName={pressName}
+            owners={owners}
+            composers={composers}
+            operators={operators}
+          />
+        </SafeAreaView>
+        <FooterNav activeTab={activeTab} onTabPress={(tab) => { setShowSettings(false); onTabPress(tab); }} />
+      </>
     );
   }
 

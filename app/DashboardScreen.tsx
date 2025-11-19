@@ -301,26 +301,66 @@ const DashboardScreen: React.FC = () => {
   } else if (activeTab === 'orders') {
     mainContent = (
       <>
-        <OrdersScreen activeTab={activeTab} onTabPress={handleTabPress} />
+        <OrdersScreen 
+          activeTab={activeTab} 
+          onTabPress={handleTabPress} 
+          ownerName={ownerName}
+          ownerPhone={phoneNumber}
+          ownerWhatsapp={whatsappNumber}
+          pressName={pressName}
+          owners={owners}
+          composers={composers}
+          operators={operators}
+        />
         <FooterNav activeTab={activeTab} onTabPress={handleTabPress} />
       </>
     );
   } else if (activeTab === 'finance') {
     mainContent = (
-      <FinanceScreen activeTab={activeTab} onTabPress={handleTabPress} />
+      <FinanceScreen 
+        activeTab={activeTab} 
+        onTabPress={handleTabPress} 
+        ownerName={ownerName}
+        ownerPhone={phoneNumber}
+        ownerWhatsapp={whatsappNumber}
+        pressName={pressName}
+        owners={owners}
+        composers={composers}
+        operators={operators}
+      />
     );
   } else if (activeTab === 'inventory') {
     mainContent = (
-      <InventoryScreen activeTab={activeTab} onTabPress={handleTabPress} />
+      <InventoryScreen 
+        activeTab={activeTab} 
+        onTabPress={handleTabPress} 
+        ownerName={ownerName}
+        ownerPhone={phoneNumber}
+        ownerWhatsapp={whatsappNumber}
+        pressName={pressName}
+        owners={owners}
+        composers={composers}
+        operators={operators}
+      />
     );
   } else if (activeTab === 'reports') {
     mainContent = (
-      <ReportsScreen activeTab={activeTab} onTabPress={handleTabPress} />
+      <ReportsScreen 
+        activeTab={activeTab} 
+        onTabPress={handleTabPress} 
+        ownerName={ownerName}
+        ownerPhone={phoneNumber}
+        ownerWhatsapp={whatsappNumber}
+        pressName={pressName}
+        owners={owners}
+        composers={composers}
+        operators={operators}
+      />
     );
   } else {
     mainContent = (
       <>
-        <ScrollView contentContainerStyle={scss.scrollContent} showsVerticalScrollIndicator={false}>
+        <ScrollView contentContainerStyle={[scss.scrollContent, darkMode && scss.scrollContentDark]} showsVerticalScrollIndicator={false}>
           {/* Hero Section with Key Insight */}
           <LinearGradient
             colors={darkMode ? ['#5B21B6', '#BE185D', '#D97706'] : ['#7C3AED', '#EC4899', '#F59E0B']}
@@ -609,6 +649,9 @@ const scss = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 120,
     backgroundColor: '#FFFFFF',
+  },
+  scrollContentDark: {
+    backgroundColor: '#1F2937',
   },
   dateFilterBtnContainer: {
     flexDirection: 'row',

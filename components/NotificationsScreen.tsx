@@ -189,7 +189,7 @@ const scss = StyleSheet.create({
     height: 64,
   },
   headerDark: {
-    backgroundColor: '#7C3AED',
+    backgroundColor: '#5B21B6',
   },
   headerTitle: {
     fontSize: 20,
