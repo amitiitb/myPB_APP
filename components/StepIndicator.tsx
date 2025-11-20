@@ -57,16 +57,17 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ steps, currentStepPage, r
             onPress={() => handleStepPress(step.id)}
             disabled={step.id >= currentStepPage!}
           >
-            {/* Step Circle with Number */}
+            {/* Step Circle with Number or Checkmark */}
             <View
               style={[
                 scss.stepCircle,
                 step.completed && scss.stepCircleCompleted,
+                step.completed && scss.stepCircleCompletedShadow,
                 step.current && scss.stepCircleCurrent,
               ]}
             >
               {step.completed ? (
-                <Ionicons name="checkmark-sharp" size={16} color="#FFFFFF" strokeWidth={3} />
+                <Ionicons name="checkmark-sharp" size={20} color="#fff" style={{ textAlign: 'center' }} />
               ) : (
                 <Text style={scss.stepNumber}>{step.id}</Text>
               )}
@@ -142,6 +143,15 @@ const scss = StyleSheet.create({
   },
   stepCircleCompleted: {
     backgroundColor: '#10B981',
+    borderWidth: 2,
+    borderColor: '#10B981',
+  },
+  stepCircleCompletedShadow: {
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 4,
   },
   stepCircleCurrent: {
     backgroundColor: '#7C3AED',
