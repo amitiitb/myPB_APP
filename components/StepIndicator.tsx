@@ -66,7 +66,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ steps, currentStepPage, r
               ]}
             >
               {step.completed ? (
-                <Ionicons name="checkmark-sharp" size={16} color="#34D399" strokeWidth={3} />
+                <Ionicons name="checkmark-sharp" size={16} color="#FFFFFF" strokeWidth={3} />
               ) : (
                 <Text style={scss.stepNumber}>{step.id}</Text>
               )}
