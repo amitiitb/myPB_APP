@@ -1,12 +1,15 @@
 import AddOrderStep1 from '@/components/AddOrderStep1';
+import CategoryCard from '@/components/CategoryCard';
 import FooterNav from '@/components/FooterNav';
 import HeaderBar from '@/components/HeaderBar';
+import InFocusPagerCard from '@/components/InFocusPagerCard';
 import NotificationsScreen from '@/components/NotificationsScreen';
+import OrderStatusTile from '@/components/OrderStatusTile';
+import PageIndicator from '@/components/PageIndicator';
 import SettingsScreen from '@/components/SettingsScreen';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
 import React, { useState } from 'react';
 import {
     Dimensions,
@@ -107,7 +110,9 @@ const DashboardScreen: React.FC = () => {
   const [showAddOrder, setShowAddOrder] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [currentPagerPage, setCurrentPagerPage] = useState(0);
   const notificationCount = 4;
+  const navigation = useNavigation<any>();
 
   const dateFilterOptions = ['Today', 'Yesterday', 'Last 7 Days', 'Last 30 Days', 'Current Month', 'All Time'];
 
@@ -358,214 +363,146 @@ const DashboardScreen: React.FC = () => {
       />
     );
   } else {
+    // Dummy data for dashboard sections
+    const categories = [
+      { name: 'Marriage Cards', icon: 'heart' },
+      { name: 'Visiting Cards', icon: 'card' },
+      { name: 'Flex', icon: 'flag' },
+      { name: 'Stickers', icon: 'pricetag' },
+      { name: 'Envelopes', icon: 'mail' },
+      { name: 'Labels', icon: 'bookmark' },
+    ];
+
+    // At a Glance - Only these 3 statuses now
+    const atAGlanceStatuses = [
+      { label: 'Composing', icon: 'pencil', color: '#8B5CF6', status: 'Composing' },
+      { label: 'Printing', icon: 'print', color: '#EC4899', status: 'Printing' },
+      { label: 'Proofing', icon: 'eye', color: '#06B6D4', status: 'Proofing' },
+    ];
+
+    // Page 1: Orders Card
+    const ordersCardStats = [
+      { label: 'Total Orders', value: orders.length, icon: 'list', color: '#7C3AED' },
+      { label: 'Active Orders', value: orders.filter(o => !['Delivered', 'Completed'].includes(o.status)).length, icon: 'timer', color: '#3B82F6' },
+      { label: 'Pending Today', value: orders.filter(o => o.status === 'Order Placed').length, icon: 'time', color: '#F59E0B' },
+    ];
+
+    // Page 2: Amounts Card
+    const amountsCardStats = [
+      { label: 'Total Amount', value: `₹${totalRevenue.toLocaleString()}`, icon: 'wallet', color: '#7C3AED' },
+      { label: 'Amount Received', value: `₹${received.toLocaleString()}`, icon: 'arrow-down-circle', color: '#10B981' },
+      { label: 'Pending Amount', value: `₹${totalPending.toLocaleString()}`, icon: 'alert-circle', color: '#F59E0B' },
+    ];
+
+    // Handle status tile tap - navigate to orders with filter
+    const handleStatusTileTap = (status: string) => {
+      setActiveTab('orders');
+      // Pass filter status via route params
+      navigation.navigate('(tabs)', {
+        screen: 'orders',
+        params: { filterStatus: status }
+      });
+    };
+
     mainContent = (
       <>
         <ScrollView contentContainerStyle={[scss.scrollContent, darkMode && scss.scrollContentDark]} showsVerticalScrollIndicator={false}>
-          {/* Hero Section with Key Insight */}
-          <LinearGradient
-            colors={darkMode ? ['#5B21B6', '#BE185D', '#D97706'] : ['#7C3AED', '#EC4899', '#F59E0B']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={scss.heroCard}
-          >
-            <View style={scss.heroTop}>
-              <View>
-                <Text style={[scss.heroLabel, darkMode && scss.heroLabelDark]}>{t('dashboard.todaysPerformance')}</Text>
-                <Text style={[scss.heroValue, darkMode && scss.heroValueDark]}>{orders.length} {t('dashboard.activeOrders')}</Text>
-              </View>
-              <TouchableOpacity 
-                style={[scss.dateFilterBtn, darkMode && scss.dateFilterBtnDark]} 
-                onPress={() => setShowDatePicker(!showDatePicker)}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="calendar-outline" size={16} color="#FFFFFF" />
-                <Text style={[scss.dateFilterBtnText]}>{dateFilter}</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={scss.heroBottom}>
-              <View style={scss.heroMetric}>
-                <Ionicons name="time-outline" size={18} color="#10B981" />
-                <Text style={[scss.heroMetricText, darkMode && scss.heroMetricTextDark]}>{orders.filter(o => o.status !== 'Delivered' && o.status !== 'Completed').length} {t('dashboard.inProduction')}</Text>
-              </View>
-              <View style={scss.heroMetric}>
-                <Ionicons name="checkmark-circle-outline" size={18} color="#7C3AED" />
-                <Text style={[scss.heroMetricText, darkMode && scss.heroMetricTextDark]}>{orders.filter(o => o.status === 'Delivered' || o.status === 'Completed').length} {t('dashboard.deliveredToday')}</Text>
-              </View>
-            </View>
-          </LinearGradient>
-
-          {/* Date Filter Dropdown */}
-          {showDatePicker && (
-            <View style={[scss.datePickerDropdown, darkMode && scss.datePickerDropdownDark, scss.datePickerRight]}>
-              {/* Quick Filter Options */}
-              <View style={[scss.quickFilterContainer, darkMode && scss.quickFilterContainerDark]}>
-                {dateFilterOptions.map((option) => (
-                  <TouchableOpacity
-                    key={option}
-                    style={[
-                      scss.quickFilterOption,
-                      darkMode && scss.quickFilterOptionDark,
-                      dateFilter === option && scss.quickFilterOptionActive
-                    ]}
-                    onPress={() => {
-                      setDateFilter(option);
-                      setStartDate(null);
-                      setEndDate(null);
-                      setShowDatePicker(false);
-                    }}
-                  >
-                    <Text
-                      style={[
-                        scss.quickFilterOptionText,
-                        darkMode && scss.quickFilterOptionTextDark,
-                        dateFilter === option && scss.quickFilterOptionTextActive,
-                      ]}
-                    >
-                      {option}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-
-              {/* Calendar */}
-              <View style={scss.calendarContainer}>
-                <View style={scss.calendarHeader}>
-                  <TouchableOpacity
-                    onPress={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() - 1))}
-                  >
-                    <Text style={[scss.calendarNavText, darkMode && scss.calendarNavTextDark]}>{'<'}</Text>
-                  </TouchableOpacity>
-                  <Text style={[scss.calendarTitle, darkMode && scss.calendarTitleDark]}>
-                    {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1))}
-                  >
-                    <Text style={[scss.calendarNavText, darkMode && scss.calendarNavTextDark]}>{'>'}</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={scss.calendarGrid}>{renderCalendar()}</View>
-              </View>
-
-              {/* Apply Button */}
-              {startDate && endDate && (
-                <TouchableOpacity
-                  style={[scss.applyBtn]}
-                  onPress={() => {
-                    const rangeStr = `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
-                    setDateFilter(rangeStr);
-                    setShowDatePicker(false);
-                  }}
-                >
-                  <Text style={scss.applyBtnText}>Apply Range</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          )}
-          {/* Insights Grid - Revenue Card */}
-          <TouchableOpacity
-            style={[scss.revenueCard, darkMode && scss.revenueCardDark]}
-            activeOpacity={0.7}
-            onPress={() => setActiveTab('finance')}
-          >
-            <View style={scss.revenueHeader}>
-              <View style={scss.revenueIconWrapper}>
-                <Ionicons name="wallet" size={24} color="#7C3AED" />
-              </View>
-              <Text style={scss.revenueTitle}>{t('dashboard.monthlyRevenue')}</Text>
-            </View>
-            <View style={{ alignItems: 'center', width: '100%' }}>
-              <Text style={scss.revenueAmount}>₹{totalRevenue.toLocaleString()}</Text>
-            </View>
-            <View style={scss.revenueFooter}>
-              <View style={scss.revenueMetric}>
-                <Ionicons name="arrow-down-circle" size={16} color="#10B981" />
-                <Text style={scss.revenueMetricText}>₹{received.toLocaleString()} {t('dashboardStatus.received')}</Text>
-              </View>
-              <View style={scss.revenueMetric}>
-                <Ionicons name="time" size={16} color="#F59E0B" />
-                <Text style={scss.revenueMetricText}>₹{totalPending.toLocaleString()} {t('dashboardStatus.pending')}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-
-          {/* Order Status List Section */}
-          <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>{t('orders.orderStatus')}</Text>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 24, marginTop: 12 }}>
-            {[
-              { label: 'Order Placed', color: '#3B82F6', status: 'Order Placed' },
-              { label: 'Printing', color: '#F59E0B', status: 'Printing' },
-              { label: 'Proofing', color: '#6366F1', status: 'Proofing' },
-              { label: 'Completed', color: '#10B981', status: 'Completed' },
-            ].map((item, idx) => {
-              const count = orders.filter(o => (item.status === 'Completed' ? ['Completed', 'Delivered'].includes(o.status) : o.status === item.status)).length;
-              return (
-                <View key={item.label} style={{ alignItems: 'center', flex: 1 }}>
-                  <View style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 18,
-                    backgroundColor: item.color + '22',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginBottom: 6,
-                  }}>
-                    <Ionicons
-                      name={
-                        item.status === 'Order Placed' ? 'document-text' :
-                        item.status === 'Printing' ? 'print' :
-                        item.status === 'Proofing' ? 'eye' :
-                        'checkmark-circle'
-                      }
-                      size={20}
-                      color={item.color}
-                    />
-                  </View>
-                  <Text style={{ fontSize: 13, fontWeight: '600', color: item.color, marginBottom: 2 }}>{item.label}</Text>
-                  <Text style={{ fontSize: 22, fontWeight: '800', color: darkMode ? '#fff' : '#111827' }}>{count}</Text>
-                </View>
-              );
-            })}
-          </View>
-
-          {/* Category Breakdown Section */}
-          <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>{t('dashboard.popularCategories')}</Text>
-          <View style={[scss.categoryBreakdownCard, darkMode && scss.categoryBreakdownCardDark]}>
-            <View style={scss.categoryRow}>
-              {/* Sticker */}
-              <TouchableOpacity 
-                style={[scss.categoryTile, { backgroundColor: '#F3E8FF' }]}
-                activeOpacity={0.7}
-                onPress={() => setActiveTab('orders')}
-              >
-                <Text style={[scss.categoryName, { color: '#7C3AED' }]}>Sticker</Text>
-                <Text style={[scss.categoryCount, { color: '#6B21A8' }]}>1</Text>
-              </TouchableOpacity>
-              
-              {/* Letterhead */}
-              <TouchableOpacity 
-                style={[scss.categoryTile, { backgroundColor: '#DBEAFE' }]}
-                activeOpacity={0.7}
-                onPress={() => setActiveTab('orders')}
-              >
-                <Text style={[scss.categoryName, { color: '#1D4ED8' }]}>Letterhead</Text>
-                <Text style={[scss.categoryCount, { color: '#1E3A8A' }]}>1</Text>
-              </TouchableOpacity>
-            </View>
+          
+          {/* SECTION 1: IN FOCUS - Horizontal Pager with Two Big Cards */}
+          <View style={scss.sectionContainer}>
+            <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>In Focus</Text>
             
-            <View style={scss.categoryRow}>
-              {/* Flex/Banner */}
-              <TouchableOpacity 
-                style={[scss.categoryTileFull, { backgroundColor: '#FCE7F3' }]}
-                activeOpacity={0.7}
-                onPress={() => setActiveTab('orders')}
-              >
-                <Text style={[scss.categoryName, { color: '#BE185D' }]}>Flex/Banner</Text>
-                <Text style={[scss.categoryCount, { color: '#9F1239' }]}>1</Text>
-              </TouchableOpacity>
+            {/* Pager ScrollView */}
+            <ScrollView
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              scrollEventThrottle={16}
+              onMomentumScrollEnd={(event) => {
+                const contentOffsetX = event.nativeEvent.contentOffset.x;
+                const currentPageIndex = Math.round(contentOffsetX / (width * 0.9));
+                setCurrentPagerPage(currentPageIndex);
+              }}
+              style={scss.pagerContainer}
+              contentContainerStyle={scss.pagerContent}
+            >
+              {/* Card 1: Orders Stats */}
+              <View style={scss.pagerCardWrapper}>
+                <InFocusPagerCard
+                  title="Orders"
+                  stats={ordersCardStats}
+                  backgroundColor="#F0F4FF"
+                />
+              </View>
+
+              {/* Card 2: Amounts Stats */}
+              <View style={scss.pagerCardWrapper}>
+                <InFocusPagerCard
+                  title="Amounts"
+                  stats={amountsCardStats}
+                  backgroundColor="#FFF8F0"
+                />
+              </View>
+            </ScrollView>
+
+            {/* Page Indicator */}
+            <PageIndicator totalPages={2} currentPage={currentPagerPage} />
+          </View>
+
+          {/* SECTION 2: AT A GLANCE - Order Status Summary (Only 3 statuses) */}
+          <View style={scss.sectionContainer}>
+            <View style={scss.sectionHeader}>
+              <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>At a Glance</Text>
+            </View>
+
+            {/* Show 3 status tiles in a row - Composing, Printing, Proofing */}
+            <View style={scss.statusTilesRow}>
+              {atAGlanceStatuses.map((status, idx) => {
+                let count = 0;
+                if (status.status === 'Composing') {
+                  count = orders.filter(o => o.status === 'Composing').length;
+                } else if (status.status === 'Printing') {
+                  count = orders.filter(o => o.status === 'Printing').length;
+                } else if (status.status === 'Proofing') {
+                  count = orders.filter(o => o.status === 'Proofing').length;
+                }
+
+                return (
+                  <TouchableOpacity
+                    key={`status-${idx}`}
+                    onPress={() => handleStatusTileTap(status.status)}
+                    activeOpacity={0.7}
+                  >
+                    <OrderStatusTile
+                      label={status.label}
+                      count={count}
+                      icon={status.icon}
+                      color={status.color}
+                    />
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
+
+          {/* SECTION 3: POPULAR CATEGORIES */}
+          <View style={scss.sectionContainer}>
+            <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>Popular Categories</Text>
+            <View style={scss.categoriesGridLayout}>
+              {categories.map((category, idx) => (
+                <View key={`category-${idx}`} style={scss.categoryItemWrapper}>
+                  <CategoryCard
+                    name={category.name}
+                    icon={category.icon}
+                    onPress={() => setActiveTab('orders')}
+                  />
+                </View>
+              ))}
+            </View>
+          </View>
+
         </ScrollView>
+        
         {/* Floating Add New Order Button */}
         <View style={scss.fabContainer}>
           <TouchableOpacity style={scss.fabButton} onPress={() => setShowAddOrder(true)}>
@@ -652,6 +589,108 @@ const scss = StyleSheet.create({
   },
   scrollContentDark: {
     backgroundColor: '#1F2937',
+  },
+  sectionContainer: {
+    marginBottom: 32,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 14,
+  },
+  sectionTitleDark: {
+    color: '#FFFFFF',
+  },
+  seeAllButton: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#7C3AED',
+  },
+  statsScroll: {
+    marginHorizontal: -20, // Compensate for section padding
+  },
+  statsScrollContent: {
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  statusTilesRowCompact: {
+    flexDirection: 'row',
+    gap: 12,
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  statusTilesRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 12,
+  },
+  pagerContainer: {
+    marginHorizontal: -20, // Extend beyond section padding
+  },
+  pagerContent: {
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  pagerCardWrapper: {
+    width: width - 40, // Responsive width minus padding
+    marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  allStatusesContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  allStatusesContainerDark: {
+    backgroundColor: '#374151',
+  },
+  allStatusesGridExpanded: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 14,
+    justifyContent: 'space-between',
+  },
+  allStatusesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 14,
+  },
+  closeSeeAllBtn: {
+    backgroundColor: '#7C3AED',
+    borderRadius: 10,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  closeSeeAllText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  categoriesGridLayout: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    justifyContent: 'space-between',
+  },
+  categoryItemWrapper: {
+    width: '48%',
+    marginBottom: 8,
   },
   dateFilterBtnContainer: {
     flexDirection: 'row',
@@ -745,29 +784,6 @@ const scss = StyleSheet.create({
   heroMetricTextDark: {
     color: 'rgba(255,255,255,0.9)',
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  sectionTitleDark: {
-    color: '#FFFFFF',
-  },
-  // dateFilterBtn: {
-  //   flexDirection: 'row',
-  //   alignItems: 'center',
-  //   backgroundColor: 'rgba(255,255,255,0.2)',
-  //   borderRadius: 10,
-  //   paddingHorizontal: 12,
-  //   paddingVertical: 8,
-  //   gap: 6,
-  // },
   datePickerDropdown: {
     backgroundColor: '#FFFFFF',
     borderColor: '#E5E7EB',

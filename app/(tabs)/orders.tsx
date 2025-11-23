@@ -4,7 +4,8 @@ import NotificationsScreen from '@/components/NotificationsScreen';
 import SettingsScreen from '@/components/SettingsScreen';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
-import React, { useState } from 'react';
+import { useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
     Alert,
     SafeAreaView,
@@ -60,12 +61,17 @@ interface OrdersScreenProps {
 const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress, ownerName, ownerPhone, ownerWhatsapp, pressName, owners = [], composers: composersProp = [], operators: operatorsProp = [] }) => {
   const { darkMode } = useTheme();
   const { language, setLanguage, t } = useLanguage();
+  const params = useLocalSearchParams<{ filterStatus?: string }>();
+  
   const [showSettings, setShowSettings] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [showStatusFilter, setShowStatusFilter] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [selectedStatus, setSelectedStatus] = useState<string>(() => {
+    // Initialize with filter status from params if available
+    return params.filterStatus || 'All';
+  });
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [statusDropdownOrderId, setStatusDropdownOrderId] = useState<string | null>(null);
@@ -83,6 +89,13 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress, owne
     { id: '2', name: 'Priya Singh' },
     { id: '3', name: 'Vikram Patel' },
   ]);
+
+  // Update selected status if filter param changes
+  useEffect(() => {
+    if (params.filterStatus) {
+      setSelectedStatus(params.filterStatus);
+    }
+  }, [params.filterStatus]);
   const [operators, setOperators] = useState<{ id: string; name: string }[]>([
     { id: '1', name: 'Amit Sharma' },
     { id: '2', name: 'Bhavna Gupta' },
