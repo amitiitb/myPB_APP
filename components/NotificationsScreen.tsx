@@ -1,3 +1,4 @@
+import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -24,12 +25,13 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
   onTabPress = () => {},
 }) => {
   const { darkMode } = useTheme();
+  const { t } = useLanguage();
   const [showMore, setShowMore] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: '1',
       icon: '📦',
-      title: 'Ready for Delivery',
+      title: t('orders.readyForDelivery'),
       description: 'Order #3npYbi for Amit is ready for delivery.',
       timestamp: '10 days ago',
       isRead: true,
@@ -37,7 +39,7 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
     {
       id: '2',
       icon: '🖨️',
-      title: 'Ready for Printing',
+      title: t('orders.readyForPrinting'),
       description: 'Order #3npYbi for customer has been approved and is ready for printing.',
       timestamp: '10 days ago',
       isRead: true,
@@ -45,7 +47,7 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
     {
       id: '3',
       icon: '📄',
-      title: 'Ready for Proofreading',
+      title: t('orders.readyForProofreading'),
       description: 'Order #3npYbi for customer is ready for proofreading.',
       timestamp: '10 days ago',
       isRead: true,
@@ -53,7 +55,7 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
     {
       id: '4',
       icon: '👤',
-      title: 'Composer Assigned',
+      title: t('orders.composerAssigned'),
       description: 'Order #3npYbi for customer has been assigned to Amit 01st Nov',
       timestamp: '10 days ago',
       isRead: false,
@@ -61,7 +63,7 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
     {
       id: '5',
       icon: '👤',
-      title: 'Composer Assigned',
+      title: t('orders.composerAssigned'),
       description: 'Order #3npYbi for customer has been assigned to team member.',
       timestamp: '9 days ago',
       isRead: false,
@@ -69,7 +71,7 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
     {
       id: '6',
       icon: '💰',
-      title: 'Payment Received',
+      title: t('orders.paymentReceived'),
       description: 'Payment of Rs. 5000 received for Order #3npYbi.',
       timestamp: '8 days ago',
       isRead: true,
@@ -77,7 +79,7 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
     {
       id: '7',
       icon: '⚠️',
-      title: 'Amount Pending',
+      title: t('orders.amountPending'),
       description: 'Amount of Rs. 2000 pending for Order #2mpXai.',
       timestamp: '7 days ago',
       isRead: true,
@@ -99,9 +101,9 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
       <View style={[scss.container, darkMode && scss.containerDark]}>
           {/* Header */}
           <View style={[scss.header, darkMode && scss.headerDark]}>
-            <Text style={scss.headerTitle}>Notifications</Text>
+            <Text style={scss.headerTitle}>{t('notifications.notifications')}</Text>
             <TouchableOpacity style={scss.markAllBtn} onPress={handleMarkAllAsRead}>
-              <Text style={scss.markAllText}>Mark all as read</Text>
+              <Text style={scss.markAllText}>{t('notifications.markAllAsRead')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -110,7 +112,7 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
         {allNotifications.length === 0 ? (
           <View style={scss.emptyState}>
             <Ionicons name="checkmark-circle-outline" size={64} color={darkMode ? '#6B7280' : '#D1D5DB'} />
-            <Text style={[scss.emptyStateText, darkMode && scss.emptyStateTextDark]}>All notifications read</Text>
+            <Text style={[scss.emptyStateText, darkMode && scss.emptyStateTextDark]}>{t('notifications.allNotificationsRead')}</Text>
           </View>
         ) : (
           <>
@@ -153,7 +155,7 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
                 style={[scss.showMoreBtn, darkMode && scss.showMoreBtnDark]}
                 onPress={() => setShowMore(true)}
               >
-                <Text style={[scss.showMoreText, darkMode && scss.showMoreTextDark]}>Show More</Text>
+                <Text style={[scss.showMoreText, darkMode && scss.showMoreTextDark]}>{t('notifications.showMore')}</Text>
                 <Ionicons name="chevron-down" size={18} color={darkMode ? '#9CA3AF' : '#6B7280'} />
               </TouchableOpacity>
             )}

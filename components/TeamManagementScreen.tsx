@@ -398,9 +398,7 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
                   <View style={scss.memberInfo}>
                     <Text style={{ fontSize: 15, fontWeight: '700', color: '#7C3AED', marginBottom: 2 }}>{member.name}</Text>
                     <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>Contact: {member.mobile}</Text>
-                    {member.whatsapp && member.whatsapp !== member.mobile && (
-                      <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>WhatsApp: {member.whatsapp}</Text>
-                    )}
+                    <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>WhatsApp: {member.whatsapp || 'NA'}</Text>
                     <View style={{ backgroundColor: '#EDE9FE', borderRadius: 12, paddingVertical: 4, paddingHorizontal: 12, alignSelf: 'flex-start', marginTop: 8 }}>
                       <Text style={{ fontSize: 11, fontWeight: '600', color: '#7C3AED' }}>{member.role}</Text>
                     </View>

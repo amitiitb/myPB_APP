@@ -480,17 +480,17 @@ const DashboardScreen: React.FC = () => {
             <View style={scss.revenueFooter}>
               <View style={scss.revenueMetric}>
                 <Ionicons name="arrow-down-circle" size={16} color="#10B981" />
-                <Text style={scss.revenueMetricText}>₹{received.toLocaleString()} Received</Text>
+                <Text style={scss.revenueMetricText}>₹{received.toLocaleString()} {t('dashboardStatus.received')}</Text>
               </View>
               <View style={scss.revenueMetric}>
                 <Ionicons name="time" size={16} color="#F59E0B" />
-                <Text style={scss.revenueMetricText}>₹{totalPending.toLocaleString()} Pending</Text>
+                <Text style={scss.revenueMetricText}>₹{totalPending.toLocaleString()} {t('dashboardStatus.pending')}</Text>
               </View>
             </View>
           </TouchableOpacity>
 
           {/* Order Status List Section */}
-          <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>Order Status</Text>
+          <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>{t('orders.orderStatus')}</Text>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 24, marginTop: 12 }}>
             {[
               { label: 'Order Placed', color: '#3B82F6', status: 'Order Placed' },

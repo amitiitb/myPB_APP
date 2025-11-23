@@ -3,19 +3,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Alert,
-  Keyboard,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    Keyboard,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -442,9 +442,7 @@ const BusinessProfileStepThree: React.FC = () => {
                   <View style={styles.memberInfo}>
                     <Text style={{ fontSize: 15, fontWeight: '700', color: '#7C3AED', marginBottom: 2 }}>{member.name}</Text>
                     <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>Contact: {member.mobile}</Text>
-                    {member.whatsapp && member.whatsapp !== member.mobile && (
-                      <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>WhatsApp: {member.whatsapp}</Text>
-                    )}
+                    <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 2 }}>WhatsApp: {member.whatsapp || 'NA'}</Text>
                     <View style={styles.roleBadge}>
                       <Text style={styles.roleBadgeText}>{member.role}</Text>
                     </View>
@@ -457,6 +455,8 @@ const BusinessProfileStepThree: React.FC = () => {
                         setFormName(member.name);
                         setFormMobile(member.mobile);
                         setFormWhatsapp(member.whatsapp);
+                        // Set sameAsContact based on whether WhatsApp equals contact number
+                        setSameAsContact(member.whatsapp === member.mobile);
                         setShowModal(true);
                       }}
                     >

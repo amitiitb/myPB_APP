@@ -3,10 +3,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useRef, useState } from 'react';
 import {
     Keyboard, KeyboardAvoidingView,
-    Platform, SafeAreaView, StyleSheet, Text, TextInput,
+    Platform, StyleSheet, Text, TextInput,
     TouchableOpacity,
     View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const OTP_LENGTH = 6;
 
@@ -51,7 +52,7 @@ export default function EnterOtpScreen() {
     >
       <SafeAreaView style={styles.safeArea}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1 }}
         >
           <View style={styles.container}>

@@ -88,6 +88,15 @@ export const en = {
     readyToDeliver: 'Ready to Deliver',
     delivered: 'Delivered',
     cancelled: 'Cancelled',
+    showOrderDetails: 'Show Order Details',
+    hideOrderDetails: 'Hide Order Details',
+    readyForDelivery: 'Ready for Delivery',
+    readyForPrinting: 'Ready for Printing',
+    readyForProofreading: 'Ready for Proofreading',
+    composerAssigned: 'Composer Assigned',
+    paymentReceived: 'Payment Received',
+    amountPending: 'Amount Pending',
+    orderStatus: 'Order Status',
   },
 
   // Finance
@@ -140,6 +149,8 @@ export const en = {
     teamManagement: 'Team Management',
     manageTeam: 'Manage composers and operators',
     appearance: 'Appearance',
+    darkMode: 'Dark Mode',
+    enableDarkMode: 'Enable dark theme for the app',
     switchDarkMode: 'Switch to Dark Mode',
     language: 'Language',
     hindi: 'Hindi (हिंदी)',
@@ -149,6 +160,12 @@ export const en = {
     connectOthers: 'Connect with other printing press owners',
     comingSoon: 'Coming Soon',
     english: 'English',
+    talkToUs: 'Talk to us',
+    callTime: 'Call Time: 10am - 9pm',
+    chatWithUs: 'Chat with us',
+    whatsappAccount: 'PrintBandhan Account On Whatsapp',
+    mailUs: 'Mail Us',
+    mailAddress: 'contact@printbandhan.com',
   },
 
   // Team Management
@@ -236,5 +253,19 @@ export const en = {
     resend: 'Resend OTP',
     verify: 'Verify',
     otp: 'OTP',
+  },
+
+  // Notifications
+  notifications: {
+    notifications: 'Notifications',
+    markAllAsRead: 'Mark all as read',
+    allNotificationsRead: 'All notifications read',
+    showMore: 'Show More',
+  },
+
+  // Dashboard
+  dashboardStatus: {
+    received: 'Received',
+    pending: 'Pending',
   },
 };

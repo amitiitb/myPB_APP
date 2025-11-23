@@ -151,7 +151,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
         </TouchableOpacity>
         <View style={scss.row}>
           <View style={[scss.iconCircle, darkMode && scss.iconCircleDark]}><Ionicons name="moon" size={22} color={darkMode ? '#c4b5fd' : '#a78bfa'} /></View>
-          <View style={scss.rowText}><Text style={[scss.rowTitle, darkMode && scss.rowTitleDark]}>Dark Mode</Text><Text style={[scss.rowDesc, darkMode && scss.rowDescDark]}>Enable dark theme for the app</Text></View>
+          <View style={scss.rowText}><Text style={[scss.rowTitle, darkMode && scss.rowTitleDark]}>{t('settings.darkMode')}</Text><Text style={[scss.rowDesc, darkMode && scss.rowDescDark]}>{t('settings.enableDarkMode')}</Text></View>
           <Switch value={darkMode} onValueChange={setDarkMode} thumbColor={darkMode ? '#7C3AED' : '#ccc'} trackColor={{ true: '#E9D5FF', false: '#E5E7EB' }} />
         </View>
         <View style={scss.row}>
@@ -166,7 +166,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
       
       {/* Support Section */}
       <View style={[scss.supportSection, darkMode && scss.supportSectionDark]}>
-        <Text style={[scss.supportSectionTitle, darkMode && scss.supportSectionTitleDark]}>SUPPORT</Text>
+        <Text style={[scss.supportSectionTitle, darkMode && scss.supportSectionTitleDark]}>{t('settings.support')}</Text>
         
         <TouchableOpacity
           style={[scss.supportRow, darkMode && scss.supportRowDark, { marginBottom: supportExpanded ? 0 : 0 }]}
@@ -177,8 +177,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
             <Ionicons name="help-circle-outline" size={22} color="#7C3AED" />
           </View>
           <View style={scss.supportTextBlock}>
-            <Text style={[scss.supportRowTitle, darkMode && scss.supportRowTitleDark]}>Help & Support</Text>
-            <Text style={[scss.supportRowDesc, darkMode && scss.supportRowDescDark]}>Get help and contact support</Text>
+            <Text style={[scss.supportRowTitle, darkMode && scss.supportRowTitleDark]}>{t('settings.helpSupport')}</Text>
+            <Text style={[scss.supportRowDesc, darkMode && scss.supportRowDescDark]}>{t('settings.getHelp')}</Text>
           </View>
           <Ionicons name={supportExpanded ? 'chevron-up' : 'chevron-down'} size={20} color={darkMode ? '#9CA3AF' : '#6B7280'} />
         </TouchableOpacity>
@@ -190,8 +190,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                 <Ionicons name="call" size={22} color="#22C55E" />
               </View>
               <View style={scss.supportTextWrap}>
-                <Text style={[scss.supportTitle, darkMode && scss.rowTitleDark]}>Talk to us</Text>
-                <Text style={[scss.supportSubtitle, darkMode && scss.rowDescDark]}>Call Time: 10am - 9pm</Text>
+                <Text style={[scss.supportTitle, darkMode && scss.rowTitleDark]}>{t('settings.talkToUs')}</Text>
+                <Text style={[scss.supportSubtitle, darkMode && scss.rowDescDark]}>{t('settings.callTime')}</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#A1A1AA" />
             </TouchableOpacity>
@@ -200,8 +200,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                 <Ionicons name="logo-whatsapp" size={22} color="#25D366" />
               </View>
               <View style={scss.supportTextWrap}>
-                <Text style={[scss.supportTitle, darkMode && scss.rowTitleDark]}>Chat with us</Text>
-                <Text style={[scss.supportSubtitle, darkMode && scss.rowDescDark]}>PrintBandhan Account On Whatsapp</Text>
+                <Text style={[scss.supportTitle, darkMode && scss.rowTitleDark]}>{t('settings.chatWithUs')}</Text>
+                <Text style={[scss.supportSubtitle, darkMode && scss.rowDescDark]}>{t('settings.whatsappAccount')}</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#A1A1AA" />
             </TouchableOpacity>
@@ -210,8 +210,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                 <Ionicons name="mail-outline" size={22} color="#2563EB" />
               </View>
               <View style={scss.supportTextWrap}>
-                <Text style={[scss.supportTitle, darkMode && scss.rowTitleDark]}>Mail Us</Text>
-                <Text style={[scss.supportSubtitle, darkMode && scss.rowDescDark]}>contact@printbandhan.com</Text>
+                <Text style={[scss.supportTitle, darkMode && scss.rowTitleDark]}>{t('settings.mailUs')}</Text>
+                <Text style={[scss.supportSubtitle, darkMode && scss.rowDescDark]}>{t('settings.mailAddress')}</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#A1A1AA" />
             </TouchableOpacity>
@@ -226,12 +226,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
             <Ionicons name="people-circle-outline" size={22} color="#F59E42" />
           </View>
           <View style={scss.supportTextBlock}>
-            <Text style={[scss.supportRowTitle, darkMode && scss.supportRowTitleDark]}>Connect with Community</Text>
-            <Text style={[scss.supportRowDesc, darkMode && scss.supportRowDescDark]}>Connect with other printing press owners</Text>
+            <Text style={[scss.supportRowTitle, darkMode && scss.supportRowTitleDark]}>{t('settings.connectCommunity')}</Text>
+            <Text style={[scss.supportRowDesc, darkMode && scss.supportRowDescDark]}>{t('settings.connectOthers')}</Text>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Animated.View style={[scss.comingSoon, { opacity: blinkAnim }]}> 
-              <Text style={scss.comingSoonText}>Coming Soon</Text>
+              <Text style={scss.comingSoonText}>{t('settings.comingSoon')}</Text>
             </Animated.View>
           </View>
         </TouchableOpacity>

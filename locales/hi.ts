@@ -105,6 +105,15 @@ export const hi = {
     quantity: 'मात्रा',
     printingType: 'प्रिंटिंग प्रकार',
     inkColor: 'इंक रंग',
+    showOrderDetails: 'ऑर्डर विवरण दिखाएं',
+    hideOrderDetails: 'ऑर्डर विवरण छिपाएं',
+    readyForDelivery: 'डिलीवरी के लिए तैयार',
+    readyForPrinting: 'प्रिंटिंग के लिए तैयार',
+    readyForProofreading: 'प्रूफरीडिंग के लिए तैयार',
+    composerAssigned: 'संगीतकार असाइन किया गया',
+    paymentReceived: 'भुगतान प्राप्त',
+    amountPending: 'राशि लंबित',
+    orderStatus: 'ऑर्डर स्थिति',
   },
 
   // Finance
@@ -157,6 +166,8 @@ export const hi = {
     teamManagement: 'टीम प्रबंधन',
     manageTeam: 'संगीतकारों और ऑपरेटरों को प्रबंधित करें',
     appearance: 'दिखावट',
+    darkMode: 'डार्क मोड',
+    enableDarkMode: 'ऐप के लिए डार्क थीम सक्षम करें',
     switchDarkMode: 'डार्क मोड में स्विच करें',
     language: 'भाषा',
     hindi: 'हिंदी (हिंदी)',
@@ -166,6 +177,12 @@ export const hi = {
     connectOthers: 'अन्य प्रिंटिंग प्रेस मालिकों से जुड़ें',
     comingSoon: 'जल्द आ रहा है',
     english: 'English',
+    talkToUs: 'हमसे बात करें',
+    callTime: 'कॉल का समय: 10am - 9pm',
+    chatWithUs: 'हमसे चैट करें',
+    whatsappAccount: 'PrintBandhan खाता WhatsApp पर',
+    mailUs: 'हमें ईमेल करें',
+    mailAddress: 'contact@printbandhan.com',
   },
 
   // Team Management
@@ -253,5 +270,19 @@ export const hi = {
     resend: 'OTP फिर से भेजें',
     verify: 'सत्यापित करें',
     otp: 'OTP',
+  },
+
+  // Notifications
+  notifications: {
+    notifications: 'सूचनाएं',
+    markAllAsRead: 'सभी को पढ़ा हुआ चिह्नित करें',
+    allNotificationsRead: 'सभी सूचनाएं पढ़ी जा चुकी हैं',
+    showMore: 'और दिखाएं',
+  },
+
+  // Dashboard
+  dashboardStatus: {
+    received: 'प्राप्त',
+    pending: 'लंबित',
   },
 };

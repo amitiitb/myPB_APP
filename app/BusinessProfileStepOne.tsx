@@ -8,7 +8,6 @@ import {
     Dimensions,
     Keyboard,
     KeyboardAvoidingView,
-    Linking,
     Platform,
     SafeAreaView,
     ScrollView,
@@ -17,7 +16,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -73,19 +72,6 @@ const BusinessProfileStepOne: React.FC = () => {
                 setLatitude(lat);
                 setLongitude(lon);
                 console.log('Location obtained:', location);
-                
-                // Open maps app with current location
-                const latitude = location.coords.latitude;
-                const longitude = location.coords.longitude;
-                const mapsUrl = Platform.OS === 'ios' 
-                  ? `maps://0,0?q=${latitude},${longitude}`
-                  : `geo:${latitude},${longitude}?q=${latitude},${longitude}`;
-                
-                try {
-                  await Linking.openURL(mapsUrl);
-                } catch (error) {
-                  console.log('Unable to open maps:', error);
-                }
               } else {
                 Alert.alert('Permission Denied', 'Location permission was not granted.');
               }
@@ -199,9 +185,15 @@ const BusinessProfileStepOne: React.FC = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1 }}
       >
-        <ScrollView ref={scrollViewRef} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          style={{ width: '100%', alignSelf: 'stretch' }}
+        >
           {/* Form Card */}
-          <View style={styles.formCard}>
+          <View style={[styles.formCard, { width: '100%', alignSelf: 'stretch' }] }>
             {/* Owner's Name */}
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>
@@ -246,9 +238,6 @@ const BusinessProfileStepOne: React.FC = () => {
               {formErrors.pressName ? <Text style={styles.errorText}><Ionicons name="alert-circle" size={12} color="#EF4444" /> {formErrors.pressName}</Text> : null}
             </View>
 
-            {/* Divider */}
-            <View style={styles.divider} />
-
             {/* WhatsApp Number with Same as Contact Toggle */}
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>
@@ -269,24 +258,24 @@ const BusinessProfileStepOne: React.FC = () => {
                   <Ionicons name="checkmark-circle" size={20} color="#10B981" style={styles.inputIcon} />
                 )}
               </View>
-            </View>
 
-            {/* Same as Contact Toggle */}
-            <View style={styles.toggleCenterWrapper}>
-              <View style={styles.switchOutlineWrapper}>
-                <Switch
-                  value={sameAsContact}
-                  onValueChange={handleToggleSameAsContact}
-                  trackColor={{ false: '#E5E7EB', true: '#7C3AED' }}
-                  thumbColor={sameAsContact ? '#fff' : '#fff'}
-                />
+              {/* Use Login Phone Number Toggle Below WhatsApp */}
+              <View style={styles.toggleRowBelowInput}>
+                <View style={styles.switchOutlineWrapper}>
+                  <Switch
+                    value={sameAsContact}
+                    onValueChange={handleToggleSameAsContact}
+                    trackColor={{ false: '#E5E7EB', true: '#7C3AED' }}
+                    thumbColor={sameAsContact ? '#fff' : '#fff'}
+                  />
+                </View>
+                <Text style={styles.toggleLabelSmall}>Use Login Phone Number</Text>
               </View>
-              <Text style={styles.toggleLabel}>Same as Contact</Text>
             </View>
 
             {/* Your Location Heading */}
             <Text style={styles.label}>
-              <Ionicons name="location" size={16} color="#7C3AED" /> Your Location
+              📍 Your Location
             </Text>
 
             {/* Locate My Press Option */}
@@ -294,7 +283,6 @@ const BusinessProfileStepOne: React.FC = () => {
               <View style={styles.locateMeContainer}>
                 <View style={styles.locateMeBoxSuccess}>
                   <View style={styles.locationContent}>
-                    <Ionicons name="location" size={20} color="#7C3AED" />
                     <TextInput
                       style={styles.locationInput}
                       value={`Lat: ${latitude}, Long: ${longitude}`}
@@ -306,19 +294,19 @@ const BusinessProfileStepOne: React.FC = () => {
                 </View>
               </View>
             ) : (
-              <TouchableOpacity style={styles.locateMeContainer} onPress={handleLocateMyPress}>
-                <View style={styles.locateMeBox}>
+              <View style={styles.locateMeContainer}>
+                <TouchableOpacity style={styles.locateMeBox} onPress={handleLocateMyPress}>
                   <Ionicons name="location" size={20} color="#7C3AED" />
-                  <Text style={styles.locateMeBoxText}>Locate My Press</Text>
-                </View>
-              </TouchableOpacity>
+                  <Text style={styles.locateMeBoxText}>Locate my Business</Text>
+                </TouchableOpacity>
+              </View>
             )}
           </View>
         </ScrollView>
 
         {/* Next Button - Floating */}
-        <View style={styles.floatingButtonContainer}>
-          <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
+        <View style={[styles.floatingButtonContainer, { width: '100%', alignSelf: 'stretch' }] }>
+          <TouchableOpacity style={[styles.nextBtn, { width: '100%', alignSelf: 'stretch' }]} onPress={handleNext}>
             <LinearGradient
               colors={['#7C3AED', '#A855F7']}
               start={{ x: 0, y: 0 }}
@@ -340,9 +328,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   scrollContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 24,
     paddingBottom: 100,
+    flexGrow: 1,
   },
   floatingButtonContainer: {
     position: 'absolute',
@@ -350,7 +339,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: '#ffffff',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingVertical: 16,
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
@@ -399,13 +388,16 @@ const styles = StyleSheet.create({
   formCard: {
     backgroundColor: '#fff',
     borderRadius: 16,
-    padding: 24,
+    paddingVertical: 24,
+    paddingHorizontal: 0,
     marginBottom: 24,
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
+    width: '100%',
+    alignSelf: 'center',
   },
   fieldContainer: {
     marginBottom: 20,
@@ -511,6 +503,8 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 4 },
     elevation: 4,
+    alignSelf: 'center',
+    marginTop: 12,
   },
   nextBtnGradient: {
     width: '100%',
@@ -584,6 +578,14 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginLeft: 8,
   },
+  manualAddressLink: {
+    fontSize: 13,
+    color: '#7C3AED',
+    fontWeight: '600',
+    marginTop: 12,
+    textDecorationLine: 'underline',
+    textAlign: 'center',
+  },
   // Unused styles (kept for reference)
   textArea: {
     minHeight: 72,
@@ -614,14 +616,15 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     justifyContent: 'center',
   },
+  toggleRowBelowInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 8,
+  },
   inputIconWrapper: {
     position: 'relative',
     justifyContent: 'center',
-  },
-  inputIcon: {
-    position: 'absolute',
-    right: 12,
-    top: 14,
   },
   inputIconTextArea: {
     position: 'absolute',

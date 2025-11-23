@@ -181,9 +181,10 @@ const styles = StyleSheet.create({
     width: 32,
   },
   scrollContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: '5%',
     paddingTop: 20,
     paddingBottom: 20,
+    flexGrow: 1,
   },
   title: {
     fontSize: 24,
@@ -257,7 +258,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: '#ffffff',
-    paddingHorizontal: 20,
+    paddingHorizontal: '5%',
     paddingVertical: 16,
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',

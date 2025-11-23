@@ -1,3 +1,4 @@
+import ConfettiAnimation from '@/components/ConfettiAnimation';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import LottieView from 'lottie-react-native';
@@ -111,6 +112,9 @@ const SetupSuccessScreen: React.FC = () => {
                 end={{ x: 1, y: 1 }}
                 style={styles.container}
             >
+                {/* Confetti Burst Animation - 1 second */}
+                <ConfettiAnimation />
+
                 {/* Confetti Animation Background - Positioned absolutely behind content */}
                 <LottieView
                     ref={confettiRef}
