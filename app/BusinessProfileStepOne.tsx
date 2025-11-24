@@ -281,8 +281,9 @@ const BusinessProfileStepOne: React.FC = () => {
             {/* Locate My Press Option */}
             {latitude && longitude ? (
               <View style={styles.locateMeContainer}>
-                <View style={styles.locateMeBoxSuccess}>
-                  <View style={styles.locationContent}>
+                <TouchableOpacity style={styles.locateMeBoxSuccess} onPress={handleLocateMyPress}>
+                  <View style={styles.locationInputContainer}>
+                    <Ionicons name="location" size={20} color="#10B981" style={styles.locationIcon} />
                     <TextInput
                       style={styles.locationInput}
                       value={`Lat: ${latitude}, Long: ${longitude}`}
@@ -291,13 +292,20 @@ const BusinessProfileStepOne: React.FC = () => {
                     />
                   </View>
                   <Ionicons name="checkmark-circle" size={24} color="#10B981" />
-                </View>
+                </TouchableOpacity>
               </View>
             ) : (
               <View style={styles.locateMeContainer}>
                 <TouchableOpacity style={styles.locateMeBox} onPress={handleLocateMyPress}>
-                  <Ionicons name="location" size={20} color="#7C3AED" />
-                  <Text style={styles.locateMeBoxText}>Locate my Business</Text>
+                  <View style={styles.locationInputContainer}>
+                    <Ionicons name="location" size={20} color="#7C3AED" style={styles.locationIcon} />
+                    <TextInput
+                      style={styles.locationInput}
+                      placeholder="Locate my Business"
+                      editable={false}
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </View>
                 </TouchableOpacity>
               </View>
             )}
@@ -533,6 +541,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 16,
     gap: 12,
+    flex: 1,
   },
   locateMeBoxSuccess: {
     flexDirection: 'row',
@@ -551,6 +560,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     flex: 1,
+  },
+  locationInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 8,
+  },
+  locationIcon: {
+    minWidth: 20,
   },
   coordinatesText: {
     flex: 1,
@@ -576,7 +594,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#111827',
     fontWeight: '500',
-    marginLeft: 8,
   },
   manualAddressLink: {
     fontSize: 13,

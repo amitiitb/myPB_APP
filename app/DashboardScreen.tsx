@@ -1,5 +1,5 @@
 import AddOrderStep1 from '@/components/AddOrderStep1';
-import CategoryCard from '@/components/CategoryCard';
+import { default as CategoryCard } from '@/components/CategoryCard';
 import FooterNav from '@/components/FooterNav';
 import HeaderBar from '@/components/HeaderBar';
 import InFocusPagerCard from '@/components/InFocusPagerCard';
@@ -363,21 +363,57 @@ const DashboardScreen: React.FC = () => {
       />
     );
   } else {
-    // Dummy data for dashboard sections
-    const categories = [
-      { name: 'Marriage Cards', icon: 'heart' },
-      { name: 'Visiting Cards', icon: 'card' },
-      { name: 'Flex', icon: 'flag' },
-      { name: 'Stickers', icon: 'pricetag' },
-      { name: 'Envelopes', icon: 'mail' },
-      { name: 'Labels', icon: 'bookmark' },
-    ];
+    // Calculate top 4 categories by order count
+    const categoryMap = new Map<string, number>();
+    orders.forEach(order => {
+      const product = order.productType;
+      categoryMap.set(product, (categoryMap.get(product) || 0) + 1);
+    });
 
-    // At a Glance - Only these 3 statuses now
+    // Convert to array and sort by count
+    const sortedCategories = Array.from(categoryMap.entries())
+      .map(([name, count]) => ({
+        name,
+        count,
+        percentage: Math.round((count / orders.length) * 100),
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 4); // Get top 4
+
+    // Icon mapping for categories
+    const categoryIconMap: { [key: string]: string } = {
+      'Marriage Card': 'heart',
+      'Sticker': 'pricetag',
+      'Wedding Invitation': 'heart',
+      'Letterhead': 'document-text',
+      'Flex/Banner': 'flag',
+      'Visiting Cards': 'card',
+      'Envelopes': 'mail',
+      'Labels': 'bookmark',
+    };
+
+    const categoriesWithIcons = sortedCategories.map(cat => ({
+      ...cat,
+      icon: categoryIconMap[cat.name] || 'archive',
+    }));
+
+    // Helper function to format amounts to k format
+    const formatAmountToK = (amount: number): string => {
+      if (amount >= 1000000) {
+        return `₹${(amount / 1000000).toFixed(1)}M`;
+      } else if (amount >= 1000) {
+        return `₹${(amount / 1000).toFixed(1)}k`;
+      }
+      return `₹${amount}`;
+    };
+
+    // At a Glance - All statuses for horizontal scroll
     const atAGlanceStatuses = [
       { label: 'Composing', icon: 'pencil', color: '#8B5CF6', status: 'Composing' },
       { label: 'Printing', icon: 'print', color: '#EC4899', status: 'Printing' },
-      { label: 'Proofing', icon: 'eye', color: '#06B6D4', status: 'Proofing' },
+      { label: 'Proofreading', icon: 'eye', color: '#06B6D4', status: 'Proofing' },
+      { label: 'Delivered', icon: 'checkmark-done-circle', color: '#10B981', status: 'Delivered' },
+      { label: 'Cancelled', icon: 'close-circle', color: '#EF4444', status: 'Cancelled' },
     ];
 
     // Page 1: Orders Card
@@ -387,11 +423,11 @@ const DashboardScreen: React.FC = () => {
       { label: 'Pending Today', value: orders.filter(o => o.status === 'Order Placed').length, icon: 'time', color: '#F59E0B' },
     ];
 
-    // Page 2: Amounts Card
+    // Page 2: Amounts Card with k format
     const amountsCardStats = [
-      { label: 'Total Amount', value: `₹${totalRevenue.toLocaleString()}`, icon: 'wallet', color: '#7C3AED' },
-      { label: 'Amount Received', value: `₹${received.toLocaleString()}`, icon: 'arrow-down-circle', color: '#10B981' },
-      { label: 'Pending Amount', value: `₹${totalPending.toLocaleString()}`, icon: 'alert-circle', color: '#F59E0B' },
+      { label: 'Total Amount', value: formatAmountToK(totalRevenue), icon: 'wallet', color: '#7C3AED' },
+      { label: 'Amount Received', value: formatAmountToK(received), icon: 'arrow-down-circle', color: '#10B981' },
+      { label: 'Pending Amount', value: formatAmountToK(totalPending), icon: 'alert-circle', color: '#F59E0B' },
     ];
 
     // Handle status tile tap - navigate to orders with filter
@@ -426,37 +462,50 @@ const DashboardScreen: React.FC = () => {
               style={scss.pagerContainer}
               contentContainerStyle={scss.pagerContent}
             >
-              {/* Card 1: Orders Stats */}
-              <View style={scss.pagerCardWrapper}>
+              {/* Card 1: Orders Stats - Clickable */}
+              <TouchableOpacity 
+                style={scss.pagerCardWrapper}
+                onPress={() => setActiveTab('orders')}
+                activeOpacity={0.8}
+              >
                 <InFocusPagerCard
                   title="Orders"
                   stats={ordersCardStats}
                   backgroundColor="#F0F4FF"
                 />
-              </View>
+              </TouchableOpacity>
 
-              {/* Card 2: Amounts Stats */}
-              <View style={scss.pagerCardWrapper}>
+              {/* Card 2: Amounts Stats - Clickable */}
+              <TouchableOpacity 
+                style={scss.pagerCardWrapper}
+                onPress={() => setActiveTab('finance')}
+                activeOpacity={0.8}
+              >
                 <InFocusPagerCard
                   title="Amounts"
                   stats={amountsCardStats}
                   backgroundColor="#FFF8F0"
                 />
-              </View>
+              </TouchableOpacity>
             </ScrollView>
 
             {/* Page Indicator */}
             <PageIndicator totalPages={2} currentPage={currentPagerPage} />
           </View>
 
-          {/* SECTION 2: AT A GLANCE - Order Status Summary (Only 3 statuses) */}
+          {/* SECTION 2: AT A GLANCE - Order Status Summary (Horizontally Scrollable) */}
           <View style={scss.sectionContainer}>
             <View style={scss.sectionHeader}>
               <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>At a Glance</Text>
             </View>
 
-            {/* Show 3 status tiles in a row - Composing, Printing, Proofing */}
-            <View style={scss.statusTilesRow}>
+            {/* Horizontally scrollable status tiles */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={scss.statusScrollContent}
+              style={scss.statusScrollContainer}
+            >
               {atAGlanceStatuses.map((status, idx) => {
                 let count = 0;
                 if (status.status === 'Composing') {
@@ -465,6 +514,10 @@ const DashboardScreen: React.FC = () => {
                   count = orders.filter(o => o.status === 'Printing').length;
                 } else if (status.status === 'Proofing') {
                   count = orders.filter(o => o.status === 'Proofing').length;
+                } else if (status.status === 'Delivered') {
+                  count = orders.filter(o => ['Delivered', 'Completed'].includes(o.status)).length;
+                } else if (status.status === 'Cancelled') {
+                  count = orders.filter(o => o.status === 'Cancelled').length;
                 }
 
                 return (
@@ -472,6 +525,7 @@ const DashboardScreen: React.FC = () => {
                     key={`status-${idx}`}
                     onPress={() => handleStatusTileTap(status.status)}
                     activeOpacity={0.7}
+                    style={scss.statusTileWrapper}
                   >
                     <OrderStatusTile
                       label={status.label}
@@ -482,18 +536,19 @@ const DashboardScreen: React.FC = () => {
                   </TouchableOpacity>
                 );
               })}
-            </View>
+            </ScrollView>
           </View>
 
           {/* SECTION 3: POPULAR CATEGORIES */}
           <View style={scss.sectionContainer}>
             <Text style={[scss.sectionTitle, darkMode && scss.sectionTitleDark]}>Popular Categories</Text>
             <View style={scss.categoriesGridLayout}>
-              {categories.map((category, idx) => (
+              {categoriesWithIcons.map((category, idx) => (
                 <View key={`category-${idx}`} style={scss.categoryItemWrapper}>
                   <CategoryCard
                     name={category.name}
                     icon={category.icon}
+                    percentage={category.percentage}
                     onPress={() => setActiveTab('orders')}
                   />
                 </View>
@@ -630,6 +685,17 @@ const scss = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     marginBottom: 12,
+  },
+  statusScrollContainer: {
+    marginHorizontal: -20, // Extend beyond section padding
+  },
+  statusScrollContent: {
+    paddingHorizontal: 20,
+    paddingRight: 40,
+    gap: 8,
+  },
+  statusTileWrapper: {
+    marginRight: 0,
   },
   pagerContainer: {
     marginHorizontal: -20, // Extend beyond section padding

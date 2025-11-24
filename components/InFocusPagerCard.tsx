@@ -1,4 +1,5 @@
 import { useTheme } from '@/context/ThemeContext';
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -15,6 +16,7 @@ interface InFocusPagerCardProps {
   stats: StatItem[];
   backgroundColor?: string;
   borderColor?: string;
+  gradientColors?: [string, string];
 }
 
 const InFocusPagerCard: React.FC<InFocusPagerCardProps> = ({
@@ -22,20 +24,12 @@ const InFocusPagerCard: React.FC<InFocusPagerCardProps> = ({
   stats,
   backgroundColor = '#FFFFFF',
   borderColor = '#E5E7EB',
+  gradientColors = ['#F0F4FF', '#EDE9FE'],
 }) => {
   const { darkMode } = useTheme();
 
-  return (
-    <View
-      style={[
-        styles.card,
-        darkMode && styles.cardDark,
-        {
-          backgroundColor: darkMode ? '#374151' : backgroundColor,
-          borderColor: darkMode ? '#4B5563' : borderColor,
-        },
-      ]}
-    >
+  const content = (
+    <View style={styles.cardContent}>
       {/* Title */}
       <Text style={[styles.cardTitle, darkMode && styles.cardTitleDark]}>
         {title}
@@ -45,15 +39,15 @@ const InFocusPagerCard: React.FC<InFocusPagerCardProps> = ({
       <View style={styles.statsGrid}>
         {stats.map((stat, idx) => (
           <View key={`stat-${idx}`} style={styles.statItem}>
-            {/* Icon */}
-            <View
-              style={[
-                styles.iconContainer,
-                { backgroundColor: `${stat.color}22` },
-              ]}
+            {/* Icon Container with Gradient */}
+            <LinearGradient
+              colors={[`${stat.color}30`, `${stat.color}10`]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.iconContainer}
             >
               <Ionicons name={stat.icon as any} size={28} color={stat.color} />
-            </View>
+            </LinearGradient>
 
             {/* Label */}
             <Text style={[styles.statLabel, darkMode && styles.statLabelDark]}>
@@ -75,34 +69,66 @@ const InFocusPagerCard: React.FC<InFocusPagerCardProps> = ({
       </View>
     </View>
   );
+
+  if (darkMode) {
+    return (
+      <View
+        style={[
+          styles.card,
+          styles.cardDark,
+          {
+            backgroundColor: '#374151',
+            borderColor: '#4B5563',
+          },
+        ]}
+      >
+        {content}
+      </View>
+    );
+  }
+
+  return (
+    <LinearGradient
+      colors={gradientColors}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={[styles.card, { borderColor }]}
+    >
+      {content}
+    </LinearGradient>
+  );
 };
 
 const styles = StyleSheet.create({
   card: {
     width: 320,
-    paddingVertical: 24,
-    paddingHorizontal: 20,
-    borderRadius: 20,
+    paddingVertical: 28,
+    paddingHorizontal: 22,
+    borderRadius: 24,
     backgroundColor: '#FFFFFF',
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: '#E5E7EB',
     shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 3,
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 5,
     justifyContent: 'center',
   },
   cardDark: {
     backgroundColor: '#374151',
     borderColor: '#4B5563',
   },
+  cardContent: {
+    width: '100%',
+  },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '800',
     color: '#111827',
-    marginBottom: 20,
+    marginBottom: 24,
     textAlign: 'center',
+    letterSpacing: 0.5,
   },
   cardTitleDark: {
     color: '#FFFFFF',
@@ -117,26 +143,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 14,
+    width: 64,
+    height: 64,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
   },
   statLabel: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '700',
     color: '#6B7280',
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   statLabelDark: {
     color: '#D1D5DB',
   },
   statValue: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 20,
+    fontWeight: '900',
     textAlign: 'center',
     letterSpacing: -0.5,
   },

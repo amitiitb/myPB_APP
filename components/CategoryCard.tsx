@@ -6,6 +6,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 interface CategoryCardProps {
   name: string;
   icon: string;
+  percentage?: number;
   backgroundColor?: string;
   textColor?: string;
   onPress?: () => void;
@@ -14,6 +15,7 @@ interface CategoryCardProps {
 const CategoryCard: React.FC<CategoryCardProps> = ({
   name,
   icon,
+  percentage = 0,
   backgroundColor = '#F3E8FF',
   textColor = '#7C3AED',
   onPress,
@@ -46,6 +48,16 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
       ]}>
         {name}
       </Text>
+
+      {/* Percentage */}
+      {percentage > 0 && (
+        <Text style={[
+          styles.percentageText,
+          { color: textColor }
+        ]}>
+          {percentage}%
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };
@@ -85,6 +97,12 @@ const styles = StyleSheet.create({
   },
   categoryNameDark: {
     color: '#FFFFFF',
+  },
+  percentageText: {
+    fontSize: 16,
+    fontWeight: '800',
+    marginTop: 8,
+    letterSpacing: -0.5,
   },
 });
 

@@ -52,8 +52,9 @@ const OrderStatusTile: React.FC<OrderStatusTileProps> = ({
 
 const styles = StyleSheet.create({
   tile: {
-    paddingVertical: 20,
-    paddingHorizontal: 12,
+    width: 100,
+    paddingVertical: 16,
+    paddingHorizontal: 8,
     borderRadius: 16,
     backgroundColor: '#FFFFFF',
     shadowColor: '#000',
@@ -63,8 +64,6 @@ const styles = StyleSheet.create({
     elevation: 2,
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
-    minWidth: '32%',
   },
   tileDark: {
     backgroundColor: '#374151',

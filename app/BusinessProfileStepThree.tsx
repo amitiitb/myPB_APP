@@ -255,8 +255,9 @@ const BusinessProfileStepThree: React.FC = () => {
       return;
     }
 
-    // If WhatsApp is empty, use contact number as fallback
-    const finalWhatsapp = formWhatsapp || formMobile;
+    // Use WhatsApp value as-is (empty string if not filled, or filled value)
+    // Only use contact number as fallback if "Same as Contact Number" was explicitly selected
+    const finalWhatsapp = formWhatsapp;
 
     if (editingMemberId) {
       // Update existing member
