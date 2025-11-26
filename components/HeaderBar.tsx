@@ -62,7 +62,7 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
         </TouchableOpacity>
         {/* Settings Icon */}
         <TouchableOpacity style={styles.bellIconWrapper} onPress={onSettingsPress}>
-          <Ionicons name="settings" size={24} color="#FFFFFF" />
+          <Ionicons name="menu" size={24} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
     </View>
