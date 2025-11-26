@@ -10,6 +10,8 @@ interface HeaderBarProps {
   onLanguageToggle?: () => void;
   onNotificationPress?: () => void;
   onSettingsPress?: () => void;
+  showBackButton?: boolean;
+  onBack?: () => void;
 }
 
 const HeaderBar: React.FC<HeaderBarProps> = ({
@@ -19,10 +21,17 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
   onLanguageToggle,
   onNotificationPress,
   onSettingsPress,
+  showBackButton = false,
+  onBack,
 }) => {
   const { darkMode } = useTheme();
   return (
     <View style={[styles.headerBar, darkMode && styles.headerBarDark]}>
+      {showBackButton && (
+        <TouchableOpacity style={styles.bellIconWrapper} onPress={onBack}>
+          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
+      )}
       <Text style={[styles.headerTitle, darkMode && styles.headerTitleDark]}>{title}</Text>
       <View style={styles.headerRightRow}>
         {/* Language Toggle */}

@@ -90,397 +90,95 @@ export default function OTPVerificationScreen() {
     }
   };
 
-  const handleVerifyOTP = async () => {
-    const otpString = otp.join('');
-    if (otpString.length !== 6) {
-      Alert.alert(
-        language === 'en' ? 'Error' : 'त्रुटि',
-        language === 'en' ? 'Please enter complete 6-digit OTP' : 'कृपया पूरा 6-अंकीय OTP दर्ज करें'
-      );
-      return;
-    }
-
-    setIsLoading(true);
-
-    // Simulate OTP verification
-    setTimeout(() => {
-      setIsLoading(false);
-
-      // For demo purposes, accept any OTP
-      // Show success toast
-      setShowSuccessToast(true);
-      // Auto-close toast and navigate after 1 second
-      setTimeout(() => {
-        router.replace({
-          pathname: '/BusinessProfileStepOne',
-          params: { phoneNumber: phoneNumber || '' }
-        });
-      }, 1000);
-    }, 1500);
-  };
-
-  const handleResendOTP = () => {
-    if (!canResend) return;
-
-    setCanResend(false);
-    setResendTimer(30);
-    setOtp(['', '', '', '', '', '']);
-    inputRefs.current[0]?.focus();
-
-    // Simulate resend
-    setTimeout(() => {
-      Alert.alert(
-        language === 'en' ? 'OTP Resent' : 'OTP पुनः भेजा गया',
-        language === 'en'
-          ? 'A new OTP has been sent to your contact number'
-          : 'आपके फोन नंबर पर एक नया OTP भेजा गया है'
-      );
-    }, 1000);
-  };
-
-  const handleBackToLogin = () => {
-    router.back();
-  };
-
-  const toggleLanguage = () => {
-    setLanguage(language === 'en' ? 'hi' : 'en');
-  };
-
+  // Show OTP input and allow any 6-digit OTP, with language toggle and back links
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: '#F8FAFC' }]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
+        style={{ flex: 1 }}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
           {/* Language Toggle */}
           <TouchableOpacity
-            style={[
-              styles.languageToggle,
-              language === 'hi'
-                ? {
-                    borderColor: '#111',
-                    backgroundColor: 'rgba(0,0,0,0.08)',
-                  }
-                : {
-                    borderColor: '#9CA3AF',
-                    backgroundColor: 'rgba(0,0,0,0.03)',
-                  },
-            ]}
-            onPress={toggleLanguage}
+            style={{ alignSelf: 'flex-end', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, borderWidth: 1.5, marginBottom: 4, borderColor: language === 'hi' ? '#111' : '#9CA3AF', backgroundColor: language === 'hi' ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.03)' }}
+            onPress={() => setLanguage(language === 'en' ? 'hi' : 'en')}
           >
-            <ThemedText
-              style={[
-                styles.languageText,
-                language === 'hi'
-                  ? { color: '#111', fontWeight: '700' }
-                  : { color: '#6B7280', fontWeight: '600' },
-              ]}
-            >
+            <ThemedText style={{ fontSize: 13, textAlign: 'center', color: language === 'hi' ? '#111' : '#6B7280', fontWeight: language === 'hi' ? '700' : '600' }}>
               {language === 'en' ? 'हिंदी' : 'English'}
             </ThemedText>
           </TouchableOpacity>
 
-          <View style={styles.content}>
-            {/* Header restored as per request */}
-            <View style={{ alignItems: 'center', marginBottom: 24 }}>
-              <ThemedText style={{ fontSize: 22, fontWeight: 'bold', color: '#1A1A1A', textAlign: 'center', marginBottom: 6 }}>
-                Enter OTP
-              </ThemedText>
-              <ThemedText style={{ fontSize: 15, color: '#6B7280', textAlign: 'center', lineHeight: 21 }}>
-                A 6-digit code was sent to your contact number
-              </ThemedText>
+          <View style={{ alignItems: 'center', marginBottom: 24 }}>
+            <ThemedText style={{ fontSize: 22, fontWeight: 'bold', color: '#1A1A1A', textAlign: 'center', marginBottom: 6 }}>
+              {language === 'en' ? 'Enter OTP' : 'OTP दर्ज करें'}
+            </ThemedText>
+            <ThemedText style={{ fontSize: 15, color: '#6B7280', textAlign: 'center', lineHeight: 21 }}>
+              {language === 'en' ? 'A 6-digit code was sent to your contact number' : 'आपके फ़ोन नंबर पर 6-अंकीय कोड भेजा गया है'}
+            </ThemedText>
+          </View>
+          <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 24, width: '100%', maxWidth: 400, alignItems: 'center', marginBottom: 32 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 24 }}>
+              {otp.map((digit, index) => (
+                <TextInput
+                  key={index}
+                  ref={(ref) => {
+                    if (ref) inputRefs.current[index] = ref;
+                  }}
+                  style={{ width: 45, height: 50, borderWidth: 2, borderColor: '#E5E7EB', borderRadius: 12, textAlign: 'center', fontSize: 20, fontWeight: '600', color: '#1F2937', backgroundColor: '#F9FAFB', marginHorizontal: 4 }}
+                  value={digit}
+                  onChangeText={(value) => handleOtpChange(value, index)}
+                  onKeyPress={(e) => handleKeyPress(e, index)}
+                  keyboardType="number-pad"
+                  maxLength={1}
+                  selectTextOnFocus
+                  autoFocus={index === 0}
+                />
+              ))}
             </View>
-
-            {/* OTP Card */}
-            <View style={styles.card}>
-              {/* OTP Input Fields */}
-              <View style={styles.otpContainer}>
-                <View style={styles.otpInputs}>
-                  {otp.map((digit, index) => (
-                    <TextInput
-                      key={index}
-                      ref={(ref) => {
-                        if (ref) inputRefs.current[index] = ref;
-                      }}
-                      style={styles.otpInput}
-                      value={digit}
-                      onChangeText={(value) => handleOtpChange(value, index)}
-                      onKeyPress={(e) => handleKeyPress(e, index)}
-                      keyboardType="number-pad"
-                      maxLength={1}
-                      selectTextOnFocus
-                      autoFocus={index === 0}
-                    />
-                  ))}
-                </View>
-              </View>
-
-              {/* Verify Button */}
-              <TouchableOpacity
-                style={styles.verifyButton}
-                onPress={handleVerifyOTP}
-                disabled={isLoading || !otp.every((d) => d.length === 1)}
-                activeOpacity={0.85}
-              >
-                <LinearGradient
-                  colors={
-                    isLoading || !otp.every((d) => d.length === 1)
-                      ? ['#D1D5DB', '#D1D5DB']
-                      : ['#A855F7', '#7C3AED']
-                  }
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.verifyButtonGradient}
-                >
-                  <ThemedText style={[styles.verifyButtonText, (isLoading || !otp.every((d) => d.length === 1)) && styles.verifyButtonTextDisabled]}>
-                    {isLoading
-                      ? (language === 'en' ? 'Verifying...' : 'सत्यापित हो रहा है...')
-                      : (language === 'en' ? 'Verify OTP' : 'OTP सत्यापित करें')}
-                  </ThemedText>
-                </LinearGradient>
-              </TouchableOpacity>
-
-              {/* Resend OTP */}
-              <View style={styles.resendContainer}>
-                <ThemedText style={styles.resendText}>
-                  {language === 'en' ? "Didn't receive OTP?" : 'OTP नहीं मिला?'}
-                </ThemedText>
-                <TouchableOpacity
-                  style={[styles.resendButton, !canResend && styles.resendButtonDisabled]}
-                  onPress={handleResendOTP}
-                  disabled={!canResend}
-                >
-                  <ThemedText style={[styles.resendButtonText, !canResend && styles.resendButtonTextDisabled]}>
-                    {canResend
-                      ? (language === 'en' ? 'Resend OTP' : 'OTP पुनः भेजें')
-                      : `${language === 'en' ? 'Resend in' : 'पुनः भेजें'} ${resendTimer}s`}
-                  </ThemedText>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Back to Login */}
-            <TouchableOpacity style={styles.backButton} onPress={handleBackToLogin}>
-              <ThemedText style={styles.backButtonText}>
-                {language === 'en' ? '← Back to Login' : '← लॉगिन पर वापस जाएं'}
+            <TouchableOpacity
+              style={{ height: 48, borderRadius: 12, justifyContent: 'center', alignItems: 'center', width: '100%', backgroundColor: otp.every((d) => d.length === 1) ? '#7C3AED' : '#D1D5DB', marginBottom: 8 }}
+              onPress={() => {
+                if (otp.join('').length === 6) {
+                  setShowSuccessToast(true);
+                  setTimeout(() => {
+                    router.replace({
+                      pathname: '/BusinessProfileStepOne',
+                      params: { phoneNumber: phoneNumber || '' }
+                    });
+                  }, 1000);
+                } else {
+                  Alert.alert(language === 'en' ? 'Error' : 'त्रुटि', language === 'en' ? 'Please enter complete 6-digit OTP' : 'कृपया पूरा 6-अंकीय OTP दर्ज करें');
+                }
+              }}
+              disabled={!otp.every((d) => d.length === 1)}
+              activeOpacity={0.85}
+            >
+              <ThemedText style={{ color: '#fff', fontSize: 18, fontWeight: 'bold' }}>
+                {language === 'en' ? 'Verify OTP' : 'OTP सत्यापित करें'}
+              </ThemedText>
+            </TouchableOpacity>
+            {/* Back to mobile number link */}
+            <TouchableOpacity
+              style={{ marginTop: 12 }}
+              onPress={() => router.back()}
+            >
+              <ThemedText style={{ color: '#6B7280', fontSize: 15, fontWeight: '500', textAlign: 'center' }}>
+                {language === 'en' ? '← Back to mobile number' : '← मोबाइल नंबर पर वापस जाएं'}
               </ThemedText>
             </TouchableOpacity>
           </View>
+          {/* Success Toast at top */}
+          {showSuccessToast && (
+            <View style={{ position: 'absolute', top: 40, left: 0, right: 0, alignItems: 'center', zIndex: 10 }}>
+              <View style={{ backgroundColor: '#10B981', paddingHorizontal: 24, paddingVertical: 14, borderRadius: 12 }}>
+                <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600', textAlign: 'center' }}>
+                  {language === 'en' ? 'OTP verified successfully!' : 'OTP सफलतापूर्वक सत्यापित!'}
+                </Text>
+              </View>
+            </View>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
-
-      {/* Success Toast */}
-      {showSuccessToast && (
-        <View style={styles.toastContainer}>
-          <View style={styles.toast}>
-            <Text style={styles.toastText}>
-              {language === 'en' ? 'OTP verified successfully!' : 'OTP सफलतापूर्वक सत्यापित!'}
-            </Text>
-          </View>
-        </View>
-      )}
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 20,
-  },
-  languageToggle: {
-    alignSelf: 'flex-end',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1.5,
-    marginBottom: 4,
-  },
-  languageText: {
-    fontSize: 13,
-    textAlign: 'center',
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    maxWidth: 400,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  logo: {
-    width: 120,
-    height: 120,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  otpTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#1A1A1A',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  otpSubtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
-    lineHeight: 22,
-    letterSpacing: 0.3,
-    marginBottom: 16,
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    marginBottom: 32,
-  },
-  otpContainer: {
-    marginBottom: 24,
-  },
-  otpLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  otpInputs: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  otpInput: {
-    width: 45,
-    height: 50,
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-    borderRadius: 12,
-    textAlign: 'center',
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1F2937',
-    backgroundColor: '#F9FAFB',
-  },
-  verifyButton: {
-    height: 48,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-    overflow: 'hidden',
-  },
-  verifyButtonGradient: {
-    height: 48,
-    borderRadius: 12,
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  verifyButtonDisabled: {
-    opacity: 0.7,
-  },
-  verifyButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
-    textShadowColor: 'rgba(0,0,0,0.10)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  verifyButtonTextDisabled: {
-    color: '#9CA3AF',
-    textShadowColor: 'transparent',
-  },
-  resendContainer: {
-    alignItems: 'center',
-  },
-  resendText: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 8,
-  },
-  resendButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  resendButtonDisabled: {
-    opacity: 0.5,
-  },
-  resendButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1E3A8A',
-  },
-  resendButtonTextDisabled: {
-    color: '#9CA3AF',
-  },
-  backButton: {
-    alignSelf: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  backButtonText: {
-    fontSize: 16,
-    color: '#6B7280',
-    fontWeight: '500',
-  },
-  toastContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    pointerEvents: 'none',
-    paddingTop: 120, // moved lower to avoid overlap with language toggle
-  },
-  toast: {
-    backgroundColor: '#10B981',
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  toastText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-});

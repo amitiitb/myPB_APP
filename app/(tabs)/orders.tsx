@@ -4,7 +4,7 @@ import NotificationsScreen from '@/components/NotificationsScreen';
 import SettingsScreen from '@/components/SettingsScreen';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     Alert,
@@ -59,9 +59,10 @@ interface OrdersScreenProps {
 }
 
 const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress, ownerName, ownerPhone, ownerWhatsapp, pressName, owners = [], composers: composersProp = [], operators: operatorsProp = [] }) => {
+  const navigation = useNavigation();
   const { darkMode } = useTheme();
   const { language, setLanguage, t } = useLanguage();
-  const params = useLocalSearchParams<{ filterStatus?: string }>();
+  const params = useLocalSearchParams<{ filterStatus?: string; scrollToOrder?: string }>();
   
   const [showSettings, setShowSettings] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -96,6 +97,18 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress, owne
       setSelectedStatus(params.filterStatus);
     }
   }, [params.filterStatus]);
+
+  // Scroll to order if scrollToOrder param is present
+  useEffect(() => {
+    if (params.scrollToOrder && orders.length > 0) {
+      setTimeout(() => {
+        const el = document.getElementById(params.scrollToOrder);
+        if (el && el.scrollIntoView) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 500);
+    }
+  }, [params.scrollToOrder, orders]);
   const [operators, setOperators] = useState<{ id: string; name: string }[]>([
     { id: '1', name: 'Amit Sharma' },
     { id: '2', name: 'Bhavna Gupta' },
@@ -364,31 +377,27 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress, owne
       <ScrollView contentContainerStyle={scss.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Filter Tabs */}
         <View style={scss.filterContainer}>
-          {orderFilters.map((filter) => (
-            <TouchableOpacity
-              key={filter}
-              style={[
-                scss.filterTab,
-                darkMode && scss.filterTabDark,
-                selectedFilter === filter && scss.filterTabActive
-              ]}
-              onPress={() => setSelectedFilter(filter)}
-            >
-              <Text style={[
-                scss.filterTabText,
-                darkMode && selectedFilter !== filter && scss.filterTabTextDark,
-                selectedFilter === filter && scss.filterTabTextActive
-              ]}>
-                {filter}
-              </Text>
-            </TouchableOpacity>
-          ))}
-          <TouchableOpacity 
-            style={scss.filterIcon}
-            onPress={() => setShowStatusFilter(!showStatusFilter)}
-          >
-            <Ionicons name="funnel" size={20} color="#7C3AED" />
-          </TouchableOpacity>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={scss.filterTabsScrollContent}>
+            {[t('orders.all'), t('orders.composing'), t('orders.proofreading'), t('orders.printing'), 'Ready to Deliver', 'Delivered'].map((filter) => (
+              <TouchableOpacity
+                key={filter}
+                style={[
+                  scss.filterTab,
+                  darkMode && scss.filterTabDark,
+                  selectedFilter === filter && scss.filterTabActive
+                ]}
+                onPress={() => setSelectedFilter(filter)}
+              >
+                <Text style={[
+                  scss.filterTabText,
+                  darkMode && selectedFilter !== filter && scss.filterTabTextDark,
+                  selectedFilter === filter && scss.filterTabTextActive
+                ]}>
+                  {filter}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
 
         {/* Status Filter Dropdown */}
@@ -491,7 +500,7 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress, owne
                 {/* Amount and Item Count Row */}
                 <View style={scss.footerRow}>
                   <Text style={[scss.orderAmount, darkMode && scss.orderAmountDark]}>
-                    ${order.amount}
+                    ₹{order.amount?.toLocaleString()}
                   </Text>
                   <Text style={[scss.itemCount, darkMode && scss.itemCountDark]}>
                     {order.quantity || 1} item
@@ -578,7 +587,12 @@ const OrdersScreen: React.FC<OrdersScreenProps> = ({ activeTab, onTabPress, owne
 
       {/* Floating Add New Order Button */}
       <View style={scss.fabContainer}>
-        <TouchableOpacity style={scss.fabButton}>
+        <TouchableOpacity style={scss.fabButton} onPress={() => {
+          // Use navigation to go to add-order-step1
+          if (typeof navigation !== 'undefined' && navigation.navigate) {
+            navigation.navigate('add-order-step1');
+          }
+        }}>
           <Ionicons name="add-circle" size={22} color="#fff" style={scss.fabIcon} />
           <Text style={scss.fabButtonText}>{t('dashboard.addNewOrder')}</Text>
         </TouchableOpacity>

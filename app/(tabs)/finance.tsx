@@ -1,4 +1,3 @@
-
 import FooterNav from '@/components/FooterNav';
 import HeaderBar from '@/components/HeaderBar';
 import NotificationsScreen from '@/components/NotificationsScreen';
@@ -7,8 +6,9 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface FinanceScreenProps {
   activeTab: 'home' | 'orders' | 'finance' | 'inventory' | 'reports';

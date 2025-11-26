@@ -8,7 +8,6 @@ import {
     KeyboardAvoidingView,
     Modal,
     Platform,
-    SafeAreaView,
     ScrollView,
     StyleSheet,
     Switch,
@@ -18,6 +17,7 @@ import {
     View,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Role = 'owners' | 'composers' | 'operators';
 
@@ -572,7 +572,7 @@ const BusinessProfileStepThree: React.FC = () => {
                     </Text>
                     <TextInput
                       style={[styles.input, formErrors.mobile && styles.inputError, (editingMemberId && activeTab === 'owners' && editingMemberId === 'primary-owner') && styles.disabledInput]}
-                      placeholder="+91-9876543210"
+                      placeholder="Contact Number"
                       value={formMobile}
                       onChangeText={handleMobileChange}
                       onBlur={validateMobile}
@@ -591,7 +591,7 @@ const BusinessProfileStepThree: React.FC = () => {
                     </Text>
                     <TextInput
                       style={[styles.input, formErrors.whatsapp && styles.inputError, (editingMemberId && activeTab === 'owners' && editingMemberId === 'primary-owner') && styles.disabledInput]}
-                      placeholder="+91-9876543210"
+                      placeholder="WhatsApp Number"
                       value={formWhatsapp}
                       onChangeText={handleWhatsappChange}
                       onBlur={validateWhatsapp}

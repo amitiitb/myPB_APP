@@ -9,6 +9,7 @@ interface CategoryCardProps {
   percentage?: number;
   backgroundColor?: string;
   textColor?: string;
+  iconColor?: string;
   onPress?: () => void;
 }
 
@@ -18,6 +19,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
   percentage = 0,
   backgroundColor = '#F3E8FF',
   textColor = '#7C3AED',
+  iconColor = '#7C3AED',
   onPress,
 }) => {
   const { darkMode } = useTheme();
@@ -37,7 +39,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
         <Ionicons 
           name={icon as any} 
           size={32} 
-          color={darkMode ? '#A78BFA' : textColor} 
+          color={darkMode ? '#A78BFA' : iconColor} 
         />
       </View>
 

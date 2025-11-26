@@ -382,7 +382,7 @@ const DashboardScreen: React.FC = () => {
 
     // Icon mapping for categories
     const categoryIconMap: { [key: string]: string } = {
-      'Marriage Card': 'heart',
+      'Marriage Card': 'card',
       'Sticker': 'pricetag',
       'Wedding Invitation': 'heart',
       'Letterhead': 'document-text',
@@ -392,10 +392,28 @@ const DashboardScreen: React.FC = () => {
       'Labels': 'bookmark',
     };
 
-    const categoriesWithIcons = sortedCategories.map(cat => ({
-      ...cat,
-      icon: categoryIconMap[cat.name] || 'archive',
-    }));
+    // Vibrant color mapping for categories
+    const categoryColorMap: { [key: string]: { background: string; text: string; icon: string } } = {
+      'Marriage Card': { background: '#FFE5EC', text: '#D72660', icon: '#D72660' },
+      'Sticker': { background: '#E0F7FA', text: '#00838F', icon: '#00838F' },
+      'Wedding Invitation': { background: '#FFF3E0', text: '#FF9800', icon: '#FF9800' },
+      'Letterhead': { background: '#E8F5E9', text: '#43A047', icon: '#43A047' },
+      'Flex/Banner': { background: '#F3E8FF', text: '#7C3AED', icon: '#7C3AED' },
+      'Visiting Cards': { background: '#E1F5FE', text: '#0277BD', icon: '#0277BD' },
+      'Envelopes': { background: '#FFFDE7', text: '#FBC02D', icon: '#FBC02D' },
+      'Labels': { background: '#FCE4EC', text: '#C2185B', icon: '#C2185B' },
+    };
+
+    const categoriesWithIcons = sortedCategories.map(cat => {
+      const colors = categoryColorMap[cat.name] || { background: '#F3E8FF', text: '#7C3AED', icon: '#7C3AED' };
+      return {
+        ...cat,
+        icon: categoryIconMap[cat.name] || 'archive',
+        backgroundColor: colors.background,
+        textColor: colors.text,
+        iconColor: colors.icon,
+      };
+    });
 
     // Helper function to format amounts to k format
     const formatAmountToK = (amount: number): string => {
@@ -409,7 +427,9 @@ const DashboardScreen: React.FC = () => {
 
     // At a Glance - All statuses for horizontal scroll
     const atAGlanceStatuses = [
+      { label: 'Order Placed', icon: 'list', color: '#7C3AED', status: 'Order Placed' },
       { label: 'Composing', icon: 'pencil', color: '#8B5CF6', status: 'Composing' },
+      { label: 'Ready to Deliver', icon: 'cube', color: '#F59E0B', status: 'Ready to Deliver' },
       { label: 'Printing', icon: 'print', color: '#EC4899', status: 'Printing' },
       { label: 'Proofreading', icon: 'eye', color: '#06B6D4', status: 'Proofing' },
       { label: 'Delivered', icon: 'checkmark-done-circle', color: '#10B981', status: 'Delivered' },
@@ -433,10 +453,11 @@ const DashboardScreen: React.FC = () => {
     // Handle status tile tap - navigate to orders with filter
     const handleStatusTileTap = (status: string) => {
       setActiveTab('orders');
-      // Pass filter status via route params
+      // Pass filter status via route params and scrollToOrder param
+      const firstOrder = orders.find(o => o.status === status);
       navigation.navigate('(tabs)', {
         screen: 'orders',
-        params: { filterStatus: status }
+        params: { filterStatus: status, scrollToOrder: firstOrder ? firstOrder.id : undefined }
       });
     };
 
@@ -508,16 +529,30 @@ const DashboardScreen: React.FC = () => {
             >
               {atAGlanceStatuses.map((status, idx) => {
                 let count = 0;
-                if (status.status === 'Composing') {
-                  count = orders.filter(o => o.status === 'Composing').length;
-                } else if (status.status === 'Printing') {
-                  count = orders.filter(o => o.status === 'Printing').length;
-                } else if (status.status === 'Proofing') {
-                  count = orders.filter(o => o.status === 'Proofing').length;
-                } else if (status.status === 'Delivered') {
-                  count = orders.filter(o => ['Delivered', 'Completed'].includes(o.status)).length;
-                } else if (status.status === 'Cancelled') {
-                  count = orders.filter(o => o.status === 'Cancelled').length;
+                switch (status.status) {
+                  case 'Order Placed':
+                    count = orders.filter(o => o.status === 'Order Placed').length;
+                    break;
+                  case 'Composing':
+                    count = orders.filter(o => o.status === 'Composing').length;
+                    break;
+                  case 'Ready to Deliver':
+                    count = orders.filter(o => o.status === 'Ready to Deliver').length;
+                    break;
+                  case 'Printing':
+                    count = orders.filter(o => o.status === 'Printing').length;
+                    break;
+                  case 'Proofing':
+                    count = orders.filter(o => o.status === 'Proofing').length;
+                    break;
+                  case 'Delivered':
+                    count = orders.filter(o => ['Delivered', 'Completed'].includes(o.status)).length;
+                    break;
+                  case 'Cancelled':
+                    count = orders.filter(o => o.status === 'Cancelled').length;
+                    break;
+                  default:
+                    count = 0;
                 }
 
                 return (
@@ -549,6 +584,9 @@ const DashboardScreen: React.FC = () => {
                     name={category.name}
                     icon={category.icon}
                     percentage={category.percentage}
+                    backgroundColor={category.backgroundColor}
+                    textColor={category.textColor}
+                    iconColor={category.iconColor}
                     onPress={() => setActiveTab('orders')}
                   />
                 </View>
@@ -560,7 +598,7 @@ const DashboardScreen: React.FC = () => {
         
         {/* Floating Add New Order Button */}
         <View style={scss.fabContainer}>
-          <TouchableOpacity style={scss.fabButton} onPress={() => setShowAddOrder(true)}>
+          <TouchableOpacity style={scss.fabButton} onPress={() => navigation.navigate('add-order-step1')}>
             <Ionicons name="add-circle" size={22} color="#fff" style={scss.fabIcon} />
             <Text style={scss.fabButtonText}>{t('dashboard.addNewOrder')}</Text>
           </TouchableOpacity>

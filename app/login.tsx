@@ -24,31 +24,11 @@ export default function LoginScreen() {
   const colors = Colors[colorScheme ?? 'light'];
 
   const handleContinue = async () => {
-    if (!phoneNumber) {
-  Alert.alert('Error', 'Please enter your contact number');
-      return;
-    }
-
-    if (phoneNumber.length !== 10) {
-  Alert.alert('Error', 'Please enter a valid 10-digit contact number');
-      return;
-    }
-
-    if (!/^[6-9]/.test(phoneNumber)) {
-  Alert.alert('Error', 'Please enter a valid Indian contact number starting with 6, 7, 8, or 9');
-      return;
-    }
-
-    setIsLoading(true);
-
-    // Simulate processing
-    setTimeout(() => {
-      setIsLoading(false);
-      router.push({
-        pathname: '/otp-verification',
-        params: { phoneNumber: phoneNumber }
-      });
-    }, 1000);
+    // Restore OTP step: go to OTP verification screen
+    router.push({
+      pathname: '/otp-verification',
+      params: { phoneNumber: phoneNumber }
+    });
   };
 
   const handleForgotPassword = () => {

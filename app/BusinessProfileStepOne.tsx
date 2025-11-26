@@ -71,6 +71,7 @@ const BusinessProfileStepOne: React.FC = () => {
                 const lon = location.coords.longitude.toFixed(4);
                 setLatitude(lat);
                 setLongitude(lon);
+                Keyboard.dismiss();
                 console.log('Location obtained:', location);
               } else {
                 Alert.alert('Permission Denied', 'Location permission was not granted.');

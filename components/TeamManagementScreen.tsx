@@ -1,10 +1,10 @@
+import * as Contacts from 'expo-contacts';
 import React, { useState } from 'react';
 import {
     Alert,
     KeyboardAvoidingView,
     Modal,
     Platform,
-    SafeAreaView,
     ScrollView,
     StyleSheet,
     Switch,
@@ -13,6 +13,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
 
@@ -113,11 +114,11 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
   const getTabDescription = () => {
     switch (activeTab) {
       case 'owners':
-        return 'Owners have full access to manage business settings, orders, and team.';
+        return 'Owner ka kaam orders, customers, payments aur team ko manage karna hota hai';
       case 'composers':
-        return 'Composers create and upload designs for customer orders.';
+        return 'Composer ka kaam designs aur artwork prepare karna hota hai';
       case 'operators':
-        return 'Operators handle print production and mark jobs as completed.';
+        return 'Operator ka kaam printing machine chalana aur printing process complete karna hota hai';
     }
   };
 
@@ -135,11 +136,11 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
   const getEmptyStateText = () => {
     switch (activeTab) {
       case 'owners':
-        return 'No owners added yet.';
+        return 'No owners added yet';
       case 'composers':
-        return 'No composers added yet.';
+        return 'No composers added yet';
       case 'operators':
-        return 'No operators added yet.';
+        return 'No operators added yet';
     }
   };
 
@@ -333,7 +334,31 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
 
   const handleOpenModal = () => {
     resetForm();
+    setShowContacts(false);
     setShowModal(true);
+  };
+
+  // Add this function to TeamManagementScreen
+  const [contacts, setContacts] = useState<any[]>([]);
+  const [showContacts, setShowContacts] = useState(false);
+
+  const handleOpenContacts = async () => {
+    const { status } = await Contacts.requestPermissionsAsync();
+    if (status === 'granted') {
+      const { data } = await Contacts.getContactsAsync({ fields: [Contacts.Fields.PhoneNumbers] });
+      setContacts(data);
+      setShowContacts(true);
+    }
+  };
+
+  const handleSelectContact = (contact: any) => {
+    if (contact.name) {
+      setFormName(contact.name);
+    }
+    if (contact.phoneNumbers && contact.phoneNumbers.length > 0) {
+      setFormMobile(contact.phoneNumbers[0].number.replace(/\D/g, '').slice(-10));
+    }
+    setShowContacts(false);
   };
 
   return (
@@ -470,14 +495,40 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
                   {/* Name Input */}
                   <View style={scss.formGroup}>
                     <Text style={[scss.label, darkMode && scss.labelDark]}>Name <Text style={{ color: '#EF4444' }}>*</Text></Text>
-                    <TextInput
-                      style={[scss.input, darkMode && scss.inputDark, formErrors.name && scss.inputError]}
-                      placeholder="Enter full name"
-                      value={formName}
-                      onChangeText={handleNameChange}
-                      placeholderTextColor="#9CA3AF"
-                      maxLength={30}
-                    />
+                    <View style={{ position: 'relative', marginBottom: 20 }}>
+                      <TextInput
+                        style={[scss.input, { height: 54, fontSize: 18, paddingHorizontal: 18, paddingRight: 44 }, darkMode && scss.inputDark, formErrors.name && scss.inputError]}
+                        placeholder="Enter full name"
+                        value={formName}
+                        onChangeText={handleNameChange}
+                        placeholderTextColor="#9CA3AF"
+                        maxLength={30}
+                      />
+                      <TouchableOpacity
+                        style={{ position: 'absolute', right: 10, top: 0, height: '100%', justifyContent: 'center' }}
+                        onPress={handleOpenContacts}
+                      >
+                        <Ionicons name="person-circle-outline" size={24} color="#A1A1AA" />
+                      </TouchableOpacity>
+                      {showContacts && (
+                        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 20 }}>
+                          <TouchableOpacity
+                            activeOpacity={1}
+                            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+                            onPress={() => setShowContacts(false)}
+                          />
+                          <View style={{ position: 'absolute', top: 60, left: 0, right: 0, maxHeight: 220, backgroundColor: '#fff', borderRadius: 10, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 3 }}>
+                            <ScrollView>
+                              {contacts.map((contact, idx) => (
+                                <TouchableOpacity key={idx} style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: '#eee' }} onPress={() => handleSelectContact(contact)}>
+                                  <Text>{contact.name} {contact.phoneNumbers && contact.phoneNumbers.length > 0 ? `(${contact.phoneNumbers[0].number})` : ''}</Text>
+                                </TouchableOpacity>
+                              ))}
+                            </ScrollView>
+                          </View>
+                        </View>
+                      )}
+                    </View>
                     {formErrors.name && <Text style={scss.errorText}>{formErrors.name}</Text>}
                   </View>
 
@@ -490,7 +541,7 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
                       </Text>
                       <TextInput
                         style={[scss.input, darkMode && scss.inputDark, formErrors.mobile && scss.inputError]}
-                        placeholder="+91-9876543210"
+                        placeholder="9876543210"
                         value={formMobile}
                         onChangeText={handleMobileChange}
                         keyboardType="phone-pad"
@@ -507,7 +558,7 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
                       </Text>
                       <TextInput
                         style={[scss.input, darkMode && scss.inputDark, formErrors.whatsapp && scss.inputError]}
-                        placeholder="+91-9876543210"
+                        placeholder="9876543210"
                         value={formWhatsapp}
                         onChangeText={handleWhatsappChange}
                         keyboardType="phone-pad"
@@ -947,6 +998,17 @@ const scss = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     letterSpacing: 0.3,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  inputIconBtn: {
+    marginLeft: 8,
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
   },
 });
 
