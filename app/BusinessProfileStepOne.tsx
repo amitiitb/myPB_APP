@@ -280,9 +280,9 @@ const BusinessProfileStepOne: React.FC = () => {
             </Text>
 
             {/* Locate My Press Option */}
-            {latitude && longitude ? (
-              <View style={styles.locateMeContainer}>
-                <TouchableOpacity style={styles.locateMeBoxSuccess} onPress={handleLocateMyPress}>
+            <TouchableOpacity style={styles.locateMeContainer} onPress={handleLocateMyPress} activeOpacity={0.85}>
+              {latitude && longitude ? (
+                <View style={styles.locateMeBoxSuccess}>
                   <View style={styles.locationInputContainer}>
                     <Ionicons name="location" size={20} color="#10B981" style={styles.locationIcon} />
                     <TextInput
@@ -293,11 +293,9 @@ const BusinessProfileStepOne: React.FC = () => {
                     />
                   </View>
                   <Ionicons name="checkmark-circle" size={24} color="#10B981" />
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View style={styles.locateMeContainer}>
-                <TouchableOpacity style={styles.locateMeBox} onPress={handleLocateMyPress}>
+                </View>
+              ) : (
+                <View style={styles.locateMeBox}>
                   <View style={styles.locationInputContainer}>
                     <Ionicons name="location" size={20} color="#7C3AED" style={styles.locationIcon} />
                     <TextInput
@@ -307,9 +305,9 @@ const BusinessProfileStepOne: React.FC = () => {
                       placeholderTextColor="#9CA3AF"
                     />
                   </View>
-                </TouchableOpacity>
-              </View>
-            )}
+                </View>
+              )}
+            </TouchableOpacity>
           </View>
         </ScrollView>
 

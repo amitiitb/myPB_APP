@@ -508,7 +508,7 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
                         style={{ position: 'absolute', right: 10, top: 0, height: '100%', justifyContent: 'center' }}
                         onPress={handleOpenContacts}
                       >
-                        <Ionicons name="person-circle-outline" size={24} color="#A1A1AA" />
+                        <Ionicons name="person-circle-outline" size={24} color="#22C55E" />
                       </TouchableOpacity>
                       {showContacts && (
                         <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 20 }}>
@@ -517,17 +517,42 @@ const TeamManagementScreen: React.FC<TeamManagementScreenProps> = ({
                             style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
                             onPress={() => setShowContacts(false)}
                           />
-                          <View style={{ position: 'absolute', top: 60, left: 0, right: 0, maxHeight: 220, backgroundColor: '#fff', borderRadius: 10, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 3 }}>
-                            <ScrollView>
-                              {contacts.map((contact, idx) => (
-                                <TouchableOpacity key={idx} style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: '#eee' }} onPress={() => handleSelectContact(contact)}>
-                                  <Text>{contact.name} {contact.phoneNumbers && contact.phoneNumbers.length > 0 ? `(${contact.phoneNumbers[0].number})` : ''}</Text>
-                                </TouchableOpacity>
-                              ))}
+                          <View style={{ backgroundColor: '#fff', borderRadius: 16, margin: 8, paddingBottom: 4, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 3 }}>
+                            <TextInput
+                              style={{ margin: 12, marginBottom: 0, padding: 12, borderRadius: 12, backgroundColor: '#F3F4F6', fontSize: 16, fontWeight: '500', borderWidth: 0 }}
+                              placeholder="Search contacts..."
+                              value={contactSearch}
+                              onChangeText={setContactSearch}
+                              placeholderTextColor="#A1A1AA"
+                            />
+                            <ScrollView style={{ maxHeight: 180 }}>
+                              {contacts
+                                .filter(contact =>
+                                  contact.name.toLowerCase().includes(contactSearch?.toLowerCase() || '') ||
+                                  (contact.phoneNumbers && contact.phoneNumbers.some(pn => pn.number.includes(contactSearch)))
+                                )
+                                .map((contact, idx) => (
+                                  <TouchableOpacity
+                                    key={idx}
+                                    style={{ paddingVertical: 16, paddingHorizontal: 18, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F3F4F6' }}
+                                    onPress={() => handleSelectContact(contact)}
+                                  >
+                                    <Text style={{ fontWeight: '700', fontSize: 17, color: '#222' }}>
+                                      {contact.name}
+                                      {contact.phoneNumbers && contact.phoneNumbers.length > 0 ? ' ' : ''}
+                                    </Text>
+                                    {contact.phoneNumbers && contact.phoneNumbers.length > 0 && (
+                                      <Text style={{ fontWeight: '400', fontSize: 15, color: '#222', marginTop: 2 }}>
+                                        {contact.phoneNumbers.map(pn => pn.number).join(', ')}
+                                      </Text>
+                                    )}
+                                  </TouchableOpacity>
+                                ))}
                             </ScrollView>
                           </View>
                         </View>
                       )}
+                      const [contactSearch, setContactSearch] = useState('');
                     </View>
                     {formErrors.name && <Text style={scss.errorText}>{formErrors.name}</Text>}
                   </View>

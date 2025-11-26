@@ -1,4 +1,3 @@
-import ConfettiAnimation from '@/components/ConfettiAnimation';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import LottieView from 'lottie-react-native';
@@ -112,13 +111,11 @@ const SetupSuccessScreen: React.FC = () => {
                 end={{ x: 1, y: 1 }}
                 style={styles.container}
             >
-                {/* Confetti Burst Animation - 1 second */}
-                <ConfettiAnimation />
 
                 {/* Confetti Animation Background - Positioned absolutely behind content */}
                 <LottieView
                     ref={confettiRef}
-                    source={require('../assets/confetti.json')}
+                    source={require('../assets/Celebration.json')}
                     autoPlay={false}
                     loop={false}
                     style={styles.confetti}
@@ -177,14 +174,22 @@ const SetupSuccessScreen: React.FC = () => {
                     <View style={styles.divider} />
 
                     <Text style={styles.successSubtext}>
-                        <Text style={{ color: '#7C3AED' }}>Ab </Text>
-                        <Text style={{ color: '#6B7280' }}>PrintBandhan par </Text>
-                        <Text style={{ color: '#10B981' }}>apne orders </Text>
-                        <Text style={{ color: '#6B7280' }}>place karna </Text>
-                        <Text style={{ color: '#F59E0B' }}>shuru</Text>
-                        <Text style={{ color: '#6B7280' }}> karein.</Text>
-                    </Text>
-                </Animated.View>
+                                                <Text style={{ color: '#7C3AED' }}>Ab </Text>
+                                                <Text style={{ color: '#6B7280' }}>PrintBandhan par </Text>
+                                                <Text style={{ color: '#10B981' }}>apne orders </Text>
+                                                <Text style={{ color: '#6B7280' }}>place karna </Text>
+                                                <Text style={{ color: '#F59E0B' }}>shuru</Text>
+                                                <Text style={{ color: '#6B7280' }}> karein.</Text>
+                                        </Text>
+                                        <View style={{ alignItems: 'center', marginTop: 24 }}>
+                                            <LottieView
+                                                source={require('../assets/Laser Printer Printing Paper Animation.json')}
+                                                autoPlay
+                                                loop
+                                                style={{ width: 180, height: 180 }}
+                                            />
+                                        </View>
+                                </Animated.View>
 
                 {/* Spacer */}
                 <View style={{ flex: 1 }} />

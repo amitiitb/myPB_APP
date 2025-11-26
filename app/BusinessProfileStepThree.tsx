@@ -1,4 +1,5 @@
 import StepIndicator from '@/components/StepIndicator';
+import * as Contacts from 'expo-contacts';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
@@ -16,8 +17,8 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 type Role = 'owners' | 'composers' | 'operators';
 
@@ -31,6 +32,7 @@ interface Member {
 }
 
 const BusinessProfileStepThree: React.FC = () => {
+  const [contactSearch, setContactSearch] = useState('');
   const { ownerName, phoneNumber, whatsappNumber, pressName, latitude, longitude, selectedServices: paramServices } = useLocalSearchParams<{
     ownerName: string;
     phoneNumber: string;
@@ -42,6 +44,26 @@ const BusinessProfileStepThree: React.FC = () => {
   }>();
   
   const [activeTab, setActiveTab] = useState<Role>('composers');
+  const [contacts, setContacts] = useState<any[]>([]);
+  const [showContacts, setShowContacts] = useState(false);
+    const handleOpenContacts = async () => {
+      const { status } = await Contacts.requestPermissionsAsync();
+      if (status === 'granted') {
+        const { data } = await Contacts.getContactsAsync({ fields: [Contacts.Fields.PhoneNumbers] });
+        setContacts(data);
+        setShowContacts(true);
+      }
+    };
+
+    const handleSelectContact = (contact: any) => {
+      if (contact.name) {
+        setFormName(contact.name);
+      }
+      if (contact.phoneNumbers && contact.phoneNumbers.length > 0) {
+        setFormMobile(contact.phoneNumbers[0].number.replace(/\D/g, '').slice(-10));
+      }
+      setShowContacts(false);
+    };
   
   // Step indicator data for Business Profile Setup
   const steps = [
@@ -458,6 +480,7 @@ const BusinessProfileStepThree: React.FC = () => {
                         setFormWhatsapp(member.whatsapp);
                         // Set sameAsContact based on whether WhatsApp equals contact number
                         setSameAsContact(member.whatsapp === member.mobile);
+                        setShowContacts(false);
                         setShowModal(true);
                       }}
                     >
@@ -551,15 +574,65 @@ const BusinessProfileStepThree: React.FC = () => {
                   <Text style={styles.label}>
                     Name <Text style={{ color: '#EF4444' }}>*</Text>
                   </Text>
-                  <TextInput
-                    style={[styles.input, formErrors.name && styles.inputError]}
-                    placeholder="Enter full name"
-                    value={formName}
-                    onChangeText={setFormName}
-                    onBlur={validateName}
-                    placeholderTextColor="#9CA3AF"
-                    maxLength={30}
-                  />
+                  <View style={{ position: 'relative' }}>
+                    <TextInput
+                      style={[styles.input, formErrors.name && styles.inputError, { paddingRight: 44 }]}
+                      placeholder="Enter full name"
+                      value={formName}
+                      onChangeText={setFormName}
+                      onBlur={validateName}
+                      placeholderTextColor="#9CA3AF"
+                      maxLength={30}
+                    />
+                    <TouchableOpacity
+                      style={{ position: 'absolute', right: 8, top: 0, height: '100%', justifyContent: 'center' }}
+                      onPress={handleOpenContacts}
+                    >
+                      <Ionicons name="person-circle-outline" size={22} color="#22C55E" />
+                    </TouchableOpacity>
+                    {showContacts && (
+                      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 20 }}>
+                        <TouchableOpacity
+                          activeOpacity={1}
+                          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+                          onPress={() => setShowContacts(false)}
+                        />
+                        <View style={{ backgroundColor: '#fff', borderRadius: 16, margin: 8, paddingBottom: 4, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 3 }}>
+                          <TextInput
+                            style={{ margin: 12, marginBottom: 0, padding: 12, borderRadius: 12, backgroundColor: '#F3F4F6', fontSize: 16, fontWeight: '500', borderWidth: 0 }}
+                            placeholder="Search contacts..."
+                            value={contactSearch}
+                            onChangeText={setContactSearch}
+                            placeholderTextColor="#A1A1AA"
+                          />
+                          <ScrollView style={{ maxHeight: 180 }}>
+                            {contacts
+                              .filter(contact =>
+                                contact.name.toLowerCase().includes(contactSearch?.toLowerCase() || '') ||
+                                (contact.phoneNumbers && contact.phoneNumbers.some(pn => pn.number.includes(contactSearch)))
+                              )
+                              .map((contact, idx) => (
+                                <TouchableOpacity
+                                  key={idx}
+                                  style={{ paddingVertical: 16, paddingHorizontal: 18, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F3F4F6' }}
+                                  onPress={() => handleSelectContact(contact)}
+                                >
+                                  <Text style={{ fontWeight: '700', fontSize: 17, color: '#222' }}>
+                                    {contact.name}
+                                    {contact.phoneNumbers && contact.phoneNumbers.length > 0 ? ' ' : ''}
+                                  </Text>
+                                  {contact.phoneNumbers && contact.phoneNumbers.length > 0 && (
+                                    <Text style={{ fontWeight: '400', fontSize: 15, color: '#222', marginTop: 2 }}>
+                                      {contact.phoneNumbers.map(pn => pn.number).join(', ')}
+                                    </Text>
+                                  )}
+                                </TouchableOpacity>
+                              ))}
+                          </ScrollView>
+                        </View>
+                      </View>
+                    )}
+                  </View>
                   {formErrors.name ? <Text style={styles.errorTextSmall}>{formErrors.name}</Text> : null}
                 </View>
 
